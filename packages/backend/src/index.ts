@@ -1,14 +1,19 @@
 import express from 'express';
 import cors from 'cors';
+import tmpRoutes from "@/routes/tmpRoutes";
 
 const PORT = 3001;
 
 const app = express();
-app.use(express.json());
+app.use(express.json()); // This is used to parse the data that the frontend sends to the backend
+
+
 app.use(cors({
 	origin: 'http://localhost:3000',
 	credentials: true
-}));
+})); // This is used to allow the frontend to make requests to the backend
+
+app.use("/temp", tmpRoutes); // This is the route that the frontend will use to make requests to the backend.
 
 
 
