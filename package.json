@@ -7,10 +7,13 @@
   ],
   "scripts": {
     "initial-install": "npm install",
-    "build": "npm run build --workspaces --if-present && npm run test && rm -rf dist && npm run lint && tsc -b",
     "frontend": "lerna run dev",
     "backend": "lerna run start",
+    "build": "lerna run build",
+    "deploy": "lerna run deploy",
+
     "both": "lerna run dev --parallel"
+
   },
   "dependencies": {
 
