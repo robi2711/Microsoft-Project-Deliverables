@@ -44,7 +44,7 @@ export default function Footer() {
 								BRAND
 							</Typography>
 							<Typography variant="body2" color="text.secondary" sx={{ mt: 1, maxWidth: 300 }}>
-								We're on a mission to help businesses grow and succeed in the digital age.
+								We&#39;re on a mission to help businesses grow and succeed in the digital age.
 							</Typography>
 						</Box>
 						<Box sx={{ display: "flex", gap: 1 }}>

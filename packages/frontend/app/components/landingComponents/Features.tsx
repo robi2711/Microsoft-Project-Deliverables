@@ -53,7 +53,7 @@ export default function Features() {
 							lineHeight: 1.6,
 						}}
 					>
-						We provide the tools you need to succeed in today's digital landscape
+						We provide the tools you need to succeed in today&#39;s digital landscape
 					</Typography>
 				</Box>
 
