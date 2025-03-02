@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import tmpRoutes from "@/routes/tmpRoutes";
-import "@/db/cosmosClient.ts";
+import dbRoutes from "@/routes/dbRoutes";
 
 const PORT = 3001;
 
@@ -14,7 +13,9 @@ app.use(cors({
 	credentials: true
 })); // This is used to allow the frontend to make requests to the backend
 
-app.use("/temp", tmpRoutes); // This is the route that the frontend will use to make requests to the backend.
+
+
+app.use("/db", dbRoutes); // This is the route that the frontend will use to make requests to the backend.
 
 
 

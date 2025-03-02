@@ -1,1 +1,0 @@
-// This is the config for Azure No SQL DB

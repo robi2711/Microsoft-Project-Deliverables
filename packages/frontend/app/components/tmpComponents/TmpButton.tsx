@@ -11,15 +11,13 @@ export default function TmpButton() {
 
 	const handleClick = async () => { // This function is called when the button is clicked
 		try {
-			const response = await api.post("/temp/randomCommand", { // This is the endpoint that the request will be sent to
-				yo: "This Will be sent to the backend where it will be printed to the terminal" // This is the data that will be sent to the backend
-			});
-			setButtonText(response.data as string); // This will set the text of the button to the response from the backend
+			const response = await api.post("/db/create", { // This is the endpoint that the request will be sent to
+				 // This is the data that will be sent to the backend
+			});// This will set the text of the button to the response from the backend
 			console.log(response.data);
 		}
 		catch (error){
 			console.error(error);
-			setButtonText("Error");
 		}
 	}
 

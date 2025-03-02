@@ -1,20 +1,11 @@
 import express, { Request, Response } from "express";
-import { randomHelperCommand } from "@/helpers/tmpHelper";
-import container from "@/db/cosmosClient";
+import container from "@/config/cosmosConfig";
 
-interface tmpController {
-	randomCommand: express.Handler;
+interface dbController {
 	createItem: express.Handler;
 }
 
-const tmpController: tmpController = {
-	randomCommand: async (req: Request, res: Response) => {
-		const yo = req.body.yo as string;
-		console.log("Received in randomCommand:", yo);
-		const someResponse = await randomHelperCommand();
-		res.send(someResponse);
-	},
-
+const dbController: dbController = {
 	createItem: async (req: Request, res: Response) => {
 		const { name, description } = req.body;
 		console.log("Creating item with:", name, description);
@@ -42,4 +33,4 @@ const tmpController: tmpController = {
 	},
 };
 
-export default tmpController;
+export default dbController;
