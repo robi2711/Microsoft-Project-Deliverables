@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import tmpRoutes from "@/routes/tmpRoutes";
+import "@/db/cosmosClient.ts";
 
 const PORT = 3001;
 

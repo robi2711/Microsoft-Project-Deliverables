@@ -20,6 +20,7 @@
     "deploy": "node dist/index.js"
   },
   "dependencies": {
+    "@azure/cosmos": "^4.2.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "cors": "^2.8.5",
