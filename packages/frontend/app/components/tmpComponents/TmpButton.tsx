@@ -7,12 +7,13 @@ import api from "@/components/services/apiService";
 import {useState} from "react";
 
 export default function TmpButton() {
-	const [buttonText, setButtonText] = useState("TmpButton"); // This is the text that will be displayed on the button
+	const [buttonText] = useState("TmpButton"); // This is the text that will be displayed on the button
 
 	const handleClick = async () => { // This function is called when the button is clicked
 		try {
-			const response = await api.post("/db/create", { // This is the endpoint that the request will be sent to
-				 // This is the data that will be sent to the backend
+			const response = await api.post("/db/create", {// This is the endpoint that the request will be sent to
+				 name:"Hello",
+				description:"HI",// This is the data that will be sent to the backend
 			});// This will set the text of the button to the response from the backend
 			console.log(response.data);
 		}
