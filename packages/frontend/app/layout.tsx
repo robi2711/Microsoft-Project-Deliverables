@@ -10,8 +10,7 @@ export default function RootLayout({children,}: {
 	return (
 		<html lang="en">
 		<head>
-			<title>Landing Page</title>
-			<meta name="description" content="A beautiful landing page built with Next.js, TypeScript, and MUI"/>
+			<title>Version 1</title>
 		</head>
 		<body>
 			<ThemeProvider theme={lpTheme}>
