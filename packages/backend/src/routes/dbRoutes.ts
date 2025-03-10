@@ -1,9 +1,18 @@
-import express from "express";
-import { Router } from "express";
+import express, { Router } from "express";
 import dbController from "@/controllers/dbController";
 
-const router: Router = express.Router(); // This is the router that will be used to create the endpoints
+const router: Router = express.Router();
 
-router.post('/create', dbController.createItem);
+// POST route for creating a user
+router.post('/create', dbController.createUser);
 
-export default router; // This exports the router so that it can be used in other files
+// GET route for retrieving a customer by name or address
+router.get('/get', dbController.getCustomer);
+
+// PUT route for updating a user by id
+router.put('/update/:id', dbController.updateUser);
+
+// DELETE route for removing a user by id
+router.delete('/remove/:id', dbController.removeUser);
+
+export default router;
