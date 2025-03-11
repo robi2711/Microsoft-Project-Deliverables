@@ -3,6 +3,7 @@ dotenv.config();
 
 const sid = process.env.TWILIO_SID;
 const key = process.env.TWILIO_KEY;
+const number = process.env.TWILIO_PHONE_NUMBER;
 
 const client = require('twilio')(sid, key);
 
@@ -11,3 +12,4 @@ if (!sid || !key) {
     process.exit(1);
 }
 
+export default client;
