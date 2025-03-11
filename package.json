@@ -19,5 +19,8 @@
     "dotenv": "^16.4.7",
     "lerna": "^8.1.9",
     "typescript": "^5"
+  },
+  "dependencies": {
+    "twilio": "^5.4.5"
   }
 }
