@@ -15,9 +15,11 @@
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/uuid": "^10.0.0",
     "dotenv": "^16.4.7",
     "lerna": "^8.1.9",
     "typescript": "^5"
+  },
+  "dependencies": {
+
   }
 }
