@@ -1,22 +1,23 @@
 import express, { Request, Response, Handler } from "express";
 import container from "@/config/cosmosConfig";
 import { v4 as uuidv4 } from "uuid";
-import { Package, User, Customer, DbController } from "@/types/dbTypes";
+import { Package, User, Customer } from "@/types/dbTypes";
+import { createGetQuery } from "@/helpers/dbHelper";
 
-// Extend the DbController interface to include updateUser and removeUser
-interface ExtendedDbController extends DbController {
+interface DbController {
+	createUser: Handler;
+	getCustomer: Handler;
 	updateUser: Handler;
 	removeUser: Handler;
 }
 
-const dbController: ExtendedDbController = {
+const dbController: DbController = {
 	createUser: async (req: Request, res: Response): Promise<void> => {
 		// Typing from cosmos documents I don't really understand it, but it works
 		const { name, address, telephone, email, packages } = req.body as User;
 
 		if (!name || !address || !telephone || !email || !packages) {
 			res.status(400).json({ message: "Missing required fields." });
-			return;
 		}
 
 		// Map packages and ensure each has an id
@@ -42,49 +43,20 @@ const dbController: ExtendedDbController = {
 				message: "User created successfully!",
 				user: createdUser,
 			});
-			return;
 		} catch (error) {
 			console.error("Error inserting user:", error);
 			res.status(500).json({ message: "Failed to create user." });
-			return;
 		}
 	},
 
 	getCustomer: async (req: Request, res: Response): Promise<void> => {
-		const { name, address } = req.query;
-
+		const name = req.query.name as string | undefined;
+		const address = req.query.address as string | undefined;
 		if (!name && !address) {
 			res.status(400).json({ message: "Please provide at least a name or address query parameter." });
-			return;
 		}
 
-		let querySpec: {
-			query: string;
-			parameters: { name: string; value: string }[];
-		};
-
-		if (typeof name === "string" && typeof address === "string") {
-			querySpec = {
-				query: "SELECT * FROM c WHERE c.name = @name OR c.address = @address",
-				parameters: [
-					{ name: "@name", value: name },
-					{ name: "@address", value: address },
-				],
-			};
-		} else if (typeof name === "string") {
-			querySpec = {
-				query: "SELECT * FROM c WHERE c.name = @name",
-				parameters: [{ name: "@name", value: name }],
-			};
-		} else if (typeof address === "string") {
-			querySpec = {
-				query: "SELECT * FROM c WHERE c.address = @address",
-				parameters: [{ name: "@address", value: address }],
-			};
-		} else {
-			res.status(400).json({ message: "Invalid query parameters." });
-			return;
-		}
+		const querySpec = createGetQuery(name as string, address as string);
 
 		try {
 			const { resources: customers } = await container.items
@@ -92,14 +64,11 @@ const dbController: ExtendedDbController = {
 				.fetchAll();
 			if (!customers.length) {
 				res.status(404).json({ message: "Customer not found." });
-				return;
 			}
 			res.status(200).json(customers);
-			return;
 		} catch (error) {
 			console.error("Error fetching customer:", error);
 			res.status(500).json({ message: "Failed to retrieve customer." });
-			return;
 		}
 	},
 
@@ -107,7 +76,6 @@ const dbController: ExtendedDbController = {
 		const { id } = req.params;
 		if (!id) {
 			res.status(400).json({ message: "User id is required for update." });
-			return;
 		}
 
 		try {
@@ -115,7 +83,6 @@ const dbController: ExtendedDbController = {
 			const { resource: existingUser } = await container.item(id, id).read<Customer>();
 			if (!existingUser) {
 				res.status(404).json({ message: "User not found." });
-				return;
 			}
 
 			// Merge the existing user with the fields provided in the request body.
@@ -138,11 +105,9 @@ const dbController: ExtendedDbController = {
 
 			const { resource: replacedUser } = await container.item(id, id).replace(updatedUser);
 			res.status(200).json({ message: "User updated successfully!", user: replacedUser });
-			return;
 		} catch (error) {
 			console.error("Error updating user:", error);
 			res.status(500).json({ message: "Failed to update user." });
-			return;
 		}
 	},
 
@@ -150,23 +115,19 @@ const dbController: ExtendedDbController = {
 		const { id } = req.params;
 		if (!id) {
 			res.status(400).json({ message: "User id is required for deletion." });
-			return;
 		}
 
 		try {
 			const { resource: existingUser } = await container.item(id, id).read<Customer>();
 			if (!existingUser) {
 				res.status(404).json({ message: "User not found." });
-				return;
 			}
 
 			await container.item(id, id).delete();
 			res.status(200).json({ message: "User removed successfully." });
-			return;
 		} catch (error) {
 			console.error("Error removing user:", error);
 			res.status(500).json({ message: "Failed to remove user." });
-			return;
 		}
 	},
 };
