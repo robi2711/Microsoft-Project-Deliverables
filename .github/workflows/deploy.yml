@@ -2,6 +2,9 @@ name: Deploy frontend and backend
 
 on:
   push:
+    branches-ignore:
+      - main
+      - version-2-frontend
     branches:
       - production
 
@@ -23,12 +26,12 @@ jobs:
           npm install
 
       - name: Build packages
-        run: npx lerna run build
+        run: lerna run build
 
       - name: Deploy Backend
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'DeliverablesBACKENDTESTINGROBERT'
+          app-name: 'deliverablesbackendtestingrobert1'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND }}
           package: './packages/backend'
 
@@ -36,6 +39,6 @@ jobs:
       - name: Deploy Frontend
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'DeliverablesFrontendTestingRobert'
+          app-name: 'DeliverablesFRONTENDTESTINGROBERT1'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONTEND }}
           package: './packages/frontend'

@@ -11,17 +11,15 @@
     "backend": "lerna run start",
     "build": "lerna run build",
     "deploy": "lerna run deploy",
-
     "both": "lerna run dev --parallel"
-
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "dotenv": "^16.4.7",
+    "lerna": "^8.1.9",
+    "typescript": "^5"
   },
   "dependencies": {
 
-  },
-  "devDependencies": {
-    "dotenv": "^16.4.7",
-    "lerna": "^8.1.9",
-    "typescript": "^5",
-    "@types/node": "^20"
   }
 }
