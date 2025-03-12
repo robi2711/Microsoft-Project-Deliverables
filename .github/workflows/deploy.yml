@@ -2,9 +2,6 @@ name: Deploy frontend and backend
 
 on:
   push:
-    branches-ignore:
-      - main
-      - version-2-frontend
     branches:
       - production
 
