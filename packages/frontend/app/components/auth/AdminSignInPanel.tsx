@@ -5,11 +5,11 @@ import type React from "react"
 import { useState } from "react"
 import { Box, Button, TextField, Typography, InputAdornment, IconButton, CircularProgress } from "@mui/material"
 import { AdminPanelSettings, Login, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signInAdmin, type AdminCredentials } from "@/components/services/authService"
+import { signInAdmin, type AdminCredentials , type UserData} from "@/components/services/authService"
 
 type AdminSignInPanelProps = {
 	//TODO: Create a type for userData when it is known
-	onSignInSuccess: (userData: any) => void
+	onSignInSuccess: (userData: UserData) => void
 }
 
 export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelProps) {

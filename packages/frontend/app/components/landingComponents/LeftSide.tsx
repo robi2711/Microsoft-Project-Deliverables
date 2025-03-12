@@ -1,5 +1,6 @@
-import {Box, Button, Container, Grid, Paper, Typography} from "@mui/material";
+import {Box, Container, Grid, Paper, Typography} from "@mui/material";
 import {useEffect, useState} from "react";
+
 
 export default function LeftSide() {
 	const [animateCards, setAnimateCards] = useState(false)

@@ -5,11 +5,11 @@ import type React from "react"
 import { useState } from "react"
 import { Box, Button, TextField, Typography, InputAdornment, IconButton, CircularProgress } from "@mui/material"
 import { Person, Login, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signInUser, type UserCredentials } from "@/components/services/authService"
+import {signInUser, type UserCredentials, UserData} from "@/components/services/authService"
 
 type UserSignInPanelProps = {
 	//TODO: Create a type for userData when it is known
-	onSignInSuccess: (userData: any) => void
+	onSignInSuccess: (userData: UserData) => void
 }
 
 export default function UserSignInPanel({ onSignInSuccess }: UserSignInPanelProps) {

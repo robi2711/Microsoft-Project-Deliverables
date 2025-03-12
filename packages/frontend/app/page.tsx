@@ -14,14 +14,15 @@ export default function LandingPage() {
                 overflow: "hidden",
             }}
         >
+
+            <LeftSide />
+            <RightSide />
             <Link href="/scanner">
                 <Button>Link To Scanner</Button>
             </Link>
             <Link href="/dashboard">
                 <Button>Link To Dashboard</Button>
             </Link>
-            <RightSide />
-            <LeftSide />
         </Box>
     )
 }

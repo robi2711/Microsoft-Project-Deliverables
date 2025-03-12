@@ -3,11 +3,11 @@
 import { useState } from "react"
 import { Box, Button, TextField, Typography, InputAdornment, IconButton, CircularProgress } from "@mui/material"
 import { PersonAdd, Person, SupportAgent, AdminPanelSettings, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signUp, type SignUpData } from "@/components/services/authService"
+import {signUp, type SignUpData, UserData} from "@/components/services/authService"
 
 type SignUpPanelProps = {
 	//TODO: Create a type for userData when it is known
-	onSignUpSuccess: (userData: any) => void
+	onSignUpSuccess: (userData: UserData) => void
 }
 
 export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {

@@ -26,6 +26,15 @@ export type SignUpData = {
 	accountType: "user" | "concierge" | "admin"
 }
 
+export type UserData = {
+	firstName: string
+	lastName: string
+	email: string
+	password: string
+	role: string
+	accountType: "user" | "concierge" | "admin"
+}
+
 const API_URL = "/localhost:3001"
 
 // Sign in functions

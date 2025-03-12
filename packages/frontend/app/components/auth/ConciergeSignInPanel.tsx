@@ -5,11 +5,11 @@ import type React from "react"
 import { useState } from "react"
 import { Box, Button, TextField, Typography, InputAdornment, IconButton, CircularProgress } from "@mui/material"
 import { SupportAgent, Login, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signInConcierge, type ConciergeCredentials } from "@/components/services/authService"
+import {signInConcierge, type ConciergeCredentials, UserData} from "@/components/services/authService"
 
 type ConciergeSignInPanelProps = {
 	//TODO: Create a type for userData when it is known
-	onSignInSuccess: (userData: any) => void
+	onSignInSuccess: (userData: UserData) => void
 }
 
 export default function ConciergeSignInPanel({ onSignInSuccess }: ConciergeSignInPanelProps) {

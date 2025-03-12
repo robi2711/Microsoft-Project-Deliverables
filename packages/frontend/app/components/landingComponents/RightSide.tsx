@@ -10,6 +10,7 @@ import AdminSignInPanel from "@/components/auth/AdminSignInPanel"
 import ConciergeSignInPanel from "@/components/auth/ConciergeSignInPanel"
 import UserSignInPanel from "@/components/auth/UserSignInPanel"
 import SignUpPanel from "@/components/auth/SignUpPanel"
+import {UserData} from "@/components/services/authService";
 
 // Form types
 type FormType = "admin-signin" | "concierge-signin" | "user-signin" | "signup"
@@ -18,7 +19,7 @@ export default function RightSide() {
 	// Animation and form state
 	const [animatePanel, setAnimatePanel] = useState(false)
 	const [activeForm, setActiveForm] = useState<FormType>("user-signin")
-	const [formDirection, setFormDirection] = useState<"left" | "right">("right")
+	const [formDirection, setFormDirection] = useState<"left" | "right">("left")
 	const router = useRouter()
 
 	// Initial animation
@@ -51,7 +52,7 @@ export default function RightSide() {
 
 	// Handle successful authentication
 	//TODO: Create a type for userData when it is known
-	const handleAuthSuccess = (userData: any) => {
+	const handleAuthSuccess = (userData: UserData) => {
 		console.log("Authentication successful:", userData)
 
 		// Redirect based on user role
