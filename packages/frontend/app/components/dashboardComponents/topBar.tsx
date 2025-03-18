@@ -2,7 +2,7 @@
 
 
 // importing necessary modules
-import { Box, TextField, InputLabel, FormControl, NativeSelect} from "@mui/material";
+import { Box, TextField, FormControl, NativeSelect} from "@mui/material";
 import Search from '@mui/icons-material/Search';
 
 export default function topBar() {

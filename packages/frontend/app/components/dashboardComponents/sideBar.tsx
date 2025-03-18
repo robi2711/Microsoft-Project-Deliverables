@@ -19,7 +19,8 @@ export default function sideBar() {
         >
             {/* adding a logo and title to the sidebar within it's own box */}
             <Box sx={{ display: "flex", alignItems: "center"}}>
-                <img src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/favicon.ico" style={{ width: 24, height: 24, marginRight: 8 }} />
+                <img src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/favicon.ico"
+                     style={{ width: 24, height: 24, marginRight: 8 }} />
                 <Typography variant="h5" sx={{ color: "white", textAlign: "center" }}>
                     Deliverables
                 </Typography>
@@ -32,13 +33,14 @@ export default function sideBar() {
                 </Typography>
                 <FormControl sx={{ width: "80%", mt: 2 }}>
                     <Select
+                        defaultValue={10}
                         id="complex-select"
                         label="Select Complex"
                         sx={{ bgcolor: "white" }}
                     >
-                        <MenuItem value={10}>Complex 1</MenuItem>
-                        <MenuItem value={20}>Complex 2</MenuItem>
-                        <MenuItem value={30}>Complex 3</MenuItem>
+                        <MenuItem value={10}>2 Rathbourne, Dublin D15 PF6A</MenuItem>
+                        <MenuItem value={20}>15 Adelaide Street, Dun Laoghaire, Dublin A96 D8Y9</MenuItem>
+                        <MenuItem value={30}>10 Elmwood Avenue, Ranelagh, Dublin D06 F9C3</MenuItem>
                     </Select> {/* placeholder values for now */}
                 </FormControl> {/* need to link it with backend */}
             </Box>
@@ -52,6 +54,8 @@ export default function sideBar() {
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, width: "100%" }}>
                 <Box sx={{ width: "80%", height: "100px", bgcolor: "white"}}>
                     {/* TODO: Google Maps API goes here - gotta look into that */}
+                    <img src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/SampleImage.png"
+                         style={{ width: "100%", height: "100%"}}/>
                 </Box>
             </Box>
 
