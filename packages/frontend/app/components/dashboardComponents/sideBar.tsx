@@ -2,7 +2,7 @@
 
 
 // importing necessary modules
-import { Box, Typography, MenuItem, FormControl, Select, Tab } from "@mui/material"
+import { Box, Typography, MenuItem, FormControl, Select, Tab, Link } from "@mui/material"
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 
 export default function sideBar() {
@@ -10,7 +10,7 @@ export default function sideBar() {
 
         <Box // using an MUI box to create a sidebar
             sx={{
-                width: "15%", // setting the width of the sidebar
+                width: "20vw", // setting the width of the sidebar - 20% of the viewport width
                 height: "100vh", // should be the whole visable height
                 display: "flex", // making the sidebar a flexbox
                 flexDirection: "column", // setting the direction of the flexbox
@@ -50,19 +50,25 @@ export default function sideBar() {
 
             {/* adding google maps window */}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, width: "100%" }}>
-                <Box sx={{ width: "80%", height: "100px", bgcolor: "white", borderRadius: 2 }}>
-                    {/* Google Maps API goes here */}
+                <Box sx={{ width: "80%", height: "100px", bgcolor: "white"}}>
+                    {/* TODO: Google Maps API goes here - gotta look into that */}
                 </Box>
             </Box>
 
-            {/* adding the Resident management tab, this can be extended to all tabs we develope*/}
+            {/* adding the Resident management tab*/}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, width: "100%" }}>
                 <Tab label="Resident management" sx={{ color: "white", bgcolor: "secondary.light", width: "100%" }}  />
+            </Box>
+            {/*  this can be extended to all tabs we develope more*/}
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 0, width: "100%" }}>
+                <Tab label="Other tabs..." sx={{ color: "white", bgcolor: "secondary.light", width: "100%" }}  />
             </Box>
 
             {/* adding a route to scanner that's fixed at the bottom of the page.*/}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: "auto", width: "100%" }}>
-                <Tab label="Scanner" sx={{ color: "white", bgcolor: "secondary.light", width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }} icon={<CenterFocusStrongIcon sx={{ fontSize: 40 }} />} />
+                <Link href="/scanner" sx={{ width: "100%", textDecoration: "none" }}>
+                    <Tab label="Scanner" sx={{ color: "white", bgcolor: "secondary.light", width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }} icon={<CenterFocusStrongIcon sx={{ fontSize: 80 }} />} />
+                </Link>
             </Box>
 
         </Box>
