@@ -1,10 +1,10 @@
-// This will become the Dashboard page - pasted from scanner for now.
+// This will become the Dashboard page
 "use client"
 
-import ScannerPage from "@/components/pages/ScannerPage"
+import SideBar from "@/components/dashboardComponents/sideBar"
 
-export default function Scanner() {
+export default function dashboard() {
     return (
-        <ScannerPage />
+        <SideBar />
     )
 }

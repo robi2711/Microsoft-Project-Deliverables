@@ -20,6 +20,6 @@
     "typescript": "^5"
   },
   "dependencies": {
-
+    "@react-google-maps/api": "^2.20.6"
   }
 }
