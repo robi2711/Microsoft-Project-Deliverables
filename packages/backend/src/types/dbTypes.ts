@@ -20,4 +20,7 @@ export interface Customer extends User {
     id?: string;
 }
 
-
+export interface DbController {
+    createUser: Handler;
+    getCustomer: Handler;
+}

@@ -21,14 +21,17 @@
   },
   "dependencies": {
     "@azure/cosmos": "^4.2.0",
+    "@azure/identity": "^4.8.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "tsx": "^4.19.3",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@azure/functions": "^4.7.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/uuid": "^10.0.0"
-    }
+  }
 }

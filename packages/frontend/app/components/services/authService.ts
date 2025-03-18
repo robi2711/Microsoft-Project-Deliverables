@@ -1,11 +1,15 @@
-// THIS IS A SAMPLE AND MUST BE MODIFIED WHEN AUTH IS DONE
-
 // Authentication service for API requests
 
 // Types for authentication
 export type UserCredentials = {
 	email: string
 	password: string
+}
+
+export type additionalUserData = {
+	phone: string
+	address: string
+	name: string
 }
 
 export type AdminCredentials = {
@@ -19,16 +23,16 @@ export type ConciergeCredentials = {
 }
 
 export type SignUpData = {
-	firstName: string
-	lastName: string
+	name: string
+	phone: string
+	address: string
 	email: string
 	password: string
 	accountType: "user" | "concierge" | "admin"
 }
 
 export type UserData = {
-	firstName: string
-	lastName: string
+	name: string
 	email: string
 	password: string
 	role: string

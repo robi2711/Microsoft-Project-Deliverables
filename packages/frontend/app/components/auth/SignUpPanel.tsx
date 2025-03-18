@@ -11,10 +11,11 @@ type SignUpPanelProps = {
 }
 
 export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
-	const [firstName, setFirstName] = useState("")
-	const [lastName, setLastName] = useState("")
+	const [name, setName] = useState("")
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
+	const [phone, setPhone] = useState("")
+	const [address, setAddress] = useState("")
 	const [showPassword, setShowPassword] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState("")
@@ -27,8 +28,8 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 	const handleSubmit = async (type: "user" | "concierge" | "admin") => {
 		setError("")
 
-		// Basic validation
-		if (!firstName.trim() || !lastName.trim() || !email.trim() || !password) {
+		//basic validation
+		if (!name.trim() || !email.trim() || !password.trim() || !phone.trim() || !address.trim()) {
 			setError("Please fill in all fields")
 			return
 		}
@@ -51,8 +52,9 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 
 		try {
 			const signUpData: SignUpData = {
-				firstName,
-				lastName,
+				name,
+				phone,
+				address,
 				email,
 				password,
 				accountType: type,
@@ -81,46 +83,12 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 			</Box>
 
 			<Box sx={{ display: "flex", gap: 2 }}>
-				<TextField
-					label="First Name"
-					variant="outlined"
-					fullWidth
-					value={firstName}
-					onChange={(e) => setFirstName(e.target.value)}
-					InputProps={{
-						sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
-					}}
-					InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
-					required
-				/>
-				<TextField
-					label="Last Name"
-					variant="outlined"
-					fullWidth
-					value={lastName}
-					onChange={(e) => setLastName(e.target.value)}
-					InputProps={{
-						sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
-					}}
-					InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
-					required
-				/>
-			</Box>
 
-			<TextField
-				label="Email"
-				variant="outlined"
-				fullWidth
-				type="email"
-				value={email}
-				onChange={(e) => setEmail(e.target.value)}
-				InputProps={{
-					sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
-				}}
-				InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
-				required
-			/>
 
+			<TextField label="Name" variant="outlined" fullWidth value={name} onChange={(e) => setName(e.target.value)} required />
+			<TextField label="Phone Number" variant="outlined" fullWidth value={phone} onChange={(e) => setPhone(e.target.value)} required />
+			<TextField label="Email" variant="outlined" fullWidth type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+			<TextField label="Address" variant="outlined" fullWidth value={address} onChange={(e) => setAddress(e.target.value)} required />
 			<TextField
 				label="Password"
 				variant="outlined"
@@ -129,19 +97,17 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 				InputProps={{
-					sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
 					endAdornment: (
 						<InputAdornment position="end">
-							<IconButton onClick={handleTogglePassword} edge="end" sx={{ color: "rgba(255,255,255,0.7)" }}>
+							<IconButton onClick={handleTogglePassword} edge="end">
 								{showPassword ? <VisibilityOff /> : <Visibility />}
 							</IconButton>
 						</InputAdornment>
 					),
 				}}
-				InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
 				required
 			/>
-
+			</Box>
 			{error && (
 				<Typography color="error" variant="body2">
 					{error}
