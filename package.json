@@ -20,6 +20,6 @@
     "typescript": "^5"
   },
   "dependencies": {
-
+    "@azure/functions": "^4.7.0"
   }
 }
