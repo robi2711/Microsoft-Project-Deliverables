@@ -1,11 +1,9 @@
-//This is the theme for MUI it gets called in the layout.tsx file and is used to style the entire app.
-
 "use client"
 
-import { createTheme } from "@mui/material/styles"
+import { createTheme, responsiveFontSizes } from "@mui/material/styles"
 
-
-export const lpTheme = createTheme({
+// Create the base theme
+let lpTheme = createTheme({
 	palette: {
 		primary: {
 			main: "#A86B31", // Base color from the logo
@@ -113,4 +111,9 @@ export const lpTheme = createTheme({
 		},
 	},
 })
+
+// Apply responsive font sizes
+lpTheme = responsiveFontSizes(lpTheme)
+
+export { lpTheme }
 

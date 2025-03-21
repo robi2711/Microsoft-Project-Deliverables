@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Paper, Tabs, Tab } from "@mui/material"
+import { Box, Paper, Tabs, Tab, useMediaQuery, useTheme } from "@mui/material"
 import { useState, useEffect } from "react"
 import { AdminPanelSettings, Person, SupportAgent } from "@mui/icons-material"
 import { useRouter } from "next/navigation"
@@ -10,7 +10,7 @@ import AdminSignInPanel from "@/components/auth/AdminSignInPanel"
 import ConciergeSignInPanel from "@/components/auth/ConciergeSignInPanel"
 import UserSignInPanel from "@/components/auth/UserSignInPanel"
 import SignUpPanel from "@/components/auth/SignUpPanel"
-import {UserData} from "@/components/services/authService";
+import type { UserData } from "@/components/services/authService"
 
 // Form types
 type FormType = "admin-signin" | "concierge-signin" | "user-signin" | "signup"
@@ -21,6 +21,8 @@ export default function RightSide() {
 	const [activeForm, setActiveForm] = useState<FormType>("user-signin")
 	const [formDirection, setFormDirection] = useState<"left" | "right">("left")
 	const router = useRouter()
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
 	// Initial animation
 	useEffect(() => {
@@ -51,7 +53,6 @@ export default function RightSide() {
 	}
 
 	// Handle successful authentication
-	//TODO: Create a type for userData when it is known
 	const handleAuthSuccess = (userData: UserData) => {
 		console.log("Authentication successful:", userData)
 
@@ -68,15 +69,16 @@ export default function RightSide() {
 	return (
 		<Box
 			sx={{
-				width: "40%",
+				width: { xs: "100%", md: "40%" },
 				bgcolor: "primary.main",
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "center",
 				alignItems: "center",
 				color: "white",
-				p: 4,
-				minHeight: "100vh",
+				p: { xs: 3, sm: 4 },
+				minHeight: { xs: "auto", md: "100vh" },
+				py: { xs: 6, md: 4 },
 				position: "relative",
 				overflow: "hidden",
 			}}
@@ -105,12 +107,30 @@ export default function RightSide() {
 							"&.Mui-selected": {
 								color: "white",
 							},
+							fontSize: { xs: "0.75rem", sm: "0.875rem" },
+							padding: { xs: "6px 8px", sm: "12px 16px" },
+							minHeight: { xs: "48px", sm: "48px" },
 						},
 					}}
 				>
-					<Tab icon={<AdminPanelSettings />} label="Admin" value="admin-signin" iconPosition="start" />
-					<Tab icon={<SupportAgent />} label="Concierge" value="concierge-signin" iconPosition="start" />
-					<Tab icon={<Person />} label="User" value="user-signin" iconPosition="start" />
+					<Tab
+						icon={<AdminPanelSettings sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />}
+						label="Admin"
+						value="admin-signin"
+						iconPosition="start"
+					/>
+					<Tab
+						icon={<SupportAgent sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />}
+						label="Concierge"
+						value="concierge-signin"
+						iconPosition="start"
+					/>
+					<Tab
+						icon={<Person sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />}
+						label="User"
+						value="user-signin"
+						iconPosition="start"
+					/>
 				</Tabs>
 			</Box>
 
@@ -118,7 +138,7 @@ export default function RightSide() {
 			<Paper
 				elevation={6}
 				sx={{
-					p: 4,
+					p: { xs: 3, sm: 4 },
 					width: "100%",
 					maxWidth: 400,
 					bgcolor: "primary.light",

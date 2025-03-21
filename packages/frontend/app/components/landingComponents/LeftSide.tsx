@@ -1,9 +1,12 @@
-import {Box, Container, Grid, Paper, Typography} from "@mui/material";
-import {useEffect, useState} from "react";
+"use client"
 
+import { Box, Container, Grid, Paper, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { useEffect, useState } from "react"
 
 export default function LeftSide() {
 	const [animateCards, setAnimateCards] = useState(false)
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -35,23 +38,39 @@ export default function LeftSide() {
 	return (
 		<Box
 			sx={{
-				width: "60%",
+				width: { xs: "100%", md: "60%" },
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "center",
-				p: 6,
+				p: { xs: 3, sm: 4, md: 6 },
 			}}
 		>
 			<Container maxWidth="md">
-				<Typography variant="h2" component="h1" gutterBottom>
+				<Typography
+					variant="h2"
+					component="h1"
+					gutterBottom
+					sx={{
+						fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+						textAlign: { xs: "center", md: "left" },
+					}}
+				>
 					Welcome to Deliverables
 				</Typography>
-				<Typography variant="h5" color="text.secondary" gutterBottom>
+				<Typography
+					variant="h5"
+					color="text.secondary"
+					gutterBottom
+					sx={{
+						fontSize: { xs: "1.2rem", md: "1.5rem" },
+						textAlign: { xs: "center", md: "left" },
+					}}
+				>
 					A modern package tracking solution for residential communities
 				</Typography>
-				<Grid container spacing={8} sx={{ mt: 2 }}>
+				<Grid container spacing={{ xs: 3, md: 8 }} sx={{ mt: 2 }}>
 					{features.map((feature, index) => (
-						<Grid item xs={12} md={6} key={feature.title}>
+						<Grid item xs={12} sm={6} key={feature.title}>
 							<Paper
 								elevation={2}
 								sx={{

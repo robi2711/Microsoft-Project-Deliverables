@@ -21,7 +21,6 @@ export default function RootLayout({children,}: {
 		<html lang="en">
 			<head>
 				<link rel="icon" href="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/favicon.ico" />
-				// I know there's better ways of linking this but I couldn't get it to work - Owen
 			</head>
 			<body className={inter.className} style={{ margin: 0, padding: 0}}>
 				<ThemeProvider theme={lpTheme}>
