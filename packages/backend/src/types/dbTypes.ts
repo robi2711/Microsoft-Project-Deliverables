@@ -1,5 +1,3 @@
-import { Handler } from "express";
-
 export interface Package {
     id: string;
     name: string;
@@ -7,7 +5,9 @@ export interface Package {
     delivered: boolean;
 }
 
-export interface User {
+export interface IUser {
+    id: string;
+    complexId: string;  // Reference to Complex
     name: string;
     address: string;
     telephone: string;
@@ -16,8 +16,19 @@ export interface User {
     createdAt: string;
 }
 
-export interface Customer extends User {
-    id?: string;
+export interface IAdmin {
+    id: string;
+    complexId: string;
+    name: string;
+    role: "admin" | "concierge"; // Differentiates Admin and Concierge
+    email: string;
+    createdAt: string;
 }
 
-
+export interface Complex {
+    id: string;
+    address: string;
+    admins: string[];  // Stores only Admin IDs
+    users: string[];   // Stores only User IDs
+    createdAt: string;
+}
