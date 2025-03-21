@@ -1,5 +1,5 @@
 import express from "express";
-import dbController from "../controllers/dbController";
+import dbController from "@/controllers/dbController";
 
 const router = express.Router();
 

@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { complexesContainer, usersContainer, adminsContainer } from "../config/cosmosConfig";
-import { Complex, IUser, IAdmin } from "../types/dbTypes"; // ✅ Correct interface imports
-import { asyncHandler } from "../helpers/dbHelper";
+import { complexesContainer, usersContainer, adminsContainer } from "@/config/cosmosConfig";
+import { Complex, IUser, IAdmin } from "@/types/dbTypes"; // ✅ Correct interface imports
+import { asyncHandler } from "@/helpers/dbHelper";
 
 const handleError = (res: Response, error: any, message: string) => {
 	console.error(message, error);
