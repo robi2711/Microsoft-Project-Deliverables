@@ -51,7 +51,7 @@ export const useCamera = ({
 		return () => {
 			resetCamera()
 		}
-	}, [initializeCamera])
+	}, [])
 
 	// Initialize camera when facing mode changes
 	useEffect(() => {
