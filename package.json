@@ -5,6 +5,9 @@
     "packages/frontend",
     "packages/backend"
   ],
+  "engines": {
+    "node": ">=22.11.0 <=23.9.0"
+  },
   "scripts": {
     "initial-install": "npm install",
     "frontend": "lerna run dev",
