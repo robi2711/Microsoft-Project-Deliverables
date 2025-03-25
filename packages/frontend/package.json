@@ -22,7 +22,8 @@
     "next": "15.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-webcam": "^7.2.0"
+    "react-webcam": "^7.2.0",
+    "dotenv": "^16.4.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
