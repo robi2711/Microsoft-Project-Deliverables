@@ -30,7 +30,7 @@ jobs:
       - name: Create deployment package
         run: |
           cd packages/backend/
-          zip -r ../backend.zip dist package.json tsconfig.json node_modules
+          zip -r --symlinks ../backend.zip dist package.json tsconfig.json node_modules
 
 
       - name: Deploy Backend
