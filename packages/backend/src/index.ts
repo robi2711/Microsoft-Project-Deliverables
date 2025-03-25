@@ -9,7 +9,7 @@ import cors from 'cors';
 import dbRoutes from "@/routes/dbRoutes";
 
 
-const PORT = 3001;
+const PORT = process.env.PORT || 8080;
 
 const app = express();
 app.use(express.json()); // This is used to parse the data that the frontend sends to the backend
