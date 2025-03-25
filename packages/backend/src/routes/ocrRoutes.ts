@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { testLocalOcr } from '../controllers/ocrController';
+import { testLocalOcr } from '@/controllers/ocrController';
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });

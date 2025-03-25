@@ -1,24 +1,59 @@
+import api from "./apiService";
+
 export interface PackageData {
-	trackingNumber: string
-	recipientName: string
-	flatNumber: string
-	carrier: string
+	trackingNumber: string;
+	recipientName: string;
+	flatNumber: string;
+	carrier: string;
+}
+
+interface OcrResponseData {
+	name: string;
+	address: string;
 }
 
 export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
-	await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulate network request
-	const mockData: PackageData = {
-		trackingNumber: "1Z999AA10123456784",
-		recipientName: "John Doe",
-		flatNumber: "Apt 4B",
-		carrier: "UPS",
+	console.log("Image Source:", imageSrc);
+	try {
+		const blob = await fetch(imageSrc).then(res => res.blob());
+		const formData = new FormData();
+		formData.append('image', blob, 'image.jpg');
+
+		const response = await api.post("/ocr/", formData, {
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		});
+		if((response.data as OcrResponseData)?.address && (response.data as OcrResponseData)?.name){
+			return {
+			trackingNumber: "WE DONT KNOW YET",
+			recipientName: (response.data as OcrResponseData).name,
+			flatNumber: (response.data as OcrResponseData).address,
+			carrier: "UPS",
+		} as PackageData;
+		}
+
+		console.log("API Response:", response.data);
+	} catch (error: any) {
+		if (error.response) {
+			console.error("Error Response Data:", (error ).response.data);
+			console.error("Error Response Status:", (error ).response.status);
+			console.error("Error Response Headers:", (error ).response.headers);
+		} else {
+			console.error("Error Message:", (error).message);
+		}
 	}
 
-	return mockData
-}
+	return {
+		trackingNumber: "Not Found",
+		recipientName: "Not Found",
+		flatNumber: "Not Found",
+		carrier: "Not Found",
+	} as PackageData;
+};
 
 export const confirmPackage = async (packageData: PackageData): Promise<boolean> => {
-	await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulate network request
-	return true
-}
-
+	await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network request
+	console.log("Package Data:", packageData);
+	return true;
+} //This command will be used when we can put the package in the database :)
