@@ -28,6 +28,12 @@ jobs:
           cd packages/backend/
           npm run build
 
+      - name: Create deployment package
+        run: |
+          cd packages/backend/
+          zip -r ../backend.zip .
+
+
       - name: Deploy Backend
         uses: azure/webapps-deploy@v2
         with:
