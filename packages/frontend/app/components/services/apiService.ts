@@ -7,7 +7,7 @@ import axios from "axios";
 console.log('Backend URL:', process.env.BACKEND_URL);
 
 const api = axios.create({
-	baseURL: process.env.BACKEND_URL || 'http://localhost:3001' ,
+	baseURL: process.env.BACKEND_URL,
 	withCredentials: true,
 	headers: {
 		'Content-Type': 'application/json',
