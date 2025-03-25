@@ -32,6 +32,9 @@ jobs:
           cd packages/backend/
           zip -r --symlinks ../backend.zip dist package.json tsconfig.json node_modules
 
+      - name: Stop App Service
+        run: |
+          az webapp stop --name DeliverablesBackendTesting --resource-group DefaultResourceGroup-NEU
 
       - name: Deploy Backend
         uses: azure/webapps-deploy@v2
@@ -39,3 +42,7 @@ jobs:
           app-name: 'DeliverablesBackendTesting'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND }}
           package: './packages/backend.zip'
+
+      - name: Start App Service
+        run: |
+          az webapp start --name DeliverablesBackendTesting --resource-group DefaultResourceGroup-NEU
