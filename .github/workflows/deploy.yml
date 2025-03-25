@@ -20,12 +20,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd 'packages\backend\'
+          cd packages\backend\
           npm install
 
       - name: Build packages
         run: |
-          cd 'packages\backend\'
+          cd packages\backend\
           npm run build
 
       - name: Deploy Backend
