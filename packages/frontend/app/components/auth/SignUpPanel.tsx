@@ -1,12 +1,21 @@
 "use client"
 
 import { useState } from "react"
-import { Box, Button, TextField, Typography, InputAdornment, IconButton, CircularProgress } from "@mui/material"
+import {
+	Box,
+	Button,
+	TextField,
+	Typography,
+	InputAdornment,
+	IconButton,
+	CircularProgress,
+	useMediaQuery,
+	useTheme,
+} from "@mui/material"
 import { PersonAdd, Person, SupportAgent, AdminPanelSettings, Visibility, VisibilityOff } from "@mui/icons-material"
-import {signUp, type SignUpData, UserData} from "@/components/services/authService"
+import { signUp, type SignUpData, type UserData } from "@/components/services/authService"
 
 type SignUpPanelProps = {
-	//TODO: Create a type for userData when it is known
 	onSignUpSuccess: (userData: UserData) => void
 }
 
@@ -19,6 +28,9 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState("")
 	const [accountType, setAccountType] = useState<"user" | "concierge" | "admin" | null>(null)
+
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
 	const handleTogglePassword = () => {
 		setShowPassword(!showPassword)
@@ -69,18 +81,24 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 	}
 
 	return (
-		<Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-			<Box sx={{ textAlign: "center", mb: 2 }}>
-				<PersonAdd sx={{ fontSize: 48, mb: 1, color: "secondary.main" }} />
-				<Typography variant="h4" gutterBottom fontWeight="bold">
+		<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+			<Box sx={{ textAlign: "center", mb: 1 }}>
+				<PersonAdd sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1, color: "secondary.main" }} />
+				<Typography variant="h4" gutterBottom fontWeight="bold" sx={{ fontSize: { xs: "1.5rem", sm: "2rem" } }}>
 					Create Account
 				</Typography>
-				<Typography variant="body2" color="rgba(255,255,255,0.7)">
+				<Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" } }}>
 					Select the type of account you want to create
 				</Typography>
 			</Box>
 
-			<Box sx={{ display: "flex", gap: 2 }}>
+			<Box
+				sx={{
+					display: "flex",
+					flexDirection: isMobile ? "column" : "row",
+					gap: 2,
+				}}
+			>
 				<TextField
 					label="First Name"
 					variant="outlined"
@@ -88,10 +106,20 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 					value={firstName}
 					onChange={(e) => setFirstName(e.target.value)}
 					InputProps={{
-						sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
+						sx: {
+							color: "white",
+							"& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+							fontSize: { xs: "0.9rem", sm: "1rem" },
+						},
 					}}
-					InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
+					InputLabelProps={{
+						sx: {
+							color: "rgba(255,255,255,0.7)",
+							fontSize: { xs: "0.9rem", sm: "1rem" },
+						},
+					}}
 					required
+					size={isMobile ? "small" : "medium"}
 				/>
 				<TextField
 					label="Last Name"
@@ -100,10 +128,20 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 					value={lastName}
 					onChange={(e) => setLastName(e.target.value)}
 					InputProps={{
-						sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
+						sx: {
+							color: "white",
+							"& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+							fontSize: { xs: "0.9rem", sm: "1rem" },
+						},
 					}}
-					InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
+					InputLabelProps={{
+						sx: {
+							color: "rgba(255,255,255,0.7)",
+							fontSize: { xs: "0.9rem", sm: "1rem" },
+						},
+					}}
 					required
+					size={isMobile ? "small" : "medium"}
 				/>
 			</Box>
 
@@ -115,10 +153,20 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 				value={email}
 				onChange={(e) => setEmail(e.target.value)}
 				InputProps={{
-					sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
+					sx: {
+						color: "white",
+						"& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
 				}}
-				InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
+				InputLabelProps={{
+					sx: {
+						color: "rgba(255,255,255,0.7)",
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
+				}}
 				required
+				size={isMobile ? "small" : "medium"}
 			/>
 
 			<TextField
@@ -129,37 +177,69 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 				InputProps={{
-					sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
+					sx: {
+						color: "white",
+						"& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
 					endAdornment: (
 						<InputAdornment position="end">
-							<IconButton onClick={handleTogglePassword} edge="end" sx={{ color: "rgba(255,255,255,0.7)" }}>
-								{showPassword ? <VisibilityOff /> : <Visibility />}
+							<IconButton
+								onClick={handleTogglePassword}
+								edge="end"
+								sx={{ color: "rgba(255,255,255,0.7)" }}
+								size={isMobile ? "small" : "medium"}
+							>
+								{showPassword ? (
+									<VisibilityOff fontSize={isMobile ? "small" : "medium"} />
+								) : (
+									<Visibility fontSize={isMobile ? "small" : "medium"} />
+								)}
 							</IconButton>
 						</InputAdornment>
 					),
 				}}
-				InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
+				InputLabelProps={{
+					sx: {
+						color: "rgba(255,255,255,0.7)",
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
+				}}
 				required
+				size={isMobile ? "small" : "medium"}
 			/>
 
 			{error && (
-				<Typography color="error" variant="body2">
+				<Typography color="error" variant="body2" sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" } }}>
 					{error}
 				</Typography>
 			)}
 
-			<Typography variant="subtitle2" sx={{ mt: 1, color: "rgba(255,255,255,0.9)" }}>
+			<Typography
+				variant="subtitle2"
+				sx={{
+					mt: 1,
+					color: "rgba(255,255,255,0.9)",
+					fontSize: { xs: "0.8rem", sm: "0.875rem" },
+				}}
+			>
 				Account Type:
 			</Typography>
 
-			<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+			<Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
 				<Button
 					variant="contained"
 					color="secondary"
-					size="large"
+					size={isMobile ? "medium" : "large"}
 					fullWidth
-					startIcon={loading && accountType === "user" ? <CircularProgress size={20} color="inherit" /> : <Person />}
-					sx={{ py: 1.5 }}
+					startIcon={
+						loading && accountType === "user" ? (
+							<CircularProgress size={isMobile ? 16 : 20} color="inherit" />
+						) : (
+							<Person fontSize={isMobile ? "small" : "medium"} />
+						)
+					}
+					sx={{ py: isMobile ? 1 : 1.5 }}
 					onClick={() => handleSubmit("user")}
 					disabled={loading}
 				>
@@ -169,13 +249,17 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 				<Button
 					variant="outlined"
 					color="secondary"
-					size="large"
+					size={isMobile ? "medium" : "large"}
 					fullWidth
 					startIcon={
-						loading && accountType === "concierge" ? <CircularProgress size={20} color="inherit" /> : <SupportAgent />
+						loading && accountType === "concierge" ? (
+							<CircularProgress size={isMobile ? 16 : 20} color="inherit" />
+						) : (
+							<SupportAgent fontSize={isMobile ? "small" : "medium"} />
+						)
 					}
 					sx={{
-						py: 1.5,
+						py: isMobile ? 1 : 1.5,
 						borderColor: "rgba(255,255,255,0.5)",
 						color: "white",
 						"&:hover": {
@@ -192,13 +276,17 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 				<Button
 					variant="outlined"
 					color="secondary"
-					size="large"
+					size={isMobile ? "medium" : "large"}
 					fullWidth
 					startIcon={
-						loading && accountType === "admin" ? <CircularProgress size={20} color="inherit" /> : <AdminPanelSettings />
+						loading && accountType === "admin" ? (
+							<CircularProgress size={isMobile ? 16 : 20} color="inherit" />
+						) : (
+							<AdminPanelSettings fontSize={isMobile ? "small" : "medium"} />
+						)
 					}
 					sx={{
-						py: 1.5,
+						py: isMobile ? 1 : 1.5,
 						borderColor: "rgba(255,255,255,0.5)",
 						color: "white",
 						"&:hover": {

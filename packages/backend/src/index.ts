@@ -7,6 +7,7 @@ moduleAlias({
 import express from 'express';
 import cors from 'cors';
 import dbRoutes from "@/routes/dbRoutes";
+import ocrRoutes from '@/routes/ocrRoutes';
 
 
 const PORT = process.env.PORT || 3001;
@@ -23,8 +24,7 @@ app.use(cors({
 
 
 app.use("/db", dbRoutes); // This is the route that the frontend will use to make requests to the backend.
-
-
+app.use('/ocr', ocrRoutes); // Route for OCR
 
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`);

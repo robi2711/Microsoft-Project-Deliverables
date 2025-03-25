@@ -17,12 +17,14 @@
     "both": "lerna run dev --parallel"
   },
   "devDependencies": {
+    "@mui/x-data-grid": "^7.28.0",
     "@types/node": "^20",
     "dotenv": "^16.4.7",
     "lerna": "^8.1.9",
     "typescript": "^5"
   },
   "dependencies": {
-
+    "@react-google-maps/api": "^2.20.6",
+    "react-webcam": "^7.2.0"
   }
 }

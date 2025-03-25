@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata = {
 	title: "Deliverables",
 	description: "Microsoft project for tracking packages",
+	icon: "/favicon.ico", // Is this supposed to be here? - Owen
 }
 
 
@@ -18,11 +19,14 @@ export default function RootLayout({children,}: {
 }) {
 	return (
 		<html lang="en">
-		<body className={inter.className} style={{ margin: 0, padding: 0}}>
-			<ThemeProvider theme={lpTheme}>
-				{children}
-			</ThemeProvider>
-		</body>
+			<head>
+				<link rel="icon" href="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/favicon.ico" />
+			</head>
+			<body className={inter.className} style={{ margin: 0, padding: 0}}>
+				<ThemeProvider theme={lpTheme}>
+					{children}
+				</ThemeProvider>
+			</body>
 		</html>
 	)
 }

@@ -1,18 +1,23 @@
-import express, { Router } from "express";
+import express from "express";
 import dbController from "@/controllers/dbController";
 
-const router: Router = express.Router();
+const router = express.Router();
 
-// POST route for creating a user
-router.post('/create', dbController.createUser);
 
-// GET route for retrieving a customer by name or address
-router.get('/get', dbController.getCustomer);
+router.post("/complex", dbController.createComplex);
+router.get("/complex/:id", dbController.getComplex);
+router.put("/complex/:id", dbController.updateComplex);
+router.delete("/complex/:id", dbController.deleteComplex);
+router.get("/complex", dbController.getComplexByAddress);
 
-// PUT route for updating a user by id
-router.put('/update/:id', dbController.updateUser);
+router.post("/user", dbController.createUser);
+router.get("/user/:id", dbController.getUser);
+router.put("/user/:id", dbController.updateUser);
+router.delete("/user/:id", dbController.deleteUser);
 
-// DELETE route for removing a user by id
-router.delete('/remove/:id', dbController.removeUser);
+router.post("/admin", dbController.createAdmin);
+router.get("/admin/:id", dbController.getAdmin);
+router.put("/admin/:id", dbController.updateAdmin);
+router.delete("/admin/:id", dbController.deleteAdmin);
 
 export default router;
