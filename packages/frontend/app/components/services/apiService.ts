@@ -3,8 +3,9 @@
 // All you have to do is import this file and use the api object to make requests to the backend. See the TmpButton component for an example of how to use this api object.
 import axios from "axios";
 
+
 const api = axios.create({
-	baseURL: process.env.BACKEND_URL || 'http://localhost:3001' ,
+	baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
 	withCredentials: true,
 	headers: {
 		'Content-Type': 'application/json',
