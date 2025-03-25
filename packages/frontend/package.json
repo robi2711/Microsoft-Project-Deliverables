@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "echo 'Backend URL during build: $BACKEND_URL' && next build",
+    "build": "next build",
     "deploy": "next start",
     "lint": "next lint"
   },
