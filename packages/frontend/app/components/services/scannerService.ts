@@ -26,22 +26,16 @@ export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
 		});
 		if((response.data as OcrResponseData)?.address && (response.data as OcrResponseData)?.name){
 			return {
-			trackingNumber: "WE DONT KNOW YET",
-			recipientName: (response.data as OcrResponseData).name,
-			flatNumber: (response.data as OcrResponseData).address,
-			carrier: "UPS",
-		} as PackageData;
+				trackingNumber: "WE DONT KNOW YET",
+				recipientName: (response.data as OcrResponseData).name,
+				flatNumber: (response.data as OcrResponseData).address,
+				carrier: "UPS",
+			} as PackageData;
 		}
 
 		console.log("API Response:", response.data);
-	} catch (error: any) {
-		if (error.response) {
-			console.error("Error Response Data:", (error ).response.data);
-			console.error("Error Response Status:", (error ).response.status);
-			console.error("Error Response Headers:", (error ).response.headers);
-		} else {
-			console.error("Error Message:", (error).message);
-		}
+	} catch (error) {
+		console.error("Error Message:", error);
 	}
 
 	return {

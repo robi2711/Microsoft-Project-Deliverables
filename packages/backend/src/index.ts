@@ -17,7 +17,7 @@ app.use(express.json()); // This is used to parse the data that the frontend sen
 
 
 app.use(cors({
-	origin: 'http://localhost:3000',
+	origin: process.env.FRONTEND_URL || 'http://localhost:3000',
 	credentials: true
 })); // This is used to allow the frontend to make requests to the backend
 

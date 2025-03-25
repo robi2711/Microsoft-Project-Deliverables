@@ -163,3 +163,5 @@ next-env.d.ts
 .idea
 
 package-lock.json
+
+.github/workflows/deploy.yml

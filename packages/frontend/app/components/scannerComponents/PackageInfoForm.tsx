@@ -15,6 +15,7 @@ import {
 	CircularProgress,
 } from "@mui/material"
 import { Edit, Save, CheckCircle, Cancel } from "@mui/icons-material"
+import Image from "next/image"
 
 interface PackageData {
 	trackingNumber: string
@@ -82,7 +83,7 @@ export const PackageInfoForm: React.FC<PackageInfoFormProps> = ({
 							borderRadius: 1,
 						}}
 					>
-						<img
+						<Image
 							src={capturedImage || "/placeholder.svg"}
 							alt="Scanned package"
 							style={{
