@@ -1,6 +1,13 @@
+import 'module-alias/register';
+import moduleAlias from 'module-alias';
+import * as path from 'path';
+moduleAlias({
+	base: path.resolve(__dirname, '..') // points to the folder with the relevant package.json
+});
 import express from 'express';
 import cors from 'cors';
 import dbRoutes from "@/routes/dbRoutes";
+
 
 const PORT = 3001;
 
