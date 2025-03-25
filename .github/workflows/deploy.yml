@@ -20,11 +20,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd packages/backend
+          cd '.\packages\backend\'
           npm install
 
       - name: Build packages
-        run: lerna run build --scope backend
+        run: |
+          cd '.\packages\backend\'
+          npm run build
 
       - name: Deploy Backend
         uses: azure/webapps-deploy@v2
