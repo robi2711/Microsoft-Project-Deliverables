@@ -20,8 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd packages/backend/
-          npm install
+          npm install --prefix packages/backend
 
       - name: Build packages
         run: |
@@ -31,7 +30,7 @@ jobs:
       - name: Create deployment package
         run: |
           cd packages/backend/
-          zip -r ../backend.zip .
+          zip -r ../backend.zip dist package.json tsconfig.json node_modules
 
 
       - name: Deploy Backend
