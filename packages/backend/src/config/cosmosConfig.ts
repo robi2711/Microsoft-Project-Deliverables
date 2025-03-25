@@ -25,7 +25,6 @@ client.getDatabaseAccount()
     })
     .catch(error => {
         console.error("❌ Failed to connect to CosmosDB:", error);
-        process.exit(1);
     });
 
 
