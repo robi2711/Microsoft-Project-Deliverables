@@ -28,9 +28,14 @@ const twilioController: extendTwilio = {
         //Attempt to send the message
         try {
             const message = await client.messages.create({
-                body: msg || `Hello ${name}, your package has arrived. Please come pick it up.`,
+                //body: msg || `Hello ${name}, your package has arrived. Please come pick it up.`,
                 from: process.env.TWILIO_PHONE,
-                to: telephone
+                to: telephone,
+                contentSid: "HX9404ac9cf792bb00cf9ccff03dba9472",
+                contentVariables: JSON.stringify({        
+                  1: name,
+                }),
+            
             });
 
             res.status(200).json({
@@ -72,6 +77,11 @@ const runCommand = (args: string[]): void => {
     
     if(command === "register") {
         console.log("Registering user with params:", params);
+        const email = params[0];
+
+        //IDEA: Generate a token, give link to the user to register and get them to put in the token
+        //Register accoutn with email and the password that they give
+
     }
 }
 export default twilioController;
