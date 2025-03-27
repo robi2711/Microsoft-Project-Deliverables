@@ -7,14 +7,14 @@ moduleAlias({
 import express from 'express';
 import cors from 'cors';
 import dbRoutes from "@/routes/dbRoutes";
+import twilioRoutes from "@/routes/twilioRoutes";
 import ocrRoutes from '@/routes/ocrRoutes';
-
 
 const PORT = process.env.PORT || 3001;
 
 const app = express();
 app.use(express.json()); // This is used to parse the data that the frontend sends to the backend
-
+app.use(express.urlencoded()); // This allows for body to be parsed when testing with POST forms in Postman!
 
 app.use(cors({
 	origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -22,8 +22,8 @@ app.use(cors({
 })); // This is used to allow the frontend to make requests to the backend
 
 
-
 app.use("/db", dbRoutes); // This is the route that the frontend will use to make requests to the backend.
+app.use("/whatsapp", twilioRoutes)
 app.use('/ocr', ocrRoutes); // Route for OCR
 
 app.listen(PORT, () => {
