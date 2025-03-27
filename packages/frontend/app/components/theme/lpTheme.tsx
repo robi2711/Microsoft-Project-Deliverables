@@ -1,23 +1,21 @@
-//This is the theme for MUI it gets called in the layout.tsx file and is used to style the entire app.
-
 "use client"
 
-import { createTheme } from "@mui/material/styles"
+import { createTheme, responsiveFontSizes } from "@mui/material/styles"
 
-
-export const lpTheme = createTheme({
+// Create the base theme
+let lpTheme = createTheme({
 	palette: {
 		primary: {
-			main: "#2563eb",
-			light: "#60a5fa",
-			dark: "#1d4ed8",
-			contrastText: "#ffffff",
+			main: "#A86B31", // Base color from the logo
+			light: "#C48A5A", // Lighter shade for hover effects
+			dark: "#875A29", // Depth color from the logo
+			contrastText: "#FFFFFF", // White text for contrast
 		},
 		secondary: {
-			main: "#f97316",
-			light: "#fdba74",
-			dark: "#c2410c",
-			contrastText: "#ffffff",
+			main: "#875A29", // Depth color from the logo
+			light: "#A86B31", // Base color for hover effects
+			dark: "#452B1F", // Shading on the depth
+			contrastText: "#FFFFFF", // White text for contrast
 		},
 		background: {
 			default: "#ffffff",
@@ -25,7 +23,7 @@ export const lpTheme = createTheme({
 		},
 		text: {
 			primary: "#0f172a",
-			secondary: "#64748b",
+			secondary: "#2E1A13",
 		},
 	},
 	typography: {
@@ -113,4 +111,9 @@ export const lpTheme = createTheme({
 		},
 	},
 })
+
+// Apply responsive font sizes
+lpTheme = responsiveFontSizes(lpTheme)
+
+export { lpTheme }
 

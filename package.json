@@ -5,6 +5,9 @@
     "packages/frontend",
     "packages/backend"
   ],
+  "engines": {
+    "node": ">=22.11.0 <=23.9.0"
+  },
   "scripts": {
     "initial-install": "npm install",
     "frontend": "lerna run dev",
@@ -14,13 +17,15 @@
     "both": "lerna run dev --parallel"
   },
   "devDependencies": {
+    "@mui/x-data-grid": "^7.28.0",
     "@types/node": "^20",
-    "@types/uuid": "^10.0.0",
     "dotenv": "^16.4.7",
     "lerna": "^8.1.9",
     "typescript": "^5"
   },
   "dependencies": {
     "twilio": "^5.4.5"
+    "@react-google-maps/api": "^2.20.6",
+    "react-webcam": "^7.2.0"
   }
 }

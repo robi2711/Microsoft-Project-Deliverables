@@ -13,18 +13,39 @@
   "license": "ISC",
   "author": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=22.11.0 <=23.9.0"
+  },
+  "_moduleAliases": {
+    "@": "dist"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "start": "tsx src/index.ts",
+    "start": "node -r tsconfig-paths/register -r module-alias/register dist/index.js",
     "build": "tsc",
     "deploy": "node dist/index.js"
   },
   "dependencies": {
+    "axios": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "lerna": "^8.1.9",
+    "module-alias": "^2.2.3",
+    "multer": "^1.4.5-lts.2",
+    "root": "file:../..",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
     "@azure/cosmos": "^4.2.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "tsx": "^4.19.3"
+    "@types/module-alias": "^2.0.4",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^20",
+    "@types/uuid": "^10.0.0"
   }
 }

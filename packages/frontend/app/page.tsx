@@ -1,25 +1,67 @@
 "use client"
-//This is the landing page of the application
-//It is the first page that users will see when they visit the site
-//It contains the header, hero, features, and footer components
-//It is the only time the page.tsx is outside a file
-import { Box, CssBaseline } from "@mui/material"
-import Header from "@/components/landingComponents/NavBar"
-import Hero from "@/components/landingComponents/Hero"
-import Features from "@/components/landingComponents/Features"
-import Footer from "@/components/landingComponents/Footer"
+
+import { Box, Button, Link, useMediaQuery, useTheme, Container } from "@mui/material"
+import LeftSide from "@/components/landingComponents/LeftSide"
+import RightSide from "@/components/landingComponents/RightSide"
 
 export default function LandingPage() {
-  return (
-      <div>
-        <CssBaseline />
-        <Box sx={{ bgcolor: "background.default", color: "text.primary", minHeight: "100vh" }}>
-          <Header />
-          <Hero />
-          <Features />
-          <Footer />
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"))
+
+    return (
+        <Box
+            sx={{
+                minHeight: "100vh",
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                overflow: "auto",
+            }}
+        >
+            {isMobile ? (
+                <>
+                    <LeftSide />
+                    <RightSide />
+                    <Container sx={{ py: 4, display: "flex", justifyContent: "center", gap: 2 }}>
+                        <Link href="/scanner" style={{ textDecoration: "none" }}>
+                            <Button variant="contained" color="primary" fullWidth>
+                                Go to Scanner
+                            </Button>
+                        </Link>
+                        <Link href="/dashboard" style={{ textDecoration: "none" }}>
+                            <Button variant="outlined" color="primary" fullWidth>
+                                Go to Dashboard
+                            </Button>
+                        </Link>
+                    </Container>
+                </>
+            ) : (
+                <>
+                    <LeftSide />
+                    <RightSide />
+                    <Box
+                        sx={{
+                            position: "fixed",
+                            bottom: 20,
+                            right: 20,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 1,
+                        }}
+                    >
+                        <Link href="/scanner" style={{ textDecoration: "none" }}>
+                            <Button variant="contained" color="secondary">
+                                Go to Scanner
+                            </Button>
+                        </Link>
+                        <Link href="/dashboard" style={{ textDecoration: "none" }}>
+                            <Button variant="contained" color="secondary">
+                                Go to Dashboard
+                            </Button>
+                        </Link>
+                    </Box>
+                </>
+            )}
         </Box>
-      </div>
-  )
+    )
 }
 
