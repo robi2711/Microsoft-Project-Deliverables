@@ -21,7 +21,7 @@
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "start": "node -r tsconfig-paths/register -r module-alias/register dist/index.js",
+    "start": "node -r module-alias/register dist/index.js",
     "build": "tsc",
     "deploy": "node dist/index.js"
   },
