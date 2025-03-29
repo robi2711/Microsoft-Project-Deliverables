@@ -2,11 +2,11 @@
 
 
 // importing necessary modules
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid'; // for building the table
 import {Box, Typography, Paper} from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 
-// Hard coding in data for now
+// Hard coding in data for now - structure will remain largely the same
 const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 100 },
     { field: 'timestamp', headerName: 'Time stamp', width: 200 },
@@ -15,6 +15,7 @@ const columns: GridColDef[] = [
     { field: 'resident', headerName: 'Resident', width: 150 },
 ];
 
+// The row values will be fetched from the backend TODO *
 const rows = [
     { id: 1, resident: 'John Smith', flatNumber: '201', packageStatus: 'Holding', timestamp: '2021-10-10 10:00:00' },
     { id: 2, resident: 'Alice Jones', flatNumber: '203', packageStatus: 'Holding', timestamp: '2021-10-10 10:00:00' },
@@ -24,10 +25,12 @@ const rows = [
     { id: 6, resident: 'Michael Green', flatNumber: '211', packageStatus: 'Collected', timestamp: '2021-10-10 10:00:00' },
 ];
 
+
 export default function overviewBody() {
     return(
 
-        <Box
+
+        <Box // This is the box which within all elements of the overview are contained
             sx={{
                 position: "absolute",
                 top: "8vh", // setting the top position to 8% of the viewport height
@@ -47,6 +50,7 @@ export default function overviewBody() {
                 display: "flex",
                 justifyContent: "space-around",
             }}>
+                {/* another box within for the individual stats and graphics - here Packages holding */}
                 <Box sx={{
                     display: "flex",
                     flexDirection: "column",
@@ -60,6 +64,7 @@ export default function overviewBody() {
                     </Box>
                 </Box>
 
+                {/* another box within for the individual stats and graphics - here Packages collected */}
                 <Box sx={{
                     display: "flex",
                     flexDirection: "column",
@@ -78,7 +83,7 @@ export default function overviewBody() {
             {/* adding box for the data table */}
             <Box sx={{ display: "flex", height: "70%" }}>
                 <Paper sx={{ height: '100%', width: '100%'}}>
-                    <DataGrid
+                    <DataGrid // using the values defined above.
                         rows={rows}
                         columns={columns}
                         pageSizeOptions={[5, 10]}

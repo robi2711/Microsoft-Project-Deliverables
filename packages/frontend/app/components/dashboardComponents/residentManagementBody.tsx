@@ -7,7 +7,7 @@ import {Box, Typography, Paper} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 
-// Hard coding in data for now
+// Hard coding in data for now - structure will remain largely the same
 const columns: GridColDef[] = [
     { field: 'resident', headerName: 'Resident Name', width: 150 },
     { field: 'flatNumber', headerName: 'Flat Number', width: 150 },
@@ -15,6 +15,7 @@ const columns: GridColDef[] = [
     { field: 'registrationDate', headerName: 'Registration Date', width: 200 },
 ];
 
+// The row values will be fetched from the backend TODO *
 const rows = [
     { id: 1, resident: 'John Smith', flatNumber: '201', whatsappNumber: '083 123 4561', registrationDate: '2015-12-25' },
     { id: 2, resident: 'Alice Jones', flatNumber: '203', whatsappNumber: '083 123 4562', registrationDate: '2016-01-15' },
@@ -38,7 +39,7 @@ export default function residentManagementBody() {
     return(
 
         <Box
-            sx={{
+            sx={{ // This is the box which within all elements of the overview are contained
                 position: "absolute",
                 top: "8vh", // setting the top position to 8% of the viewport height
                 left: "21vw", // setting the left position to 21% of the viewport width
@@ -57,7 +58,7 @@ export default function residentManagementBody() {
                 display: "flex",
                 justifyContent: "space-around",
             }}>
-                <Box sx={{
+                <Box sx={{ // another box within for the individual stats and graphics - here # w/ packages in-hold
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
@@ -70,7 +71,7 @@ export default function residentManagementBody() {
                     </Box>
                 </Box>
 
-                <Box sx={{
+                <Box sx={{ // another box within for the individual stats and graphics - here # w/ no packages
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
@@ -88,7 +89,7 @@ export default function residentManagementBody() {
             {/* adding box for the data table */}
             <Box sx={{ display: "flex", height: "70%" }}>
                 <Paper sx={{ height: '100%', width: '100%'}}>
-                    <DataGrid
+                    <DataGrid // taking the values from the rows and columns defined above
                         rows={rows}
                         columns={columns}
                         checkboxSelection
