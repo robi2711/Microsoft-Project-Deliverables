@@ -4,7 +4,7 @@ import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 export default function ResidentConfirmationPage() {
     return (
         <Box
-            sx={{
+            sx={{ // Box encompasses entire screen and centers it's content
                 height: "100vh",
                 width: "100vw",
                 display: "flex",
@@ -12,11 +12,11 @@ export default function ResidentConfirmationPage() {
                 alignItems: "center",
             }}>
             <Box
-                sx={{
+                sx={{ // box half the size within the center of screen, also with main colour
                     height: "50vh",
                     width: "50vw",
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: "column", // stacks elements vertically
                     justifyContent: "center",
                     alignItems: "center",
                     bgcolor: "primary.main"

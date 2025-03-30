@@ -60,6 +60,19 @@ export const getComplexByAddress = asyncHandler(async (req: Request, res: Respon
 	res.status(200).json(complexes[0]);
 });
 
+// Get all residents of a complex - to populate rows in residents management dashboard page.
+export const getResidentsByComplexId = asyncHandler(async (req: Request, res: Response) => {
+	const { id } = req.params;
+	const { resources: users } = await usersContainer.items
+		.query(`SELECT * FROM c WHERE c.complexId = '${id}'`)
+		.fetchAll();
+
+	if (!users.length) return res.status(404).json({ message: "No residents found for this complex." });
+
+	res.status(200).json(users);
+});
+
+
 export const updateComplex = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const { resource: existingComplex } = await complexesContainer.item(id, id).read<Complex>();
@@ -143,6 +156,7 @@ export default {
 	createComplex,
 	getComplex,
 	getComplexByAddress,
+	getResidentsByComplexId,
 	updateComplex,
 	deleteComplex,
 	createUser,

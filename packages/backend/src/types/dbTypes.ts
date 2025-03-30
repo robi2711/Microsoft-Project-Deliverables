@@ -9,7 +9,7 @@ export interface IUser {
     id: string;
     complexId: string;  // Reference to Complex
     name: string;
-    address: string;
+    address: string; // Unit number - should we rename this?
     telephone: string;
     email: string;
     packages: Package[];

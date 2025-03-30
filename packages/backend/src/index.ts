@@ -23,7 +23,7 @@ app.use(cors({
 
 
 app.use("/db", dbRoutes); // This is the route that the frontend will use to make requests to the backend.
-app.use("/whatsapp", twilioRoutes)
+// app.use("/whatsapp", twilioRoutes)
 app.use('/ocr', ocrRoutes); // Route for OCR
 
 app.listen(PORT, () => {
