@@ -4,7 +4,7 @@
 // importing necessary modules
 import { Box, Typography, MenuItem, FormControl, Select, Tab, Link } from "@mui/material"
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
-import Image from 'next/image';
+// import Image from 'next/image';
 
 {/* We need arguments relating to active tabs so we can highlight the active */}
 interface SideBarProps {
@@ -25,8 +25,10 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
         >
             {/* adding a logo and title to the sidebar within it's own box */}
             <Box sx={{ display: "flex", alignItems: "center"}}>
-                <Image src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/favicon.ico"
+                {/* <Image src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/favicon.ico"
                      style={{ width: 24, height: 24, marginRight: 8 }} alt={""}/>
+                     currently commenting out image
+                     TODO: fix it, giving errors and idk how it's supposed to work*/}
                 <Typography variant="h5" sx={{ color: "white", textAlign: "center" }}>
                     Deliverables
                 </Typography>
@@ -66,8 +68,8 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, width: "100%" }}>
                 <Box sx={{ width: "80%", height: "100px", bgcolor: "white"}}>
                     {/* TODO: Google Maps API goes here - gotta look into that */}
-                    <Image src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/SampleImage.png"
-                         style={{ width: "100%", height: "100%"}} alt={""}/>
+                    {/* <Image src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/SampleImage.png"
+                         style={{ width: "100%", height: "100%"}} alt={""}/> */}
                 </Box>
             </Box>
 
