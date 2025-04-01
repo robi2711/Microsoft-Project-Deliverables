@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dbRoutes from "@/routes/dbRoutes";
-import authUserRoutes from "@/routes/authUserRoutes";
+import authRoutes from "@/routes/authRoutes";
 import session from "express-session";
 
 
@@ -24,7 +24,7 @@ app.use(cors({
 
 
 //app.use("/db", dbRoutes); // This is the route that the frontend will use to make requests to the backend.
-app.use("/auth", authUserRoutes);
+app.use("/auth", authRoutes);
 
 
 app.listen(PORT, () => {

@@ -8,8 +8,19 @@ export interface UserInfo {
     address: string;
 }
 
+export interface AdminInfo {
+    email: string;
+    givenName: string;
+}
+
 export interface CustomRequest extends Request {
     session: session.Session & {
         userInfo?: UserInfo;
+        AdminInfo?: AdminInfo;
     };
+}
+
+export interface CustomUserRequest extends Request {
+    userInfo?: UserInfo;
+    AdminInfo?: AdminInfo;
 }
