@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
-import { OcrStatusResponse } from '../types/ocrTypes';
+import { OcrStatusResponse, llmResponse } from '../types/ocrTypes';
 
 interface MulterRequest extends Request {
     file: Express.Multer.File;
@@ -8,11 +8,11 @@ interface MulterRequest extends Request {
 
 const AZURE_ENDPOINT = process.env.AZURE_OCR_ENDPOINT as string;
 const AZURE_KEY = process.env.AZURE_OCR_KEY as string;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY as string;
 
 export const testLocalOcr = async (req: Request, res: Response): Promise<void> => {
     try {
         const file = (req as MulterRequest).file;
-
         if (!file || !file.buffer) {
             res.status(400).json({ error: 'No image uploaded.' });
             return;
@@ -32,17 +32,14 @@ export const testLocalOcr = async (req: Request, res: Response): Promise<void> =
         );
 
         const operationLocation = response.headers['operation-location'];
-
         if (!operationLocation) {
             res.status(400).json({ error: 'No operation-location returned from Azure OCR.' });
             return;
         }
 
         let result = null;
-
         for (let i = 0; i < 10; i++) {
             await new Promise((resolve) => setTimeout(resolve, 1000));
-
             const statusResponse = await axios.get<OcrStatusResponse>(operationLocation, {
                 headers: {
                     'Ocp-Apim-Subscription-Key': AZURE_KEY,
@@ -50,7 +47,6 @@ export const testLocalOcr = async (req: Request, res: Response): Promise<void> =
             });
 
             const data = statusResponse.data;
-
             if (data.status === 'failed') {
                 res.status(400).json({ error: 'Azure OCR failed to process the image.' });
                 return;
@@ -68,45 +64,76 @@ export const testLocalOcr = async (req: Request, res: Response): Promise<void> =
         }
 
         const lines: string[] = [];
-
         for (const page of result) {
             for (const line of page.lines) {
                 lines.push(line.text);
             }
         }
 
-        let name = '';
-        let address = '';
+        const fullText = lines.join('\n');
 
-        const nameRegex = /^name[:\s]*(.*)$/i;
-        const addressRegex = /^address[:\s]*(.*)$/i;
+        const prompt = `
+You will be given some OCR scanned text from a letter. Please extract, figure out and return the following fields in JSON format that make the most sense for the fields. If you're not sure about any value, return null.
+ONLY RETURN THE JSON!
+Required format:
+{
+  "name": string | null,
+  "street": string | null,
+  "flat_number": string | null,
+  "country": string | null,
+  "postal_code": string | null
+}
 
-        for (const line of lines) {
-            const nameMatch = nameRegex.exec(line);
-            const addressMatch = addressRegex.exec(line);
+OCR Text:
+${fullText}
+    `.trim();
 
-            if (nameMatch && nameMatch[1]) {
-                name = nameMatch[1].trim();
+        const llmApiResponse = await axios.post<llmResponse>(
+            'https://openrouter.ai/api/v1/chat/completions',
+            {
+                model: 'google/gemini-2.0-flash-001',
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt,
+                    },
+                ],
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+                    'Content-Type': 'application/json',
+                },
             }
+        );
 
-            if (addressMatch && addressMatch[1]) {
-                address = addressMatch[1].trim();
-            }
+        let extractedContent = llmApiResponse.data.choices[0].message.content;
+
+        
+        if (extractedContent.startsWith('```')) {
+            extractedContent = extractedContent.replace(/```(?:json)?\s*([\s\S]*?)\s*```/, '$1').trim();
+        }
+
+        let parsed: any = null;
+        try {
+            parsed = JSON.parse(extractedContent);
+        } catch {
+            res.status(422).json({ error: 'Failed to parse LLM response as JSON', raw: extractedContent });
+            return;
         }
 
         res.json({
-            name,
-            address,
+            extracted: parsed,
             allLines: lines,
         });
     } catch (error: any) {
         if (error?.response && error?.isAxiosError) {
             res.status(500).json({
-                error: 'Azure OCR error',
+                error: 'OCR or LLM request failed',
                 details: error.response?.data,
             });
         } else if (!res.headersSent) {
-            res.status(500).json({ error: 'Internal server error during OCR processing.' });
+            res.status(500).json({ error: 'Internal server error during OCR/LLM processing.' });
         }
     }
 };

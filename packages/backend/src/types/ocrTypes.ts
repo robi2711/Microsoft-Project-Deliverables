@@ -3,6 +3,14 @@ export interface OcrWord {
     boundingBox: number[];
     confidence?: number;
 }
+export interface llmResponse {
+    choices: {
+        message: {
+            content: string;
+        };
+    }[];
+}
+
 
 export interface OcrLine {
     text: string;
