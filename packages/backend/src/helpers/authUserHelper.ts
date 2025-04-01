@@ -15,6 +15,10 @@ export const signUpUser = async (UserInfo: UserInfo, password : string) => {
         Password: password as string,
         UserAttributes: [
             {
+              Name: 'email',
+                Value: UserInfo.email
+            },
+            {
                 Name: 'given_name',
                 Value: UserInfo.givenName,
             },
