@@ -73,7 +73,7 @@ export const testLocalOcr = async (req: Request, res: Response): Promise<void> =
         const fullText = lines.join('\n');
 
         const prompt = `
-You will be given some OCR scanned text from a letter. Please extract, figure out and return the following fields in JSON format that make the most sense for the fields. If you're not sure about any value, return null.
+You will be given some OCR scanned text from a letter. You have to deduce and return the following fields in JSON format that make the most sense for the fields. If you're not sure about any value, return null.
 ONLY RETURN THE JSON!
 Required format:
 {
