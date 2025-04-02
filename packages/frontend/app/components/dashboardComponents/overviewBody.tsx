@@ -1,32 +1,43 @@
 "use client"
-
+// This page displays data from packages within the selected complex
 
 // importing necessary modules
+import { Package } from '../../../../backend/src/types/dbTypes';
 import { DataGrid, GridColDef } from '@mui/x-data-grid'; // for building the table
 import {Box, Typography, Paper} from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
+import axios from "axios";
+import {useEffect, useState} from "react"; // for retrieving resident data from the backend
 
-// Hard coding in data for now - structure will remain largely the same
+// The columns define the structure of the data table - fields should match the Package type TODO: add time delivered
 const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'timestamp', headerName: 'Time stamp', width: 200 },
-    { field: 'flatNumber', headerName: 'Flat Number', width: 150 },
-    { field: 'packageStatus', headerName: 'Package Status', width: 150 },
-    { field: 'resident', headerName: 'Resident', width: 150 },
-];
-
-// The row values will be fetched from the backend TODO *
-const rows = [
-    { id: 1, resident: 'John Smith', flatNumber: '201', packageStatus: 'Holding', timestamp: '2021-10-10 10:00:00' },
-    { id: 2, resident: 'Alice Jones', flatNumber: '203', packageStatus: 'Holding', timestamp: '2021-10-10 10:00:00' },
-    { id: 3, resident: 'Robert Brown', flatNumber: '205', packageStatus: 'Collected', timestamp: '2021-10-10 10:00:00' },
-    { id: 4, resident: 'Nancy Hall', flatNumber: '207', packageStatus: 'Collected', timestamp: '2021-10-10 10:00:00' },
-    { id: 5, resident: 'Daniel King', flatNumber: '209', packageStatus: 'Collected', timestamp: '2021-10-10 10:00:00' },
-    { id: 6, resident: 'Michael Green', flatNumber: '211', packageStatus: 'Collected', timestamp: '2021-10-10 10:00:00' },
+    { field: 'name', headerName: 'Resident name', width: 200 },
+    { field: 'description', headerName: 'Package Description', width: 600 },
+    { field: 'delivered', headerName: 'Package Status', width: 300 },
 ];
 
 
 export default function overviewBody() {
+    const [rows, setRows] = useState<Package[]>([]); // starts as an empty array of IUser objects
+    const complexId = "c0"; // complexId will be selected within the sidebar and passed in, hardcoded for now
+
+    useEffect(() => {
+        // Function to fetch packages from the backend
+        const fetchPackages = async () => {
+            try {
+                const response = await axios.get<Package[]>(`http://localhost:3001/db/complex/${complexId}/packages`);
+                console.log("Response from backend:", response); // Debugging line
+                const packages: Package[] = response.data;
+                setRows(packages);
+            } catch (error) {
+                console.error("Error fetching residents:", error);
+            }
+        };
+
+        fetchPackages();
+    }, [complexId]);
+
     return(
 
 
@@ -60,7 +71,8 @@ export default function overviewBody() {
                     <Typography variant="h6">Packages holding:</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                         <CircleIcon sx={{ color: 'cornflowerblue' }}/>
-                        <Typography variant="h3">2</Typography>
+                        <Typography variant="h3">x</Typography>
+                        {/* TODO: MAKE THIS NUMBER REFLECT #PACKAGES DELIVERED = FALSE*/}
                     </Box>
                 </Box>
 
@@ -74,13 +86,15 @@ export default function overviewBody() {
                     <Typography variant="h6">Packages collected:</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                         <CircleIcon sx={{ color: 'green' }}/>
-                        <Typography variant="h3">4</Typography>
+                        <Typography variant="h3">x</Typography>
+                        {/* TODO: MAKE THIS NUMBER REFLECT #PACKAGES DELIVERED = TRUE*/}
                     </Box>
                 </Box>
 
             </Box>
 
             {/* adding box for the data table */}
+            {/* TODO: ADD A COLUMN OF CIRCLES TO THE LEFT INDICATING DELIVERY STATUS*/}
             <Box sx={{ display: "flex", height: "70%" }}>
                 <Paper sx={{ height: '100%', width: '100%'}}>
                     <DataGrid // using the values defined above.
