@@ -1,17 +1,9 @@
-// Authentication service for API requests
-
-// Types for authentication
+import api from './apiService';
+// Handles user login with the provider
 export type UserCredentials = {
 	email: string
 	password: string
 }
-
-export type additionalUserData = {
-	phone: string
-	address: string
-	name: string
-}
-
 export type AdminCredentials = {
 	adminId: string
 	password: string
@@ -38,53 +30,49 @@ export type UserData = {
 	role: string
 	accountType: "user" | "concierge" | "admin"
 }
+const API_URL = "asdasdads"
+export const signInAdmin = async (provider: AdminCredentials) => {
+	const response = await api.post('/auth/signUpAdmin', {
+		provider
+	});
 
-const API_URL = "/localhost:3001"
-
-// Sign in functions
-export async function signInUser(credentials: UserCredentials) {
-	try {
-		const response = await fetch(`${API_URL}/auth/user/signin`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(credentials),
-		})
-
-		if (!response.ok) {
-			const error = await response.json()
-			throw new Error(error.message || "Failed to sign in")
-		}
-
-		return await response.json()
-	} catch (error) {
-		console.error("Sign in error:", error)
-		throw error
+	// If login fails, show an error
+	if (!response) {
+		throw new Error('Failed to sign in');
 	}
-}
 
-export async function signInAdmin(credentials: AdminCredentials) {
-	try {
-		const response = await fetch(`${API_URL}/auth/admin/signin`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(credentials),
-		})
+	// Return the user data from the response
+	return await response;
+};
 
-		if (!response.ok) {
-			const error = await response.json()
-			throw new Error(error.message || "Failed to sign in")
-		}
+// Handles user logout
+export const signOut = async () => {
+	const response = await fetch('/api/auth/logout', {
+		method: 'POST',
+	});
 
-		return await response.json()
-	} catch (error) {
-		console.error("Admin sign in error:", error)
-		throw error
+	// If logout fails, show an error
+	if (!response.ok) {
+		throw new Error('Failed to sign out');
 	}
-}
+
+	// Return the response confirming the user has logged out
+	return await response.json();
+};
+
+// Fetch the current logged-in user session
+export const getUserSession = async () => {
+	const response = await fetch('/api/auth/session');
+
+	// If there’s no session, return null
+	if (!response.ok) {
+		return null;
+	}
+
+	// Return the session data if the user is logged in
+	return await response.json();
+};
+
 
 export async function signInConcierge(credentials: ConciergeCredentials) {
 	try {
@@ -101,6 +89,7 @@ export async function signInConcierge(credentials: ConciergeCredentials) {
 			throw new Error(error.message || "Failed to sign in")
 		}
 
+
 		return await response.json()
 	} catch (error) {
 		console.error("Concierge sign in error:", error)
@@ -108,7 +97,6 @@ export async function signInConcierge(credentials: ConciergeCredentials) {
 	}
 }
 
-// Sign up function
 export async function signUp(data: SignUpData) {
 	try {
 		const response = await fetch(`${API_URL}/auth/signup`, {
@@ -131,3 +119,25 @@ export async function signUp(data: SignUpData) {
 	}
 }
 
+
+export async function signInUser(credentials: AdminCredentials) {
+	try {
+		const response = await fetch(`${API_URL}/auth/admin/signin`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(credentials),
+		})
+
+		if (!response.ok) {
+			const error = await response.json()
+			throw new Error(error.message || "Failed to sign in")
+		}
+
+		return await response.json()
+	} catch (error) {
+		console.error("Admin sign in error:", error)
+		throw error
+	}
+}

@@ -59,7 +59,6 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 				password,
 				accountType: type,
 			}
-
 			const userData = await signUp(signUpData)
 			onSignUpSuccess(userData)
 		} catch (err) {

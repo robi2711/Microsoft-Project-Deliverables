@@ -1,9 +1,9 @@
 //This is the layout Next.js will use to display the pages
-
-import type React from "react"
+import React from "react"
 import {ThemeProvider} from "@mui/material/styles"
 import {lpTheme} from "@/components/theme/lpTheme"
 import {Inter} from "next/font/google"
+import { UserProvider} from "@/components/services/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -19,9 +19,11 @@ export default function RootLayout({children,}: {
 	return (
 		<html lang="en">
 		<body className={inter.className} style={{ margin: 0, padding: 0}}>
-			<ThemeProvider theme={lpTheme}>
-				{children}
-			</ThemeProvider>
+			<UserProvider>
+				<ThemeProvider theme={lpTheme}>
+					{children}
+				</ThemeProvider>
+			</UserProvider>
 		</body>
 		</html>
 	)
