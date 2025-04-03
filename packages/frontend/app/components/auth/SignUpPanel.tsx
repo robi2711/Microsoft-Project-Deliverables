@@ -13,7 +13,7 @@ import {
 	useTheme,
 } from "@mui/material"
 import { PersonAdd, Person, SupportAgent, AdminPanelSettings, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signUp, type SignUpData, type UserData } from "@/components/services/authService"
+import {signUp, signUpAdmin, type SignUpData, type UserData} from "@/components/services/authService"
 
 type SignUpPanelProps = {
 	onSignUpSuccess: (userData: UserData) => void
@@ -63,13 +63,17 @@ export default function SignUpPanel({ onSignUpSuccess }: SignUpPanelProps) {
 
 		try {
 			const signUpData: SignUpData = {
-				firstName,
-				lastName,
+				name: firstName,
 				email,
 				password,
 				accountType: type,
 			}
 
+			if (type === "admin") {
+
+				const userData1 =signUpAdmin(signUpData)
+				console.log(userData1);
+			}
 			const userData = await signUp(signUpData)
 			onSignUpSuccess(userData)
 		} catch (err) {

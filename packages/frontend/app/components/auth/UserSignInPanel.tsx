@@ -15,7 +15,7 @@ import {
 	useTheme,
 } from "@mui/material"
 import { Person, Login, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signInUser, type UserCredentials, type UserData } from "@/components/services/authService"
+import {AdminCredentials, signInUser, type UserData} from "@/components/services/authService"
 
 type UserSignInPanelProps = {
 	onSignInSuccess: (userData: UserData) => void
@@ -55,8 +55,8 @@ export default function UserSignInPanel({ onSignInSuccess }: UserSignInPanelProp
 		setLoading(true)
 
 		try {
-			const credentials: UserCredentials = {
-				email,
+			const credentials: AdminCredentials = {
+				adminId: email,
 				password,
 			}
 

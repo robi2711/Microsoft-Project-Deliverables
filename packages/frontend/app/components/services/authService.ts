@@ -16,9 +16,9 @@ export type ConciergeCredentials = {
 
 export type SignUpData = {
 	name: string
-	phone: string
-	address: string
-	email: string
+	phone?: string
+	address?: string
+	email?: string
 	password: string
 	accountType: "user" | "concierge" | "admin"
 }
@@ -32,6 +32,22 @@ export type UserData = {
 }
 const API_URL = "asdasdads"
 export const signInAdmin = async (provider: AdminCredentials) => {
+	console.log(provider);
+	const response = await api.post('/auth/signInAdmin', {
+		provider
+	});
+
+	// If login fails, show an error
+	if (!response) {
+		throw new Error('Failed to sign in');
+	}
+
+	// Return the user data from the response
+	return await response;
+};
+
+export const signUpAdmin = async (provider: AdminCredentials) => {
+	console.log(provider);
 	const response = await api.post('/auth/signUpAdmin', {
 		provider
 	});
@@ -46,7 +62,7 @@ export const signInAdmin = async (provider: AdminCredentials) => {
 };
 
 // Handles user logout
-export const signOut = async () => {
+export const signOutAdmin = async () => {
 	const response = await fetch('/api/auth/logout', {
 		method: 'POST',
 	});
