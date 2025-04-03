@@ -24,6 +24,7 @@
     "@azure/identity": "^4.8.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "express-session": "^1.18.1",
     "tsx": "^4.19.3",
     "uuid": "^11.1.0"
   },

@@ -14,12 +14,18 @@
     "both": "lerna run dev --parallel"
   },
   "devDependencies": {
+    "@mui/x-data-grid": "^7.28.0",
+    "@types/express-session": "^1.18.1",
     "@types/node": "^20",
     "dotenv": "^16.4.7",
     "lerna": "^8.1.9",
     "typescript": "^5"
   },
   "dependencies": {
-    "@azure/functions": "^4.7.0"
+    "@aws-cdk/aws-cognito": "^1.203.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.777.0",
+    "@react-google-maps/api": "^2.20.6",
+    "express-session": "^1.18.1",
+    "react-webcam": "^7.2.0"
   }
 }

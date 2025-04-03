@@ -18,6 +18,9 @@ export default function AdminSignInPanel({ }: AdminSignInPanelProps) {
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState("")
 
+	const theme = useTheme()
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+
 	const handleTogglePassword = () => {
 		setShowPassword(!showPassword)
 	}
@@ -50,13 +53,13 @@ export default function AdminSignInPanel({ }: AdminSignInPanelProps) {
 	}
 
 	return (
-		<Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-			<Box sx={{ textAlign: "center", mb: 2 }}>
-				<AdminPanelSettings sx={{ fontSize: 48, mb: 1, color: "secondary.main" }} />
-				<Typography variant="h4" gutterBottom fontWeight="bold">
+		<Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+			<Box sx={{ textAlign: "center", mb: 1 }}>
+				<AdminPanelSettings sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1, color: "secondary.main" }} />
+				<Typography variant="h4" gutterBottom fontWeight="bold" sx={{ fontSize: { xs: "1.5rem", sm: "2rem" } }}>
 					Admin Sign In
 				</Typography>
-				<Typography variant="body2" color="rgba(255,255,255,0.7)">
+				<Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ fontSize: { xs: "0.8rem", sm: "0.875rem" } }}>
 					Access the administrative dashboard
 				</Typography>
 			</Box>
@@ -68,10 +71,20 @@ export default function AdminSignInPanel({ }: AdminSignInPanelProps) {
 				value={adminId}
 				onChange={(e) => setAdminId(e.target.value)}
 				InputProps={{
-					sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
+					sx: {
+						color: "white",
+						"& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
 				}}
-				InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
+				InputLabelProps={{
+					sx: {
+						color: "rgba(255,255,255,0.7)",
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
+				}}
 				required
+				size={isMobile ? "small" : "medium"}
 			/>
 
 			<TextField
@@ -82,21 +95,40 @@ export default function AdminSignInPanel({ }: AdminSignInPanelProps) {
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 				InputProps={{
-					sx: { color: "white", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" } },
+					sx: {
+						color: "white",
+						"& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
 					endAdornment: (
 						<InputAdornment position="end">
-							<IconButton onClick={handleTogglePassword} edge="end" sx={{ color: "rgba(255,255,255,0.7)" }}>
-								{showPassword ? <VisibilityOff /> : <Visibility />}
+							<IconButton
+								onClick={handleTogglePassword}
+								edge="end"
+								sx={{ color: "rgba(255,255,255,0.7)" }}
+								size={isMobile ? "small" : "medium"}
+							>
+								{showPassword ? (
+									<VisibilityOff fontSize={isMobile ? "small" : "medium"} />
+								) : (
+									<Visibility fontSize={isMobile ? "small" : "medium"} />
+								)}
 							</IconButton>
 						</InputAdornment>
 					),
 				}}
-				InputLabelProps={{ sx: { color: "rgba(255,255,255,0.7)" } }}
+				InputLabelProps={{
+					sx: {
+						color: "rgba(255,255,255,0.7)",
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
+				}}
 				required
+				size={isMobile ? "small" : "medium"}
 			/>
 
 			{error && (
-				<Typography color="error" variant="body2" sx={{ mt: 1 }}>
+				<Typography color="error" variant="body2" sx={{ mt: 1, fontSize: { xs: "0.8rem", sm: "0.875rem" } }}>
 					{error}
 				</Typography>
 			)}
@@ -105,13 +137,13 @@ export default function AdminSignInPanel({ }: AdminSignInPanelProps) {
 				type="submit"
 				variant="contained"
 				color="secondary"
-				size="large"
+				size={isMobile ? "medium" : "large"}
 				fullWidth
-				endIcon={loading ? null : <Login />}
-				sx={{ mt: 2, py: 1.5 }}
+				endIcon={loading ? null : <Login fontSize={isMobile ? "small" : "medium"} />}
+				sx={{ mt: 2, py: isMobile ? 1 : 1.5 }}
 				disabled={loading}
 			>
-				{loading ? <CircularProgress size={24} color="inherit" /> : "Sign In as Admin"}
+				{loading ? <CircularProgress size={isMobile ? 20 : 24} color="inherit" /> : "Sign In as Admin"}
 			</Button>
 		</Box>
 	)
