@@ -5,14 +5,13 @@ import type React from "react"
 import { useState } from "react"
 import { Box, Button, TextField, Typography, InputAdornment, IconButton, CircularProgress } from "@mui/material"
 import { AdminPanelSettings, Login, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signInAdmin, type AdminCredentials , type UserData} from "@/components/services/authService"
+import { signInAdmin, type AdminCredentials} from "@/components/services/authService"
 
 type AdminSignInPanelProps = {
 	//TODO: Create a type for userData when it is known
-	onSignInSuccess: (userData: UserData) => void
 }
 
-export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelProps) {
+export default function AdminSignInPanel({ }: AdminSignInPanelProps) {
 	const [adminId, setAdminId] = useState("")
 	const [password, setPassword] = useState("")
 	const [showPassword, setShowPassword] = useState(false)
@@ -42,7 +41,7 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 			}
 
 			const userData = await signInAdmin(credentials)
-			onSignInSuccess(userData)
+			console.log(userData);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Failed to sign in")
 		} finally {

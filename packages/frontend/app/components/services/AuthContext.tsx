@@ -1,79 +1,51 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { useRouter } from 'next/router';
-import { signIn, signOut, getUserSession } from '@/components/services/authService';
+"use client";
+import { createContext, useContext, useState, useEffect } from 'react';
 
-// Define a type for user data
-type User = {
-    id: number;
-    name: string;
+export interface UserInfo {
+    username: string;
     email: string;
-    provider: string;
-    role: 'resident' | 'staff' | 'admin';  // Role-based access control
-};
+    accessToken: string,
+    idToken: string,
+    refreshToken: string,
+    tokenType: string,
+    rooms: string[];
+    roomsOwned: string[];
+    sub: string;
+}
 
-// Define the AuthContext type
-type AuthContextType = {
-    user: User | null;
-    login: (provider: string) => Promise<void>;
-    logout: () => Promise<void>;
-    isAuthenticated: boolean;
-    hasRole: (role: 'resident' | 'staff' | 'admin') => boolean;
-};
+interface UserContextType {
+    userInfo: UserInfo | null;
+    setUserInfo: (userInfo: UserInfo) => void;
+}
 
-// Create context with proper typing
-const AuthContext = createContext<AuthContextType | null>(null);
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const router = useRouter();
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-    // Load user from session storage
+    const updateUserInfo = (userInfo: UserInfo) => {
+        setUserInfo(userInfo);
+        sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+    };
+
     useEffect(() => {
-        const loadUserSession = async () => {
-            const storedUser = await getUserSession();
-            if (storedUser) {
-                setUser(storedUser);
-            }
-        };
-        loadUserSession();
+        const storedUserInfo = sessionStorage.getItem('userInfo');
+        if (storedUserInfo) {
+            setUserInfo(JSON.parse(storedUserInfo));
+        }
     }, []);
 
-    // Login function (calls backend auth API)
-    const login = async (provider: string) => {
-        try {
-            const userData: User = await signIn(provider);
-            setUser(userData);
-            localStorage.setItem('user', JSON.stringify(userData)); // Save session
-        } catch (error) {
-            console.error('Login failed:', error);
-        }
-    };
-
-    // Logout function (clears session)
-    const logout = async () => {
-        await signOut();
-        setUser(null);
-        localStorage.removeItem('user');
-        router.push('/'); // Redirect to home
-    };
-
-    // Check if user has a specific role
-    const hasRole = (role: 'resident' | 'staff' | 'admin') => {
-        return user?.role === role;
-    };
-
     return (
-        <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, hasRole }}>
+        <UserContext.Provider value={{ userInfo, setUserInfo: updateUserInfo }}>
             {children}
-        </AuthContext.Provider>
+        </UserContext.Provider>
     );
 };
 
-// Custom hook to use auth context anywhere
-export const useAuth = () => {
-    const context = useContext(AuthContext);
+export const useUser = () => {
+    const context = useContext(UserContext);
     if (!context) {
-        throw new Error("useAuth must be used within an AuthProvider");
+        throw new Error('useUser must be used within a UserProvider');
     }
     return context;
 };
