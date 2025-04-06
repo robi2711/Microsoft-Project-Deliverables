@@ -4,22 +4,27 @@
 // importing necessary modules
 import { Package } from '../../../../backend/src/types/dbTypes';
 import { DataGrid, GridColDef } from '@mui/x-data-grid'; // for building the table
-import {Box, Typography, Paper} from "@mui/material";
+import {Box, Typography, Paper, IconButton} from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import {useEffect, useState} from "react"; // for retrieving resident data from the backend
 
 // The columns define the structure of the data table - fields should match the Package type TODO: add time delivered
 const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'name', headerName: 'Resident name', width: 200 },
-    { field: 'description', headerName: 'Package Description', width: 600 },
-    { field: 'delivered', headerName: 'Package Status', width: 300 },
+    { field: 'name', headerName: 'Resident name', width: 150 },
+    { field: 'description', headerName: 'Description', width: 500 },
+    { field: 'delivered', headerName: 'Collection Status', width: 150 },
 ];
 
 
-export default function overviewBody() {
+export default function OverviewBody() {
     const [rows, setRows] = useState<Package[]>([]); // starts as an empty array of IUser objects
+    const [packagesHoldingCount, setPackagesHoldingCount] = useState<number>(0); // for summary statistics at the top of the page
+    const [packagesCollectedCount, setPackagesCollectedCount] = useState<number>(0);
     const complexId = "c0"; // complexId will be selected within the sidebar and passed in, hardcoded for now
 
     useEffect(() => {
@@ -30,6 +35,8 @@ export default function overviewBody() {
                 console.log("Response from backend:", response); // Debugging line
                 const packages: Package[] = response.data;
                 setRows(packages);
+                setPackagesHoldingCount(packages.filter(pkg => !pkg.delivered).length);
+                setPackagesCollectedCount(packages.filter(pkg => pkg.delivered).length);
             } catch (error) {
                 console.error("Error fetching residents:", error);
             }
@@ -37,6 +44,8 @@ export default function overviewBody() {
 
         fetchPackages();
     }, [complexId]);
+
+
 
     return(
 
@@ -71,8 +80,7 @@ export default function overviewBody() {
                     <Typography variant="h6">Packages holding:</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                         <CircleIcon sx={{ color: 'cornflowerblue' }}/>
-                        <Typography variant="h3">x</Typography>
-                        {/* TODO: MAKE THIS NUMBER REFLECT #PACKAGES DELIVERED = FALSE*/}
+                        <Typography variant="h3">{packagesHoldingCount}</Typography>
                     </Box>
                 </Box>
 
@@ -86,8 +94,7 @@ export default function overviewBody() {
                     <Typography variant="h6">Packages collected:</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                         <CircleIcon sx={{ color: 'green' }}/>
-                        <Typography variant="h3">x</Typography>
-                        {/* TODO: MAKE THIS NUMBER REFLECT #PACKAGES DELIVERED = TRUE*/}
+                        <Typography variant="h3">{packagesCollectedCount}</Typography>
                     </Box>
                 </Box>
 
@@ -97,6 +104,20 @@ export default function overviewBody() {
             {/* TODO: ADD A COLUMN OF CIRCLES TO THE LEFT INDICATING DELIVERY STATUS*/}
             <Box sx={{ display: "flex", height: "70%" }}>
                 <Paper sx={{ height: '100%', width: '100%'}}>
+                    <Box sx={{
+                        position: 'absolute',
+                        top: 140
+                    }}> {/* This box is for the RUD icons */}
+                        <IconButton>
+                            <AddIcon />
+                        </IconButton>
+                        <IconButton>
+                            <EditIcon />
+                        </IconButton>
+                        <IconButton>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Box>
                     <DataGrid // using the values defined above.
                         rows={rows}
                         columns={columns}

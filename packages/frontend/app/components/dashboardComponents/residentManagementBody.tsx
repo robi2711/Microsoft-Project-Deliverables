@@ -4,10 +4,13 @@
 import { IUser } from '../../../../backend/src/types/dbTypes';
 import { useState, useEffect } from 'react'; // handling current info displayed
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, Typography, Paper } from "@mui/material";
+import {Box, Typography, Paper, IconButton} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
-import axios from "axios"; // for retrieving resident data from the backend
+import axios from "axios";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete"; // for retrieving resident data from the backend
 
 // The columns define the structure of the data table
 const columns: GridColDef[] = [
@@ -92,6 +95,20 @@ export default function ResidentManagementBody() {
 
             <Box sx={{ display: "flex", height: "70%" }}>
                 <Paper sx={{ height: '100%', width: '100%' }}>
+                    <Box sx={{
+                        position: 'absolute',
+                        top: 140
+                    }}> {/* This box is for the RUD icons */}
+                        <IconButton>
+                            <AddIcon />
+                        </IconButton>
+                        <IconButton>
+                            <EditIcon />
+                        </IconButton>
+                        <IconButton>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Box>
                     <DataGrid
                         rows={rows}
                         columns={columns}
