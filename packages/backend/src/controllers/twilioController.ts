@@ -1,10 +1,35 @@
 import express, { Request, Response, Handler } from "express";
 import { User } from "@/types/dbTypes";
 import client from "@/config/twilioConfig";
+import axios from "axios";
+import pdfParse from 'pdf-parse';
+import { text } from "stream/consumers";
 
 interface extendTwilio {
     sendSMS: Handler
     receiveSMS: Handler
+}
+
+//Command Management
+const runCommand = (args: string[]): void => {
+    const command = args[0].substring(1);
+    const params = args.slice(1);
+    
+    if(command === "register") {
+        console.log("Registering user with params:", params);
+        const email = params[0];
+
+        //IDEA: Generate a token, give link to the user to register and get them to put in the token
+        //Register accoutn with email and the password that they give
+
+    }
+}
+
+//Process the contract we received
+const processContract = (text: string): void => {
+
+    //Use the LLM to extract the data, check in the database if user exists
+
 }
 
 const twilioController: extendTwilio = {
@@ -63,25 +88,63 @@ const twilioController: extendTwilio = {
             //Do some AI prompt stuff here
         }
 
-        //IDEAS:
-        //1. Store previous message history on database and use them for our AI prompts
+        //Check if we receive contract
+        const numMedia = parseInt(req.body.NumMedia || '0', 10);
+
+        if (numMedia > 0) {
+
+            //Hardcoded for now for testing
+            const mediaUrl = ''//req.body.MediaUrl0;
+            const contentType = 'application/pdf'//req.body.MediaContentType0;
+            
+            //Read PDF directly
+            if(contentType == 'application/pdf') {
+                try {
+                    // Download the PDF file
+                    const pdfResponse = await axios.get(mediaUrl, {
+                      responseType: 'arraybuffer',
+                      auth: {
+                        username: process.env.TWILIO_SID,
+                        password: process.env.TWILIO_AUTH_TOKEN,
+                      },
+                    });
+                    
+                    const data = await pdfParse(pdfResponse.data);
+
+                    console.log('PDF text content:', data.text);
+                    processContract(data.text);
+                    res.send('PDF received and parsed successfully!');
+                } catch(error) {
+                    console.error('Error parsing PDF:', error);
+                    res.status(500).send('Error handling PDF');
+                }
+            }
+
+            //Read image and do OCR
+            if(contentType == 'image/jpeg' || contentType == 'image/png') {
+                try {
+                    // Download the image file
+                    const imageResponse = await axios.get(mediaUrl, {
+                      responseType: 'arraybuffer',
+                      auth: {
+                        username: process.env.TWILIO_SID,
+                        password: process.env.TWILIO_AUTH_TOKEN,
+                      },
+                    });
+
+                    const imageBuffer = Buffer.from(imageResponse.data, 'binary');
+                
+                    // Perform OCR on the image
+
+                } catch(error) {
+                    console.error('Error parsing image:', error);
+                    res.status(500).send('Error handling image');
+                }
+            }
+        }
 
         res.status(200).send();
     }
 }
 
-//Command Management
-const runCommand = (args: string[]): void => {
-    const command = args[0].substring(1);
-    const params = args.slice(1);
-    
-    if(command === "register") {
-        console.log("Registering user with params:", params);
-        const email = params[0];
-
-        //IDEA: Generate a token, give link to the user to register and get them to put in the token
-        //Register accoutn with email and the password that they give
-
-    }
-}
 export default twilioController;
