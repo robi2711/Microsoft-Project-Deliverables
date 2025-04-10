@@ -48,10 +48,9 @@ export const signUpUser = async (UserInfo: UserInfo, password : string) => {
         console.error('Error signing up user in CONFIG:', error);
     }
 }
-
 export const signUpAdmin = async (AdminInfo:AdminInfo ,Password: string) => {
     const params = {
-        ClientId: process.env.COGNITO_CLIENT_ID || '',
+        ClientId: process.env.COGNITO_ADMIN_CLIENT_ID || '',
         Username: AdminInfo.email,
         Password: Password,
         UserAttributes: [

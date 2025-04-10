@@ -46,6 +46,7 @@ const authController: IUserController = {
         const Password = req.body.Password
         try {
             const response = await signInAdmin(Password, Email);
+
             res.send(response);
         } catch (error) {
             res.status(500).send('Error signing in user');
