@@ -1,9 +1,10 @@
 import express, { Request, Response, Handler } from "express";
-import { User } from "@/types/dbTypes";
 import client from "@/config/twilioConfig";
 import axios from "axios";
 import pdfParse from 'pdf-parse';
-import { text } from "stream/consumers";
+import dotenv from "dotenv";
+import FormData from 'form-data';
+dotenv.config();
 
 interface extendTwilio {
     sendSMS: Handler
@@ -29,6 +30,7 @@ const runCommand = (args: string[]): void => {
 const processContract = (text: string): void => {
 
     //Use the LLM to extract the data, check in the database if user exists
+    console.log("Received contract data: " + text)
 
 }
 
@@ -78,15 +80,9 @@ const twilioController: extendTwilio = {
 
     //POST route for receiving an SMS, Twilio handles Webhook and sends the POST request to a given endpoint
     receiveSMS: async (req: Request, res: Response): Promise<void> => {
-        console.log("Received SMS:", req.body);
 
-        //If we are running a command, handle it
-        if(req.body.startsWith("/")) {
-            const args = req.body.split(" ");
-            runCommand(args);
-        } else {
-            //Do some AI prompt stuff here
-        }
+        const text = req.body.Body;
+        console.log("Received SMS:", text);
 
         //Check if we receive contract
         const numMedia = parseInt(req.body.NumMedia || '0', 10);
@@ -94,8 +90,8 @@ const twilioController: extendTwilio = {
         if (numMedia > 0) {
 
             //Hardcoded for now for testing
-            const mediaUrl = ''//req.body.MediaUrl0;
-            const contentType = 'application/pdf'//req.body.MediaContentType0;
+            const mediaUrl = req.body.MediaUrl0;
+            const contentType = req.body.MediaContentType0;
             
             //Read PDF directly
             if(contentType == 'application/pdf') {
@@ -105,13 +101,14 @@ const twilioController: extendTwilio = {
                       responseType: 'arraybuffer',
                       auth: {
                         username: process.env.TWILIO_SID,
-                        password: process.env.TWILIO_AUTH_TOKEN,
+                        password: process.env.TWILIO_KEY,
                       },
+                      headers: {
+                        'Content-Type': 'application/pdf'
+                      }
                     });
                     
                     const data = await pdfParse(pdfResponse.data);
-
-                    console.log('PDF text content:', data.text);
                     processContract(data.text);
                     res.send('PDF received and parsed successfully!');
                 } catch(error) {
@@ -128,18 +125,40 @@ const twilioController: extendTwilio = {
                       responseType: 'arraybuffer',
                       auth: {
                         username: process.env.TWILIO_SID,
-                        password: process.env.TWILIO_AUTH_TOKEN,
+                        password: process.env.TWILIO_KEY,
                       },
                     });
 
-                    const imageBuffer = Buffer.from(imageResponse.data, 'binary');
-                
-                    // Perform OCR on the image
+                    const imageBuffer = Buffer.from(imageResponse.data);
+                    
+                    const form = new FormData();
+                    form.append('image', imageBuffer, {
+                        filename: 'image.jpg',
+                        contentType: contentType,
+                    });
+                    
+                    const ocrData = await axios.post('http://localhost:3001/ocr', form, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        }
+                    })
+                    const ocrResponse = ocrData.data.allLines.join('\n');
+
+                    processContract(ocrResponse);
+                    res.send('Image received and processed successfully!');
 
                 } catch(error) {
                     console.error('Error parsing image:', error);
                     res.status(500).send('Error handling image');
                 }
+            }
+        } else {
+            //If we are running a command, handle it
+            if(text.startsWith("/")) {
+                const args = text.split(" ");
+                runCommand(args);
+            } else {
+                //Do some AI prompt stuff here
             }
         }
 

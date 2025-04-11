@@ -21,6 +21,10 @@ app.use(cors({
 	credentials: true
 })); // This is used to allow the frontend to make requests to the backend
 
+app.use(cors({
+	origin: 'https://api.twilio.com',
+	credentials: true
+})); // This is used to allow post requests from twilio webhook to our backend
 
 app.use("/db", dbRoutes); // This is the route that the frontend will use to make requests to the backend.
 app.use("/whatsapp", twilioRoutes)
