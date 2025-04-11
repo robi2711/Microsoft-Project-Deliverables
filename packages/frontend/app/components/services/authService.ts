@@ -27,8 +27,7 @@ export type UserInfo = {
 }
 
 export type UserData = {
-	firstName: string
-	lastName: string
+	givenName: string
 	email: string
 	password: string
 	role: string
