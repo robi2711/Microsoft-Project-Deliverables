@@ -15,10 +15,10 @@ import {
 	useTheme,
 } from "@mui/material"
 import { AdminPanelSettings, Login, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signInAdmin, type AdminCredentials,type UserData} from "@/components/services/authService"
+import { signInAdmin, type AdminCredentials, type AdminInfo} from "@/components/services/authService"
 
 type AdminSignInPanelProps = {
-	onSignInSuccess: (userData: UserData) => void
+	onSignInSuccess: (AdmimCredentials: AdminCredentials) => void
 }
 
 export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelProps) {
@@ -40,7 +40,6 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 		e.preventDefault()
 		setError("")
 
-		// Basic validation
 		if (!email.trim() || !password) {
 			setError("Please fill in all fields")
 			return
@@ -54,8 +53,8 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 				givenName,
 			}
 
-			const userData = await signInAdmin(credentials,password)
-			onSignInSuccess(userData)
+			const adminInfo: AdminInfo = await signInAdmin(credentials,password)
+			onSignInSuccess(adminInfo)
 			setEmail("")
 			setPassword("")
 			setGivenName("")

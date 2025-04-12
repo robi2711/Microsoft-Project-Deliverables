@@ -50,7 +50,7 @@ export const signUpUser = async (UserInfo: UserInfo, password : string) => {
 }
 export const signUpAdmin = async (AdminInfo:AdminInfo ,Password: string) => {
     const params = {
-        ClientId: process.env.COGNITO_ADMIN_CLIENT_ID || '',
+        ClientId: process.env.COGNITO_CLIENT_ID,
         Username: AdminInfo.email,
         Password: Password,
         UserAttributes: [
@@ -68,7 +68,7 @@ export const signUpAdmin = async (AdminInfo:AdminInfo ,Password: string) => {
         if (error instanceof UsernameExistsException) {
             return 'Username already exists';
         }
-        console.error('Error signing up user in CONFIG:', error);
+        console.error('Error signing up user in HELPER:', error);
     }
 }
 
@@ -85,12 +85,12 @@ export const getUser = async (AccessToken: string) => {
     }
 }
 
-export const signInAdmin = async (AdminInfo:AdminInfo,Password: string) => {
+export const signInAdmin = async (Email: string,Password: string) => {
     const params = {
         AuthFlow: "USER_PASSWORD_AUTH" as AuthFlowType,
         ClientId: process.env.COGNITO_CLIENT_ID || '',
         AuthParameters: {
-            USERNAME: AdminInfo.email,
+            USERNAME: Email,
             PASSWORD: Password,
         }
     }
@@ -101,7 +101,7 @@ export const signInAdmin = async (AdminInfo:AdminInfo,Password: string) => {
         const userInfo = await getUser(response.AuthenticationResult?.AccessToken as string);
 
         return {
-            email: AdminInfo.email,
+            email: Email,
             sub: userInfo?.UserAttributes?.find((attr) => attr.Name === 'sub')?.Value,
             username: userInfo?.UserAttributes?.find((attr) => attr.Name === 'given_name')?.Value,
             accessToken: response.AuthenticationResult?.AccessToken,

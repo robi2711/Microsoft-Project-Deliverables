@@ -1,25 +1,22 @@
 "use client"
 
-import { Box, Paper, Tabs, Tab } from "@mui/material"
+import { Box, Paper } from "@mui/material"
 import { useState, useEffect } from "react"
-import { AdminPanelSettings, Person, SupportAgent } from "@mui/icons-material"
 import { useRouter } from "next/navigation"
+import { AdminPanelSettings, PersonAdd } from "@mui/icons-material"
 
 // Import panel components
 import AdminSignInPanel from "@/components/auth/AdminSignInPanel"
-import ConciergeSignInPanel from "@/components/auth/ConciergeSignInPanel"
-import UserSignInPanel from "@/components/auth/UserSignInPanel"
-import SignUpPanel from "@/components/auth/SignUpPanel"
-import type { UserData } from "@/components/services/authService"
+import AdminSignUpPanel from "@/components/auth/AdminSignUpPanel"
+import {AdminCredentials} from "@/components/services/authService";
 
-// Form types
-type FormType = "admin-signin" | "concierge-signin" | "user-signin" | "signup"
+type PanelType = "admin-signin" | "admin-signup"
 
 export default function RightSide() {
-	// Animation and form state
+	// Animation and panel state
 	const [animatePanel, setAnimatePanel] = useState(false)
-	const [activeForm, setActiveForm] = useState<FormType>("user-signin")
-	const [formDirection, setFormDirection] = useState<"left" | "right">("left")
+	const [activePanel, setActivePanel] = useState<PanelType>("admin-signin")
+	const [slideDirection, setSlideDirection] = useState<"left" | "right">("left")
 	const router = useRouter()
 
 	// Initial animation
@@ -31,37 +28,27 @@ export default function RightSide() {
 		return () => clearTimeout(timer)
 	}, [])
 
-	// Handle form change with direction for animation
-	const handleFormChange = (newForm: FormType) => {
-		// Determine animation direction based on form order
-		const formOrder: FormType[] = ["admin-signin", "concierge-signin", "user-signin", "signup"]
-		const currentIndex = formOrder.indexOf(activeForm)
-		const newIndex = formOrder.indexOf(newForm)
-
-		setFormDirection(newIndex > currentIndex ? "right" : "left")
+	// Handle panel change with animation
+	const handlePanelChange = (newPanel: PanelType) => {
+		// Determine animation direction
+		setSlideDirection(newPanel === "admin-signup" ? "right" : "left")
 
 		// Animate out
 		setAnimatePanel(false)
 
-		// Change form and animate in
+		// Change panel and animate in
 		setTimeout(() => {
-			setActiveForm(newForm)
+			setActivePanel(newPanel)
 			setAnimatePanel(true)
-		}, 100)
+		}, 300)
 	}
 
 	// Handle successful authentication
-	const handleAuthSuccess = (userData: UserData) => {
-		console.log("Authentication successful:", userData)
+	const handleAuthSuccess = (AdminCredentials: AdminCredentials) => {
+		console.log("Authentication successful:", AdminCredentials)
 
-		// Redirect based on user role
-		if (userData.role === "admin") {
-			router.push("/dashboard")
-		} else if (userData.role === "concierge") {
-			router.push("/scanner")
-		} else {
-			router.push("/successful-login")
-		}
+		// Redirect to dashboard for admin
+		router.push("/dashboard")
 	}
 
 	return (
@@ -81,58 +68,34 @@ export default function RightSide() {
 				overflow: "hidden",
 			}}
 		>
-			{/* Form selection tabs */}
+			{/* Title for Admin Panel */}
 			<Box
 				sx={{
 					width: "100%",
 					maxWidth: 400,
 					mb: 3,
-					borderRadius: 2,
-					bgcolor: "primary.dark",
-					"& .MuiTabs-indicator": {
-						backgroundColor: "secondary.main",
-					},
+					textAlign: "center",
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
 				}}
 			>
-				<Tabs
-					value={activeForm.includes("signin") ? activeForm : false}
-					onChange={(_, value) => value && handleFormChange(value as FormType)}
-					variant="fullWidth"
-					textColor="inherit"
+				<Box
 					sx={{
-						"& .MuiTab-root": {
-							color: "rgba(255,255,255,0.7)",
-							"&.Mui-selected": {
-								color: "white",
-							},
-							fontSize: { xs: "0.75rem", sm: "0.875rem" },
-							padding: { xs: "6px 8px", sm: "12px 16px" },
-							minHeight: { xs: "48px", sm: "48px" },
-						},
+						fontSize: "1.75rem",
+						fontWeight: "bold",
+						mb: 1,
+						display: "flex",
+						alignItems: "center",
+						gap: 1,
 					}}
 				>
-					<Tab
-						icon={<AdminPanelSettings sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />}
-						label="Admin"
-						value="admin-signin"
-						iconPosition="start"
-					/>
-					<Tab
-						icon={<SupportAgent sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />}
-						label="Concierge"
-						value="concierge-signin"
-						iconPosition="start"
-					/>
-					<Tab
-						icon={<Person sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />}
-						label="User"
-						value="user-signin"
-						iconPosition="start"
-					/>
-				</Tabs>
+					<AdminPanelSettings sx={{ fontSize: "2rem" }} />
+					Admin Portal
+				</Box>
 			</Box>
 
-			{/* Main form panel */}
+			{/* Main form panel with animation */}
 			<Paper
 				elevation={6}
 				sx={{
@@ -143,54 +106,73 @@ export default function RightSide() {
 					color: "white",
 					borderRadius: 2,
 					opacity: animatePanel ? 1 : 0,
-					transform: animatePanel ? "translateX(0)" : `translateX(${formDirection === "right" ? "100%" : "-100%"})`,
-					transition: "all 0.8s cubic-bezier(0.1, 0.3, 0.2, 0.4)",
+					transform: animatePanel ? "translateX(0)" : `translateX(${slideDirection === "right" ? "-100%" : "100%"})`,
+					transition: "all 0.5s cubic-bezier(0.1, 0.3, 0.2, 0.4)",
 				}}
 			>
-				{/* Render the appropriate panel based on activeForm */}
-				{activeForm === "admin-signin" && <AdminSignInPanel onSignInSuccess={handleAuthSuccess} />}
-				{activeForm === "concierge-signin" && <ConciergeSignInPanel onSignInSuccess={handleAuthSuccess} />}
-				{activeForm === "user-signin" && <UserSignInPanel onSignInSuccess={handleAuthSuccess} />}
-				{activeForm === "signup" && <SignUpPanel onSignUpSuccess={handleAuthSuccess} />}
+				{/* Render the appropriate panel based on activePanel */}
+				{activePanel === "admin-signin" ? (
+					<AdminSignInPanel onSignInSuccess={handleAuthSuccess} />
+				) : (
+					<AdminSignUpPanel onSignUpSuccess={handleAuthSuccess} />
+				)}
 
-				{/* Footer with sign-in/sign-up toggle */}
+				{/* Toggle between sign-in and sign-up */}
 				<Box sx={{ mt: 4, textAlign: "center" }}>
-					{activeForm === "signup" ? (
-						<Box>
-							Already have an account?{" "}
+					{activePanel === "admin-signin" ? (
+						<Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+							<Box sx={{ mb: 1 }}>Need an admin account?</Box>
 							<Box
 								component="button"
-								onClick={() => handleFormChange("user-signin")}
+								onClick={() => handlePanelChange("admin-signup")}
 								sx={{
+									display: "flex",
+									alignItems: "center",
+									gap: 1,
 									background: "none",
-									border: "none",
+									border: "1px solid",
+									borderColor: "secondary.main",
 									color: "secondary.main",
 									cursor: "pointer",
 									fontWeight: "bold",
-									textDecoration: "underline",
-									p: 0,
+									p: "8px 16px",
+									borderRadius: 1,
+									transition: "all 0.2s",
+									"&:hover": {
+										bgcolor: "rgba(255,255,255,0.1)",
+									},
 								}}
 							>
-								Sign In
+								<PersonAdd fontSize="small" />
+								Register New Admin
 							</Box>
 						</Box>
 					) : (
-						<Box>
-							Don&#39;t have an account?{" "}
+						<Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+							<Box sx={{ mb: 1 }}>Already have an admin account?</Box>
 							<Box
 								component="button"
-								onClick={() => handleFormChange("signup")}
+								onClick={() => handlePanelChange("admin-signin")}
 								sx={{
+									display: "flex",
+									alignItems: "center",
+									gap: 1,
 									background: "none",
-									border: "none",
+									border: "1px solid",
+									borderColor: "secondary.main",
 									color: "secondary.main",
 									cursor: "pointer",
 									fontWeight: "bold",
-									textDecoration: "underline",
-									p: 0,
+									p: "8px 16px",
+									borderRadius: 1,
+									transition: "all 0.2s",
+									"&:hover": {
+										bgcolor: "rgba(255,255,255,0.1)",
+									},
 								}}
 							>
-								Sign Up
+								<AdminPanelSettings fontSize="small" />
+								Sign In
 							</Box>
 						</Box>
 					)}
@@ -199,4 +181,3 @@ export default function RightSide() {
 		</Box>
 	)
 }
-

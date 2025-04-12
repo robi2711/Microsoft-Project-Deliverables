@@ -29,8 +29,8 @@ const authController: IUserController = {
 
     signUpAdmin: async (req: CustomRequest, res: Response) => {
         const AdminInfo : AdminInfo = {
-            email: req.body?.email,
-            givenName: req.body?.givenName,
+            email: req.body?.credentials.email,
+            givenName: req.body?.credentials.givenName,
         }
         const password = req.body.password as string
         try {
@@ -42,11 +42,12 @@ const authController: IUserController = {
     },
 
     signInAdmin: async (req: CustomRequest, res: Response) => {
-        const Email = req.body.Email;
-        const Password = req.body.Password
+        const Email = req.body.credentials.email;
+        const Password = req.body.password
+        console.log(req.body);
         try {
-            const response = await signInAdmin(Password, Email);
-
+            const response = await signInAdmin(Email, Password);
+            console.log(response);
             res.send(response);
         } catch (error) {
             res.status(500).send('Error signing in user');

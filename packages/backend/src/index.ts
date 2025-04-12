@@ -52,3 +52,4 @@ app.use('/ocr', ocrRoutes); // Route for OCR
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`);
 });
+console.log("closed")
