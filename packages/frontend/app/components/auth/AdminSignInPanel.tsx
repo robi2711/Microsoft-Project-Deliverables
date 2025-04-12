@@ -15,14 +15,15 @@ import {
 	useTheme,
 } from "@mui/material"
 import { AdminPanelSettings, Login, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signInAdmin, type AdminCredentials, type UserData } from "@/components/services/authService"
+import { signInAdmin, type AdminCredentials,type UserData} from "@/components/services/authService"
 
 type AdminSignInPanelProps = {
 	onSignInSuccess: (userData: UserData) => void
 }
 
 export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelProps) {
-	const [adminId, setAdminId] = useState("")
+	const [email, setEmail] = useState("")
+	const [givenName, setGivenName] = useState("")
 	const [password, setPassword] = useState("")
 	const [showPassword, setShowPassword] = useState(false)
 	const [loading, setLoading] = useState(false)
@@ -40,7 +41,7 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 		setError("")
 
 		// Basic validation
-		if (!adminId.trim() || !password) {
+		if (!email.trim() || !password) {
 			setError("Please fill in all fields")
 			return
 		}
@@ -49,12 +50,15 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 
 		try {
 			const credentials: AdminCredentials = {
-				adminId,
-				password,
+				email,
+				givenName,
 			}
 
-			const userData = await signInAdmin(credentials)
+			const userData = await signInAdmin(credentials,password)
 			onSignInSuccess(userData)
+			setEmail("")
+			setPassword("")
+			setGivenName("")
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Failed to sign in")
 		} finally {
@@ -75,11 +79,34 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 			</Box>
 
 			<TextField
-				label="Admin ID"
+				label="Email"
 				variant="outlined"
 				fullWidth
-				value={adminId}
-				onChange={(e) => setAdminId(e.target.value)}
+				value={email}
+				onChange={(e) => setEmail(e.target.value)}
+				InputProps={{
+					sx: {
+						color: "white",
+						"& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
+				}}
+				InputLabelProps={{
+					sx: {
+						color: "rgba(255,255,255,0.7)",
+						fontSize: { xs: "0.9rem", sm: "1rem" },
+					},
+				}}
+				required
+				size={isMobile ? "small" : "medium"}
+			/>
+
+			<TextField
+				label="name"
+				variant="outlined"
+				fullWidth
+				value={givenName}
+				onChange={(e) => setGivenName(e.target.value)}
 				InputProps={{
 					sx: {
 						color: "white",

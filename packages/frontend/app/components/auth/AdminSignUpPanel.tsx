@@ -22,12 +22,13 @@ onSignUpSuccess: (userData: UserData) => void
 }
 
 export default function AdminSignUpPanel({ onSignUpSuccess }: AdminSignUpPanelProps) {
-const [adminId, setAdminId] = useState("")
+const [email, setEmail] = useState("")
 const [password, setPassword] = useState("")
 const [confirmPassword, setConfirmPassword] = useState("")
 const [showPassword, setShowPassword] = useState(false)
 const [loading, setLoading] = useState(false)
 const [error, setError] = useState("")
+    const [givenName,setGivenName ] = useState("")
 
 const theme = useTheme()
 const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -41,7 +42,7 @@ e.preventDefault()
 setError("")
 
 // Basic validation
-if (!adminId.trim() || !password || !confirmPassword) {
+if (!email.trim() || !password || !confirmPassword) {
 setError("Please fill in all fields")
 return
 }
@@ -55,12 +56,16 @@ setLoading(true)
 
 try {
 const credentials: AdminCredentials = {
-adminId,
-password,
+email,
+givenName,
 }
 
-const userData = await signUpAdmin(credentials)
+const userData = await signUpAdmin(credentials,password)
 onSignUpSuccess(userData)
+    setEmail("")
+    setPassword("")
+    setConfirmPassword("")
+    setGivenName("")
 } catch (err) {
 setError(err instanceof Error ? err.message : "Failed to sign up")
 } finally {
@@ -81,11 +86,11 @@ Create a new administrative account
 </Box>
 
 <TextField
-label="Admin ID"
+label="email"
 variant="outlined"
 fullWidth
-value={adminId}
-onChange={(e) => setAdminId(e.target.value)}
+value={email}
+onChange={(e) => setEmail(e.target.value)}
 InputProps={{
 sx: {
 color: "white",
@@ -102,6 +107,29 @@ fontSize: { xs: "0.9rem", sm: "1rem" },
 required
 size={isMobile ? "small" : "medium"}
 />
+
+    <TextField
+        label="name"
+        variant="outlined"
+        fullWidth
+        value={givenName}
+        onChange={(e) => setGivenName(e.target.value)}
+        InputProps={{
+            sx: {
+                color: "white",
+                "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+                fontSize: { xs: "0.9rem", sm: "1rem" },
+            },
+        }}
+        InputLabelProps={{
+            sx: {
+                color: "rgba(255,255,255,0.7)",
+                fontSize: { xs: "0.9rem", sm: "1rem" },
+            },
+        }}
+        required
+        size={isMobile ? "small" : "medium"}
+    />
 
 <TextField
 label="Password"
