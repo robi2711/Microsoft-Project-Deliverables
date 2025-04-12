@@ -18,12 +18,11 @@ import { AdminPanelSettings, Login, Visibility, VisibilityOff } from "@mui/icons
 import { signInAdmin, type AdminCredentials, type AdminInfo} from "@/components/services/authService"
 
 type AdminSignInPanelProps = {
-	onSignInSuccess: (AdmimCredentials: AdminCredentials) => void
+	onSignInSuccess: (AdminInfo: AdminInfo) => void
 }
 
 export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelProps) {
 	const [email, setEmail] = useState("")
-	const [givenName, setGivenName] = useState("")
 	const [password, setPassword] = useState("")
 	const [showPassword, setShowPassword] = useState(false)
 	const [loading, setLoading] = useState(false)
@@ -50,14 +49,13 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 		try {
 			const credentials: AdminCredentials = {
 				email,
-				givenName,
+				givenName: "a",
 			}
 
 			const adminInfo: AdminInfo = await signInAdmin(credentials,password)
 			onSignInSuccess(adminInfo)
 			setEmail("")
 			setPassword("")
-			setGivenName("")
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Failed to sign in")
 		} finally {
@@ -100,28 +98,6 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 				size={isMobile ? "small" : "medium"}
 			/>
 
-			<TextField
-				label="name"
-				variant="outlined"
-				fullWidth
-				value={givenName}
-				onChange={(e) => setGivenName(e.target.value)}
-				InputProps={{
-					sx: {
-						color: "white",
-						"& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
-						fontSize: { xs: "0.9rem", sm: "1rem" },
-					},
-				}}
-				InputLabelProps={{
-					sx: {
-						color: "rgba(255,255,255,0.7)",
-						fontSize: { xs: "0.9rem", sm: "1rem" },
-					},
-				}}
-				required
-				size={isMobile ? "small" : "medium"}
-			/>
 
 			<TextField
 				label="Password"

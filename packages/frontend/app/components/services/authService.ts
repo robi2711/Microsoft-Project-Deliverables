@@ -7,11 +7,8 @@ export type AdminCredentials = {
 
 export type AdminInfo = {
 	email: string;
-	givenName: string;
 	sub: string;
 }
-
-const API_URL = "http://localhost:3001";
 
 
 
@@ -41,7 +38,7 @@ export async function signOutAdmin(credentials: AdminCredentials, password : str
 		password,
 	}
 	try {
-		const response = await fetch(`${API_URL}/auth/signOutAdmin`, {
+		const response = await fetch(`/auth/signOutAdmin`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -74,7 +71,6 @@ export async function signUpAdmin(credentials: AdminCredentials, password: strin
 				"Content-Type": "application/json",
 			},
 		});
-
 		return response.data;
 	} catch (error) {
 		console.error("Sign up error:", error);

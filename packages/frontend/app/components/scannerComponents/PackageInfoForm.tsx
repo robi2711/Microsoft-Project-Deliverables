@@ -84,13 +84,13 @@ export const PackageInfoForm: React.FC<PackageInfoFormProps> = ({
 						}}
 					>
 						<Image
-							src={capturedImage || "/placeholder.svg"}
-							alt="Scanned package"
-							style={{
-								maxWidth: "100%",
-								maxHeight: "100%",
-								objectFit: "contain",
-							}}
+							src={capturedImage || ""}
+							alt="Captured Package"
+							width={400} // Replace with the appropriate width
+							height={400} // Replace with the appropriate height
+							layout="intrinsic"
+							style={{ objectFit: "cover" }}
+
 						/>
 					</Box>
 				</Paper>

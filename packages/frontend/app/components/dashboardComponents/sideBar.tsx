@@ -23,14 +23,18 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
                 bgcolor: "primary.dark"
             }}
         >
+            {/* TODO: FIX IMAGE */}
             {/* adding a logo and title to the sidebar within it's own box */}
-            <Box sx={{ display: "flex", alignItems: "center"}}>
+            {/*<Box sx={{ display: "flex", alignItems: "center"}}>
                 <Image src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/favicon.ico"
-                     style={{ width: 24, height: 24, marginRight: 8 }} alt={""}/>
+                       width={24}
+                       height={24}
+                       alt=""
+                       style={{ marginRight: 8 }} />
                 <Typography variant="h5" sx={{ color: "white", textAlign: "center" }}>
                     Deliverables
                 </Typography>
-            </Box>
+            </Box>*/}
 
             {/* adding the complex selection within it's own box */}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 4 }}>
@@ -64,11 +68,14 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
 
             {/* google maps window */}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, width: "100%" }}>
+                {/* TODO: Google Maps API goes here - gotta look into that */}
+                {/* TODO: FIX THIS BOX
                 <Box sx={{ width: "80%", height: "100px", bgcolor: "white"}}>
-                    {/* TODO: Google Maps API goes here - gotta look into that */}
+
                     <Image src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/SampleImage.png"
                          style={{ width: "100%", height: "100%"}} alt={""}/>
                 </Box>
+              */}
             </Box>
 
             {/* resident management tab*/}

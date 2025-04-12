@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 app.use(express.json()); // This is used to parse the data that the frontend sends to the backend
-app.use(express.urlencoded()); // This allows for body to be parsed when testing with POST forms in Postman!
+app.use(express.urlencoded({ extended: true })); // This allows for body to be parsed when testing with POST forms in Postman!
 app.use(session({
 	secret: 'v',
 	resave: true,
@@ -52,4 +52,3 @@ app.use('/ocr', ocrRoutes); // Route for OCR
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`);
 });
-console.log("closed")

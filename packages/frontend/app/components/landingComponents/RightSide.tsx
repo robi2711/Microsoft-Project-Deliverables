@@ -8,7 +8,7 @@ import { AdminPanelSettings, PersonAdd } from "@mui/icons-material"
 // Import panel components
 import AdminSignInPanel from "@/components/auth/AdminSignInPanel"
 import AdminSignUpPanel from "@/components/auth/AdminSignUpPanel"
-import {AdminCredentials} from "@/components/services/authService";
+import {AdminInfo} from "@/components/services/authService";
 
 type PanelType = "admin-signin" | "admin-signup"
 
@@ -43,9 +43,10 @@ export default function RightSide() {
 		}, 300)
 	}
 
-	// Handle successful authentication
-	const handleAuthSuccess = (AdminCredentials: AdminCredentials) => {
-		console.log("Authentication successful:", AdminCredentials)
+	const handleAuthSuccess = (AdminInfo: AdminInfo) => {
+		console.log("Authentication successful:", AdminInfo)
+
+		//TODO: ADD THIS RESPONSE TO USER CONTEXT
 
 		// Redirect to dashboard for admin
 		router.push("/dashboard")
@@ -114,7 +115,7 @@ export default function RightSide() {
 				{activePanel === "admin-signin" ? (
 					<AdminSignInPanel onSignInSuccess={handleAuthSuccess} />
 				) : (
-					<AdminSignUpPanel onSignUpSuccess={handleAuthSuccess} />
+					<AdminSignUpPanel onSignUpComplete={() => handlePanelChange("admin-signin")}/>
 				)}
 
 				{/* Toggle between sign-in and sign-up */}

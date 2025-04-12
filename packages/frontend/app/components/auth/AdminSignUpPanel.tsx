@@ -6,14 +6,33 @@ import { useState } from "react"
 import { Box, TextField, Button, CircularProgress, Alert } from "@mui/material"
 import { type AdminCredentials, signUpAdmin } from "@/components/services/authService"
 
+// Update the props interface to include onSignUpComplete
+interface AdminSignUpPanelProps {
+    onSignUpComplete: () => void
+}
 
-export default function AdminSignUpPanel() {
+
+export default function AdminSignUpPanel({onSignUpComplete}: AdminSignUpPanelProps) {
     const [email, setEmail] = useState("")
     const [givenName, setGivenName] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+
+    async function handleSignUp(credentials: AdminCredentials,password:string) {
+        try {
+            const result = await signUpAdmin(credentials, password);
+            if (result === "Username already exists") {
+                setError("Username already exists");
+                return;
+            }
+            onSignUpComplete();
+            console.log("Sign up successful:", result);
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -32,8 +51,7 @@ export default function AdminSignUpPanel() {
         setLoading(true)
 
         try {
-            const response = signUpAdmin(credentials, password)
-            console.log(response);
+            await handleSignUp(credentials, password);
 
             // TODO: ADD THIS RESPONSE TO USER CONTEXT
 
