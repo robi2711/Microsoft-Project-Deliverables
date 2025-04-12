@@ -10,6 +10,7 @@ import AdminSignInPanel from "@/components/auth/AdminSignInPanel"
 import AdminSignUpPanel from "@/components/auth/AdminSignUpPanel"
 import {AdminInfo} from "@/components/services/authService";
 
+import {useUser} from "@/components/services/UserContext";
 type PanelType = "admin-signin" | "admin-signup"
 
 export default function RightSide() {
@@ -18,6 +19,7 @@ export default function RightSide() {
 	const [activePanel, setActivePanel] = useState<PanelType>("admin-signin")
 	const [slideDirection, setSlideDirection] = useState<"left" | "right">("left")
 	const router = useRouter()
+	const { setUserInfo } = useUser();
 
 	// Initial animation
 	useEffect(() => {
@@ -43,10 +45,19 @@ export default function RightSide() {
 		}, 300)
 	}
 
-	const handleAuthSuccess = (AdminInfo: AdminInfo) => {
-		console.log("Authentication successful:", AdminInfo)
+	const handleAuthSuccess = (LoginInfo: AdminInfo) => {
 
-		//TODO: ADD THIS RESPONSE TO USER CONTEXT
+		console.log("Authentication successful:", LoginInfo);
+
+		setUserInfo({
+			email: LoginInfo.email,
+			username: LoginInfo.username,
+			accessToken: LoginInfo.accessToken,
+			idToken: LoginInfo.idToken,
+			refreshToken: LoginInfo.refreshToken,
+			tokenType: LoginInfo.tokenType,
+			sub: LoginInfo.sub
+		})
 
 		// Redirect to dashboard for admin
 		router.push("/dashboard")

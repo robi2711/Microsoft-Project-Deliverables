@@ -7,6 +7,11 @@ export type AdminCredentials = {
 
 export type AdminInfo = {
 	email: string;
+	username: string;
+	accessToken: string;
+	idToken: string;
+	refreshToken: string;
+	tokenType: string;
 	sub: string;
 }
 
@@ -32,28 +37,17 @@ export async function signInAdmin(credentials: AdminCredentials, password : stri
 	}
 }
 
-export async function signOutAdmin(credentials: AdminCredentials, password : string) {
-	const params = {
-		credentials,
-		password,
-	}
+export async function signOutAdmin(AccessToken: string) {
 	try {
-		const response = await fetch(`/auth/signOutAdmin`, {
-			method: "POST",
+		const response = await api.post(`/auth/signOutAdmin`, AccessToken, {
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify(params),
 		});
-
-		if (!response.ok) {
-			const error = await response.json();
-			throw new Error(error.message || "Failed to sign in");
-		}
-
-		return await response.json();
+		console.log(response);
+		return response;
 	} catch (error) {
-		console.error("Admin sign in error:", error);
+		console.error("Sign out error:", error);
 		throw error;
 	}
 }
