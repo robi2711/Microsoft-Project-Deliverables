@@ -25,6 +25,12 @@ export type UserInfo = {
 	address: string;
 
 }
+export type AdminInfo = {
+	email: string;
+	givenName: string;
+	role: string
+	accountType: "admin"
+}
 
 export type UserData = {
 	givenName: string

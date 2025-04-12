@@ -15,10 +15,10 @@ useMediaQuery,
 useTheme,
 } from "@mui/material"
 import { AdminPanelSettings, PersonAdd, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signUpAdmin, type AdminCredentials, type UserData } from "@/components/services/authService"
+import { signUpAdmin, type AdminCredentials, type AdminInfo } from "@/components/services/authService"
 
 type AdminSignUpPanelProps = {
-onSignUpSuccess: (userData: UserData) => void
+onSignUpSuccess: (userData: AdminInfo) => void
 }
 
 export default function AdminSignUpPanel({ onSignUpSuccess }: AdminSignUpPanelProps) {

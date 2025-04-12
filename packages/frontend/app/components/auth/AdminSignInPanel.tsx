@@ -58,7 +58,6 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 			onSignInSuccess(userData)
 			setEmail("")
 			setPassword("")
-			setGivenName("")
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Failed to sign in")
 		} finally {
@@ -84,29 +83,6 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 				fullWidth
 				value={email}
 				onChange={(e) => setEmail(e.target.value)}
-				InputProps={{
-					sx: {
-						color: "white",
-						"& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
-						fontSize: { xs: "0.9rem", sm: "1rem" },
-					},
-				}}
-				InputLabelProps={{
-					sx: {
-						color: "rgba(255,255,255,0.7)",
-						fontSize: { xs: "0.9rem", sm: "1rem" },
-					},
-				}}
-				required
-				size={isMobile ? "small" : "medium"}
-			/>
-
-			<TextField
-				label="name"
-				variant="outlined"
-				fullWidth
-				value={givenName}
-				onChange={(e) => setGivenName(e.target.value)}
 				InputProps={{
 					sx: {
 						color: "white",

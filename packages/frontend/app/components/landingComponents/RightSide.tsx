@@ -5,26 +5,21 @@ import { useState, useEffect } from "react"
 import { AdminPanelSettings, Person, SupportAgent } from "@mui/icons-material"
 import { useRouter } from "next/navigation"
 
-// Import panel components
 import AdminSignInPanel from "@/components/auth/AdminSignInPanel"
+import AdminSignUpPanel from "@/components/auth/AdminSignUpPanel"
 import ConciergeSignInPanel from "@/components/auth/ConciergeSignInPanel"
-import UserSignInPanel from "@/components/auth/UserSignInPanel"
-import SignUpPanel from "@/components/auth/SignUpPanel"
 import type { UserData } from "@/components/services/authService"
 
-// Form types
-type FormType = "admin-signin" | "concierge-signin" | "user-signin" | "signup"
+type FormType = "admin-signin" | "concierge-signin" | "admin-signup"
 
 export default function RightSide() {
-	// Animation and form state
 	const [animatePanel, setAnimatePanel] = useState(false)
-	const [activeForm, setActiveForm] = useState<FormType>("user-signin")
+	const [activeForm, setActiveForm] = useState<FormType>("admin-signin")
 	const [formDirection, setFormDirection] = useState<"left" | "right">("left")
 	const router = useRouter()
 	const theme = useTheme()
 	const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
-	// Initial animation
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setAnimatePanel(true)
@@ -33,30 +28,23 @@ export default function RightSide() {
 		return () => clearTimeout(timer)
 	}, [])
 
-	// Handle form change with direction for animation
 	const handleFormChange = (newForm: FormType) => {
-		// Determine animation direction based on form order
-		const formOrder: FormType[] = ["admin-signin", "concierge-signin", "user-signin", "signup"]
+		const formOrder: FormType[] = ["admin-signin", "concierge-signin", "admin-signup"]
 		const currentIndex = formOrder.indexOf(activeForm)
 		const newIndex = formOrder.indexOf(newForm)
 
 		setFormDirection(newIndex > currentIndex ? "right" : "left")
-
-		// Animate out
 		setAnimatePanel(false)
 
-		// Change form and animate in
 		setTimeout(() => {
 			setActiveForm(newForm)
 			setAnimatePanel(true)
 		}, 100)
 	}
 
-	// Handle successful authentication
 	const handleAuthSuccess = (userData: UserData) => {
 		console.log("Authentication successful:", userData)
 
-		// Redirect based on user role
 		if (userData.role === "admin") {
 			router.push("/dashboard")
 		} else if (userData.role === "concierge") {
@@ -83,7 +71,7 @@ export default function RightSide() {
 				overflow: "hidden",
 			}}
 		>
-			{/* Form selection tabs */}
+			{/* Tabs */}
 			<Box
 				sx={{
 					width: "100%",
@@ -97,8 +85,8 @@ export default function RightSide() {
 				}}
 			>
 				<Tabs
-					value={activeForm.includes("signin") ? activeForm : false}
-					onChange={(_, value) => value && handleFormChange(value as FormType)}
+					value={activeForm}
+					onChange={(_, value) => handleFormChange(value)}
 					variant="fullWidth"
 					textColor="inherit"
 					sx={{
@@ -115,26 +103,26 @@ export default function RightSide() {
 				>
 					<Tab
 						icon={<AdminPanelSettings sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />}
-						label="Admin"
+						label="Admin Sign In"
 						value="admin-signin"
 						iconPosition="start"
 					/>
 					<Tab
 						icon={<SupportAgent sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />}
-						label="Concierge"
+						label="Concierge Sign In"
 						value="concierge-signin"
 						iconPosition="start"
 					/>
 					<Tab
 						icon={<Person sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />}
-						label="User"
-						value="user-signin"
+						label="Admin Sign Up"
+						value="admin-signup"
 						iconPosition="start"
 					/>
 				</Tabs>
 			</Box>
 
-			{/* Main form panel */}
+			{/* Active Form */}
 			<Paper
 				elevation={6}
 				sx={{
@@ -149,56 +137,55 @@ export default function RightSide() {
 					transition: "all 0.8s cubic-bezier(0.1, 0.3, 0.2, 0.4)",
 				}}
 			>
-				{/* Render the appropriate panel based on activeForm */}
 				{activeForm === "admin-signin" && <AdminSignInPanel onSignInSuccess={handleAuthSuccess} />}
 				{activeForm === "concierge-signin" && <ConciergeSignInPanel onSignInSuccess={handleAuthSuccess} />}
-				{activeForm === "user-signin" && <UserSignInPanel onSignInSuccess={handleAuthSuccess} />}
-				{activeForm === "signup" && <SignUpPanel onSignUpSuccess={handleAuthSuccess} />}
+				{activeForm === "admin-signup" && <AdminSignUpPanel onSignUpSuccess={handleAuthSuccess} />}
 
-				{/* Footer with sign-in/sign-up toggle */}
-				<Box sx={{ mt: 4, textAlign: "center" }}>
-					{activeForm === "signup" ? (
-						<Box>
-							Already have an account?{" "}
-							<Box
-								component="button"
-								onClick={() => handleFormChange("user-signin")}
-								sx={{
-									background: "none",
-									border: "none",
-									color: "secondary.main",
-									cursor: "pointer",
-									fontWeight: "bold",
-									textDecoration: "underline",
-									p: 0,
-								}}
-							>
-								Sign In
+				{/* Only Admin gets toggle */}
+				{activeForm.startsWith("admin") && (
+					<Box sx={{ mt: 4, textAlign: "center" }}>
+						{activeForm === "admin-signup" ? (
+							<Box>
+								Already have an account?{" "}
+								<Box
+									component="button"
+									onClick={() => handleFormChange("admin-signin")}
+									sx={{
+										background: "none",
+										border: "none",
+										color: "secondary.main",
+										cursor: "pointer",
+										fontWeight: "bold",
+										textDecoration: "underline",
+										p: 0,
+									}}
+								>
+									Sign In
+								</Box>
 							</Box>
-						</Box>
-					) : (
-						<Box>
-							Don&#39;t have an account?{" "}
-							<Box
-								component="button"
-								onClick={() => handleFormChange("signup")}
-								sx={{
-									background: "none",
-									border: "none",
-									color: "secondary.main",
-									cursor: "pointer",
-									fontWeight: "bold",
-									textDecoration: "underline",
-									p: 0,
-								}}
-							>
-								Sign Up
+						) : (
+							<Box>
+								Don&apos;t have an account?{" "}
+								<Box
+									component="button"
+									onClick={() => handleFormChange("admin-signup")}
+									sx={{
+										background: "none",
+										border: "none",
+										color: "secondary.main",
+										cursor: "pointer",
+										fontWeight: "bold",
+										textDecoration: "underline",
+										p: 0,
+									}}
+								>
+									Sign Up
+								</Box>
 							</Box>
-						</Box>
-					)}
-				</Box>
+						)}
+					</Box>
+				)}
 			</Paper>
 		</Box>
 	)
 }
-
