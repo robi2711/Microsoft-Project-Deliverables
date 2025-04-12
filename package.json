@@ -27,6 +27,7 @@
   "dependencies": {
     "@aws-cdk/aws-cognito": "^1.203.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.777.0",
+    "twilio": "^5.4.5",
     "@react-google-maps/api": "^2.20.6",
     "express-session": "^1.18.1",
     "react-webcam": "^7.2.0"

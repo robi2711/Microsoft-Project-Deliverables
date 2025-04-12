@@ -10,7 +10,9 @@ import dbRoutes from "@/routes/dbRoutes";
 import authRoutes from "@/routes/authRoutes";
 import session from "express-session";
 
+import twilioRoutes from "@/routes/twilioRoutes";
 import ocrRoutes from '@/routes/ocrRoutes';
+
 
 const PORT = process.env.PORT || 3001;
 
@@ -45,8 +47,8 @@ app.use(
 	})
 );
 app.use("/auth", authRoutes);
+// app.use("/twilio", twilioRoutes); // This is the route that the frontend will use to make requests to the backend.
 app.use("/db", dbRoutes); // This is the route that the frontend will use to make requests to the backend.
-//app.use("/whatsapp", twilioRoutes)
 app.use('/ocr', ocrRoutes); // Route for OCR
 
 app.listen(PORT, () => {

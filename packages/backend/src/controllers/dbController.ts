@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { complexesContainer, usersContainer, adminsContainer } from "@/config/cosmosConfig";
-import { Complex, IUser, IAdmin } from "@/types/dbTypes"; // ✅ Correct interface imports
+import { Complex, IUser, IAdmin } from "@/types/dbTypes";
 import { asyncHandler } from "@/helpers/dbHelper";
 
 const handleError = (res: Response, error: any, message: string) => {
@@ -59,6 +59,19 @@ export const getComplexByAddress = asyncHandler(async (req: Request, res: Respon
 
 	res.status(200).json(complexes[0]);
 });
+
+// Get all residents of a complex - to populate rows in residents management dashboard page.
+export const getResidentsByComplexId = asyncHandler(async (req: Request, res: Response) => {
+	const { id } = req.params;
+	const { resources: users } = await usersContainer.items
+		.query(`SELECT * FROM c WHERE c.complexId = '${id}'`)
+		.fetchAll();
+
+	if (!users.length) return res.status(404).json({ message: "No residents found for this complex." });
+
+	res.status(200).json(users);
+});
+
 
 export const updateComplex = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
@@ -139,10 +152,36 @@ export const deleteAdmin = asyncHandler(async (req: Request, res: Response) => {
 	res.status(200).json({ message: "Admin deleted!" });
 });
 
+export const getPackagesByComplexId = asyncHandler(async (req: Request, res: Response) => {
+	const { id } = req.params;
+
+
+	const { resources: users } = await usersContainer.items
+		.query<IUser>(`SELECT * FROM c WHERE c.complexId = '${id}'`)
+		.fetchAll();
+
+	if (!users.length) {
+		return res.status(404).json({ message: "No users found for this complex." });
+	}
+
+
+	const allPackages = users.flatMap(user =>
+		user.packages.map(pkg => ({
+			...pkg,
+			userId: user.id,
+			userName: user.name,
+			unitNumber: user.unitNumber
+		}))
+	);
+
+	res.status(200).json(allPackages);
+});
+
 export default {
 	createComplex,
 	getComplex,
 	getComplexByAddress,
+	getResidentsByComplexId,
 	updateComplex,
 	deleteComplex,
 	createUser,
@@ -152,5 +191,6 @@ export default {
 	createAdmin,
 	getAdmin,
 	updateAdmin,
-	deleteAdmin
+	deleteAdmin,
+	getPackagesByComplexId
 };

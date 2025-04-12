@@ -9,6 +9,11 @@ router.get("/complex/:id", dbController.getComplex);
 router.put("/complex/:id", dbController.updateComplex);
 router.delete("/complex/:id", dbController.deleteComplex);
 router.get("/complex", dbController.getComplexByAddress);
+// Get all residents of a complex - to populate rows in residents management dashboard page.
+router.get("/complex/:id/residents", dbController.getResidentsByComplexId);
+// Get all packages of a complex - to populate rows in all packages viewer.
+router.get("/complex/:id/packages", dbController.getPackagesByComplexId);
+
 
 router.post("/user", dbController.createUser);
 router.get("/user/:id", dbController.getUser);

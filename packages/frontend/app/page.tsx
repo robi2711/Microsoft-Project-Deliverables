@@ -58,6 +58,11 @@ export default function LandingPage() {
                                 Go to Dashboard
                             </Button>
                         </Link>
+                        <Link href="/residentConfirmation" style={{ textDecoration: "none" }}>
+                            <Button variant="contained" color="secondary">
+                                Go to Resident confirmation
+                            </Button>
+                        </Link>
                     </Box>
                 </>
             )}
