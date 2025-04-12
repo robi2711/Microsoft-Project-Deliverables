@@ -9,6 +9,7 @@ export interface UserInfo {
 	refreshToken: string,
 	tokenType: string,
 	sub: string;
+	type: string;
 }
 
 interface UserContextType {

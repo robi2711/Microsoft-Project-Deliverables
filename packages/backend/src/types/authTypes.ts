@@ -8,6 +8,10 @@ export interface UserInfo {
     address: string;
 }
 
+export interface ConciergeInfo {
+    email: string;
+}
+
 export interface AdminInfo {
     email: string;
     givenName: string;

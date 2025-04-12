@@ -6,6 +6,7 @@ export type AdminCredentials = {
 }
 
 export type AdminInfo = {
+	type: string;
 	email: string;
 	username: string;
 	accessToken: string;
@@ -37,7 +38,28 @@ export async function signInAdmin(credentials: AdminCredentials, password : stri
 	}
 }
 
-export async function signOutAdmin(AccessToken: string) {
+export async function signInConcierge(credentials: AdminCredentials, password : string) {
+	const params = {
+		credentials,
+		password,
+	};
+
+	try {
+		const response = await api.post(`/auth/signInConcierge`, params, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		console.log("Response from signInAdmin:", response.data);
+		return response.data as AdminInfo;
+	} catch (error) {
+		console.error("Sign up error:", error);
+		throw error;
+	}
+}
+
+
+export async function signOutAdmin(AccessToken: string | undefined) {
 	try {
 		const response = await api.post(`/auth/signOutAdmin`, AccessToken, {
 			headers: {

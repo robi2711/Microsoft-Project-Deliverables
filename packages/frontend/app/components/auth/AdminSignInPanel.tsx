@@ -15,7 +15,8 @@ import {
 	useTheme,
 } from "@mui/material"
 import { AdminPanelSettings, Login, Visibility, VisibilityOff } from "@mui/icons-material"
-import { signInAdmin, type AdminCredentials, type AdminInfo} from "@/components/services/authService"
+import { signInConcierge, signInAdmin, type AdminCredentials, type AdminInfo} from "@/components/services/authService"
+
 
 type AdminSignInPanelProps = {
 	onSignInSuccess: (AdminInfo: AdminInfo) => void
@@ -53,6 +54,34 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 			}
 
 			const adminInfo: AdminInfo = await signInAdmin(credentials,password)
+			onSignInSuccess(adminInfo)
+			setEmail("")
+			setPassword("")
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Failed to sign in")
+		} finally {
+			setLoading(false)
+		}
+	}
+
+
+	async function handleConciergeSignIn() {
+		setError("")
+
+		if (!email.trim() || !password) {
+			setError("Please fill in all fields")
+			return
+		}
+
+		setLoading(true)
+
+		try {
+			const credentials: AdminCredentials = {
+				email,
+				givenName: "a",
+			}
+
+			const adminInfo: AdminInfo = await signInConcierge(credentials, password)
 			onSignInSuccess(adminInfo)
 			setEmail("")
 			setPassword("")
@@ -156,6 +185,19 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 				disabled={loading}
 			>
 				{loading ? <CircularProgress size={isMobile ? 20 : 24} color="inherit" /> : "Sign In as Admin"}
+			</Button>
+			<Button
+				type="button"
+				variant="contained"
+				color="secondary"
+				size={isMobile ? "medium" : "large"}
+				fullWidth
+				endIcon={loading ? null : <Login fontSize={isMobile ? "small" : "medium"} />}
+				sx={{ mt: 2, py: isMobile ? 1 : 1.5 }}
+				disabled={loading}
+				onClick={handleConciergeSignIn}
+			>
+				{loading ? <CircularProgress size={isMobile ? 20 : 24} color="inherit" /> : "Sign In as Concierge"}
 			</Button>
 		</Box>
 	)

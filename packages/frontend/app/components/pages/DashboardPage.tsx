@@ -1,9 +1,9 @@
 import {useState} from "react";
 import {Box} from "@mui/material";
-import SideBar from "@/components/dashboardComponents/sideBar";
-import TopBar from "@/components/dashboardComponents/topBar";
-import Overview from "@/components/dashboardComponents/overviewBody";
-import ResidentManagement from "@/components/dashboardComponents/residentManagementBody";
+import SideBar from "@/components/dashboardComponents/SideBar";
+import TopBar from "@/components/dashboardComponents/TopBar";
+import Overview from "@/components/dashboardComponents/OverviewBody";
+import ResidentManagement from "@/components/dashboardComponents/ResidentManagementBody";
 
 export default function DashboardPage() {
 	const [activeTab, setActiveTab] = useState("overview") // Default to overview

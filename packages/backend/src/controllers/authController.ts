@@ -1,12 +1,13 @@
 import express, {Response} from "express";
-import {UserInfo, AdminInfo, CustomRequest, CustomUserRequest} from "@/types/authTypes";
-import { signUpAdmin, signUpUser, signInAdmin, signOutAdmin } from "@/helpers/authHelper";
+import {UserInfo, AdminInfo, CustomRequest, CustomUserRequest, ConciergeInfo} from "@/types/authTypes";
+import { signUpAdmin, signUpConcierge, signInConcierge, signInAdmin, signOutAdmin } from "@/helpers/authHelper";
 import {IAdmin} from "@/types/dbTypes";
 import {v4 as uuidv4} from "uuid";
 import {adminsContainer} from "@/config/cosmosConfig";
 
 interface IUserController {
-    signUpUser: express.Handler,
+    signUpConcierge: express.Handler,
+    signInConcierge: express.Handler,
     signUpAdmin: express.Handler,
     signOutAdmin: express.Handler,
     signInAdmin: express.Handler
@@ -14,19 +15,29 @@ interface IUserController {
 
 const authController: IUserController = {
 
-    signUpUser: async (req: CustomUserRequest, res: Response) => {
-        const UserInfo : UserInfo = {
-            email: req.body?.email,
-            givenName: req.body?.givenName,
-            number: req.body?.number,
-            address: req.body?.address,
+    signUpConcierge: async (req: CustomUserRequest, res: Response) => {
+        const ConciergeInfo : ConciergeInfo = {
+            email: req.body?.email
         }
         const password = req.body.password as string
         try {
-            const response = await signUpUser(UserInfo, password as string);
+            const response = await signUpConcierge(ConciergeInfo, password as string);
             res.send(response);
         } catch (error : any) {
             res.status(500).send('Error signing up user');
+        }
+    },
+
+    signInConcierge: async (req: CustomRequest, res: Response) => {
+        const Email = req.body.credentials.email;
+        const Password = req.body.password
+        console.log(req.body);
+        try {
+            const response = await signInConcierge(Email, Password);
+            console.log(response);
+            res.send(response);
+        } catch (error) {
+            res.status(500).send('Error signing in user');
         }
     },
 

@@ -56,7 +56,8 @@ export default function RightSide() {
 			idToken: LoginInfo.idToken,
 			refreshToken: LoginInfo.refreshToken,
 			tokenType: LoginInfo.tokenType,
-			sub: LoginInfo.sub
+			sub: LoginInfo.sub,
+			type: LoginInfo.type
 		})
 
 		// Redirect to dashboard for admin
