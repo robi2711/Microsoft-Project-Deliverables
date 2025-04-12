@@ -1,6 +1,9 @@
 import express, {Response} from "express";
 import {UserInfo, AdminInfo, CustomRequest, CustomUserRequest} from "@/types/authTypes";
 import { signUpAdmin, signUpUser, signInAdmin, signOutAdmin } from "@/helpers/authHelper";
+import {IAdmin} from "@/types/dbTypes";
+import {v4 as uuidv4} from "uuid";
+import {adminsContainer} from "@/config/cosmosConfig";
 
 interface IUserController {
     signUpUser: express.Handler,
@@ -35,6 +38,15 @@ const authController: IUserController = {
         const password = req.body.password as string
         try {
             const response = await signUpAdmin(AdminInfo, password as string);
+            console.log(response);
+            if (response && typeof response === "object" && response.metadata?.httpStatusCode === 200) {
+                const admin: IAdmin = {
+                    ...req.body,
+                    id: uuidv4(),
+                    createdAt: new Date().toISOString(),
+                };
+                await adminsContainer.items.create(admin);
+            }
             res.send(response);
         } catch (error : any) {
             res.status(500).send('Error signing up user');
