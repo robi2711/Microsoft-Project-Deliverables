@@ -1,12 +1,10 @@
 "use client"
 
-import { Box, Container, Grid, Paper, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { Box, Container, Grid, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 
 export default function LeftSide() {
 	const [animateCards, setAnimateCards] = useState(false)
-	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
 	useEffect(() => {
 		const timer = setTimeout(() => {

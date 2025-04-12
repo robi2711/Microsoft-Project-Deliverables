@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Paper, Tabs, Tab, useMediaQuery, useTheme } from "@mui/material"
+import { Box, Paper, Tabs, Tab } from "@mui/material"
 import { useState, useEffect } from "react"
 import { AdminPanelSettings, Person, SupportAgent } from "@mui/icons-material"
 import { useRouter } from "next/navigation"
@@ -21,8 +21,6 @@ export default function RightSide() {
 	const [activeForm, setActiveForm] = useState<FormType>("user-signin")
 	const [formDirection, setFormDirection] = useState<"left" | "right">("left")
 	const router = useRouter()
-	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
 	// Initial animation
 	useEffect(() => {
