@@ -38,7 +38,7 @@ export async function signInAdmin(credentials: AdminCredentials, password : stri
 	}
 }
 
-export async function signInConcierge(credentials: AdminCredentials, password : string) {
+export async function signInConcierge(credentials: string, password : string) {
 	const params = {
 		credentials,
 		password,
@@ -83,6 +83,25 @@ export async function signUpAdmin(credentials: AdminCredentials, password: strin
 
 	try {
 		const response = await api.post(`/auth/signUpAdmin`, params, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		return response.data;
+	} catch (error) {
+		console.error("Sign up error:", error);
+		throw error;
+	}
+}
+
+export async function signUpConcierge(credentials: string, password: string) {
+	const params = {
+		credentials,
+		password,
+	};
+
+	try {
+		const response = await api.post(`/auth/signUpConcierge`, params, {
 			headers: {
 				"Content-Type": "application/json",
 			},

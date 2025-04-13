@@ -2,7 +2,6 @@
 // This page displays data from packages within the selected complex
 
 // importing necessary modules
-import { Package } from '../../../../backend/src/types/dbTypes';
 import { DataGrid, GridColDef } from '@mui/x-data-grid'; // for building the table
 import {Box, Typography, Paper, IconButton} from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
@@ -11,6 +10,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import {useEffect, useState} from "react"; // for retrieving resident data from the backend
+
+interface Package {
+    id: string;
+    name: string; // Why do packages have names?
+    description: string;
+    delivered: boolean;
+}
 
 // The columns define the structure of the data table - fields should match the Package type TODO: add time delivered
 const columns: GridColDef[] = [

@@ -1,7 +1,6 @@
 "use client"
 
 // importing necessary modules
-import { IUser } from '../../../../backend/src/types/dbTypes';
 import { useState, useEffect } from 'react'; // handling current info displayed
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import {Box, Typography, Paper, IconButton} from "@mui/material";
@@ -11,6 +10,24 @@ import axios from "axios";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete"; // for retrieving resident data from the backend
+
+interface IUser {
+    id: string;
+    complexId: string;  // Reference to Complex
+    name: string;
+    unitNumber: string; // Unit number - should we rename this? - it was address
+    phone: string; // changed to phone from telephone to match cosmos
+    email: string;
+    packages: Package[];
+    createdAt: string;
+}
+
+interface Package {
+    id: string;
+    name: string; // Why do packages have names?
+    description: string;
+    delivered: boolean;
+}
 
 // The columns define the structure of the data table
 const columns: GridColDef[] = [

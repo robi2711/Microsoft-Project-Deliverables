@@ -61,6 +61,11 @@ export default function RightSide() {
 		})
 
 		// Redirect to dashboard for admin
+
+		 if (LoginInfo.type === "concierge"){
+			router.push("/scanner")
+			 return
+		}
 		router.push("/dashboard")
 	}
 

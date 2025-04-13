@@ -76,12 +76,8 @@ export default function AdminSignInPanel({ onSignInSuccess }: AdminSignInPanelPr
 		setLoading(true)
 
 		try {
-			const credentials: AdminCredentials = {
-				email,
-				givenName: "a",
-			}
 
-			const adminInfo: AdminInfo = await signInConcierge(credentials, password)
+			const adminInfo: AdminInfo = await signInConcierge(email, password)
 			onSignInSuccess(adminInfo)
 			setEmail("")
 			setPassword("")

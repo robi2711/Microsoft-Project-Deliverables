@@ -86,6 +86,13 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
 
             {/*  this can be extended to all tabs we develope more*/}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 0, width: "100%" }}>
+                <Tab
+                    label="Concierge management"
+                    sx={{ color: "white",
+                        bgcolor: activeTab === "conciergeManagement" ? "secondary.dark" : "secondary.light", // if active, make it dark, else light
+                        width: "100%" }}
+                    onClick={() => setActiveTab("conciergeManagement")}
+                />
                 <Tab label="Other tabs..." sx={{ color: "white", bgcolor: "secondary.light", width: "100%" }} />
             </Box>
 
