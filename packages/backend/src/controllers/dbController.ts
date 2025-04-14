@@ -115,6 +115,24 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
 	res.status(200).json({ message: "User updated!", user: replacedUser });
 });
 
+// UPDATE USER PACKAGE like a boss,this is hard to code on a laptop crying
+export const updateUserPackage = asyncHandler(async (req: Request, res: Response) => {
+	const { userId, packageId } = req.params;
+	const updatedPackageData = req.body;
+
+	const { resource: user } = await usersContainer.item(userId, userId).read<IUser>();
+	if (!user) return res.status(404).json({ message: "User not found." });
+
+	const updatedPackages = user.packages.map(pkg =>
+		pkg.id === packageId ? { ...pkg, ...updatedPackageData } : pkg
+	);
+
+	const updatedUser = { ...user, packages: updatedPackages, updatedAt: new Date().toISOString() };
+	const { resource: replacedUser } = await usersContainer.item(userId, userId).replace(updatedUser);
+
+	res.status(200).json({ message: "Package updated!", user: replacedUser });
+});
+
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	await usersContainer.item(id, id).delete();
@@ -177,7 +195,23 @@ export const getPackagesByComplexId = asyncHandler(async (req: Request, res: Res
 	res.status(200).json(allPackages);
 });
 
+
+export const getComplexesByAdminId = asyncHandler(async (req: Request, res: Response) => {
+	const { adminId } = req.params;
+
+	const { resources: complexes } = await complexesContainer.items
+		.query<Complex>(`SELECT * FROM c WHERE ARRAY_CONTAINS(c.admins, '${adminId}')`)
+		.fetchAll();
+
+	if (!complexes.length) return res.status(404).json({ message: "No complexes found for this admin." });
+
+	res.status(200).json(complexes);
+});
+
+
 export default {
+	updateUserPackage,
+	getComplexesByAdminId,
 	createComplex,
 	getComplex,
 	getComplexByAddress,
