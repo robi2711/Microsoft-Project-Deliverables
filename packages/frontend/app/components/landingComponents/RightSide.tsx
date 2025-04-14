@@ -58,6 +58,7 @@ export default function RightSide() {
 			tokenType: LoginInfo.tokenType,
 			sub: LoginInfo.sub,
 			address: LoginInfo.address,
+			complexIds: LoginInfo.complexIds,
 			type: LoginInfo.type
 		})
 

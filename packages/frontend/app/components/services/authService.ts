@@ -14,6 +14,7 @@ export type AdminInfo = {
 	refreshToken: string;
 	tokenType: string;
 	address: string;
+	complexIds: string[];
 	sub: string;
 }
 

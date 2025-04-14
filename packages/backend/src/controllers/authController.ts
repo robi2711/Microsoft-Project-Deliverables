@@ -65,7 +65,7 @@ const authController: IUserController = {
 
             if (response && typeof response === "object" && response.UserConfirmed === true) {
                 const complex: Complex = {
-                    id: response.UserSub as string,
+                    id: response.UserSub + "c0" as string,
                     address: address,
                     admins: [response.UserSub as string],
                     concierges: [],
@@ -81,6 +81,7 @@ const authController: IUserController = {
                     email: AdminInfo.email,
                     id: response.UserSub as string,
                     complexId: response.UserSub as string,
+                    complexIds: [response.UserSub as string + "c0"],
                     createdAt: new Date().toISOString(),
                 };
                 await adminsContainer.items.create(admin);
@@ -98,9 +99,16 @@ const authController: IUserController = {
         try {
             const response = await signInAdmin(Email, Password);
             if(response && typeof response === "object" && response.sub !== undefined) {
-                const { resource: complex } = await complexesContainer.item(response.sub, response.sub).read<Complex>();
+                console.log(await adminsContainer.item(response.sub, "").read<IAdmin>());
+                const { resource: admin } = await adminsContainer.item(response.sub, response.sub).read<IAdmin>();
+
+                const complexIds2 = admin?.complexIds?.[0];
+                const complexIds = admin?.complexIds;
+                const { resource: complex } = await complexesContainer.item(complexIds2 as string, complexIds2).read<Complex>();
                 const address = complex?.address;
-                res.send({...response, address});
+                console.log(complexIds2);
+
+                res.send({...response, address, complexIds});
             }
             else {
                 res.status(400).send('Invalid response from signInAdmin');

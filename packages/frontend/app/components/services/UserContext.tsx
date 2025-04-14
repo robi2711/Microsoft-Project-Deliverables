@@ -8,6 +8,7 @@ export interface UserInfo {
 	idToken: string,
 	refreshToken: string,
 	tokenType: string,
+	complexIds: string[],
 	sub: string;
 	address: string;
 	type: string;
