@@ -2,9 +2,12 @@
 
 
 // importing necessary modules
-import { Box, Typography, MenuItem, FormControl, Select, Tab, Link } from "@mui/material"
+import {Box, FormControl, Link, MenuItem, Select, Tab, Typography} from "@mui/material"
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
-import {useUser} from "@/components/services/UserContext"; //we will use user context to get complex list
+import {useUser} from "@/components/services/UserContext";
+import {useEffect, useState} from "react";
+import api from "@/components/services/apiService";
+import {userInfo} from "node:os"; //we will use user context to get complex list
 // import Image from 'next/image';
 
 {/* We need arguments relating to active tabs so we can highlight the active */}
@@ -13,9 +16,53 @@ interface SideBarProps {
     activeTab: string;
 }
 
+interface ComplexResponse {
+    address: string;
+}
+
+
 export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
-    const { userInfo } = useUser()
-    console.log(userInfo)
+    const { userInfo, setUserInfo } = useUser()
+    const [selectedComplex, setSelectedComplex] = useState<string>(""); // State to store the selected value
+    const [complexes, setComplexes] = useState<ComplexResponse[]>([]);
+    const complexIds = userInfo?.complexIds || []
+
+
+    useEffect(() => {
+        if(!complexIds || complexIds.length === 0) return;
+        const fetchedComplexes: ComplexResponse[] = [];
+        const fetchComplexes = async (complexIds: string[]) => {
+            try {
+                for (const complexId of complexIds) {
+                    const response = await api.get<ComplexResponse>(`/db/complex/${complexId}`);
+                    fetchedComplexes.push(response.data); // Add each fetched complex to the array
+                }
+                setComplexes(fetchedComplexes);
+            } catch (error) {
+                console.error("Error fetching complexes:", error)
+            }
+        }
+        fetchComplexes(complexIds)
+
+    }, [complexIds])
+
+    const handleComplexChange = (value: string) => {
+        setUserInfo({
+            accessToken: "",
+            complexIds: [],
+            email: "",
+            idToken: "",
+            refreshToken: "",
+            sub: "",
+            tokenType: "",
+            type: "",
+            username: "",
+            ...userInfo,
+            selectedComplex: value
+        });
+        setSelectedComplex(value);
+    };
+
     return(
         <Box
             sx={{
@@ -43,18 +90,17 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
                     Building Complex
                 </Typography>
                 <FormControl sx={{ width: "80%", mt: 2 }}>
-                    <Select
-                        defaultValue={10}
-                        id="complex-select"
-                        label="Select Complex"
-                        sx={{ bgcolor: "white" }}
-                    >
-                        <MenuItem value={10}>2 Rathbourne, Dublin D15 PF6A</MenuItem>
-                        <MenuItem value={20}>15 Adelaide Street, Dun Laoghaire, Dublin A96 D8Y9</MenuItem>
-                        <MenuItem value={30}>10 Elmwood Avenue, Ranelagh, Dublin D06 F9C3</MenuItem>
+                    <Select value={selectedComplex} // Bind the state to the Select component
+                            onChange={(e) => handleComplexChange(e.target.value)}
+                            id="complex-select"
+                            sx={{ bgcolor: "white" }}>
+                        {complexes.map((complex, index) => (
+                            <MenuItem key={index} value={complex.address}>
+                                {complex.address}
+                            </MenuItem>
+                        ))}
                     </Select>
-                </FormControl> {/* TODO: Link with backend*/}
-                {/* Almost ready, we'll hittem with the get("/admin/:id/complexes")*/}
+                </FormControl>
             </Box>
 
             {/* The overview tab*/}

@@ -11,6 +11,7 @@ export interface UserInfo {
 	complexIds: string[],
 	sub: string;
 	type: string;
+	selectedComplex? : string;
 }
 
 interface UserContextType {
