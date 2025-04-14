@@ -107,7 +107,7 @@ export default function ResidentManagementBody() {
         // Function to fetch residents from the backend
         const fetchResidents = async () => {
             try {
-                const response = await api.get<IUser[]>('/db/complex/${complexId}/residents');
+                const response = await api.get<IUser[]>(`/db/complex/${complexId}/residents`);
                 console.log("Response from backend:", response); // Debugging line
                 const residents: IUser[] = response.data;
                 setRows(residents);

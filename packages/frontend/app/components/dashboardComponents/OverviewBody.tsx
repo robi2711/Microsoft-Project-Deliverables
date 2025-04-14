@@ -91,7 +91,7 @@ export default function OverviewBody() {
         // Function to fetch packages from the backend
         const fetchPackages = async () => {
             try {
-                const response = await api.get<Package[]>('/db/complex/${complexId}/packages');
+                const response = await api.get<Package[]>(`/db/complex/${complexId}/packages`);
 
                 console.log("Response from backend:", response); // Debugging line
                 const packages: Package[] = response.data;

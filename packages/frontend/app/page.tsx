@@ -38,32 +38,6 @@ export default function LandingPage() {
                 <>
                     <LeftSide />
                     <RightSide />
-                    <Box
-                        sx={{
-                            position: "fixed",
-                            bottom: 20,
-                            right: 20,
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 1,
-                        }}
-                    >
-                        <Link href="/scanner" style={{ textDecoration: "none" }}>
-                            <Button variant="contained" color="secondary">
-                                Go to Scanner
-                            </Button>
-                        </Link>
-                        <Link href="/dashboard" style={{ textDecoration: "none" }}>
-                            <Button variant="contained" color="secondary">
-                                Go to Dashboard
-                            </Button>
-                        </Link>
-                        <Link href="/residentConfirmation" style={{ textDecoration: "none" }}>
-                            <Button variant="contained" color="secondary">
-                                Go to Resident confirmation
-                            </Button>
-                        </Link>
-                    </Box>
                 </>
             )}
         </Box>

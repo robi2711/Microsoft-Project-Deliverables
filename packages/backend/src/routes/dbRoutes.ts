@@ -25,6 +25,9 @@ router.delete("/user/:id", dbController.deleteUser);
 
 router.post("/admin", dbController.createAdmin);
 router.get("/admin/:id", dbController.getAdmin);
+// Get all complexes of an admin - so we can populate the dropdown in the sidebar
+// router.get("/admin/:id/complexes", dbController.getComplexesByAdminId);
+// STAS PLZ
 router.put("/admin/:id", dbController.updateAdmin);
 router.delete("/admin/:id", dbController.deleteAdmin);
 

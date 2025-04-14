@@ -4,6 +4,7 @@
 // importing necessary modules
 import { Box, Typography, MenuItem, FormControl, Select, Tab, Link } from "@mui/material"
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
+import {useUser} from "@/components/services/UserContext"; //we will use user context to get complex list
 // import Image from 'next/image';
 
 {/* We need arguments relating to active tabs so we can highlight the active */}
@@ -13,6 +14,8 @@ interface SideBarProps {
 }
 
 export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
+    const { userInfo } = useUser()
+    console.log(userInfo)
     return(
         <Box
             sx={{
@@ -49,8 +52,9 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
                         <MenuItem value={10}>2 Rathbourne, Dublin D15 PF6A</MenuItem>
                         <MenuItem value={20}>15 Adelaide Street, Dun Laoghaire, Dublin A96 D8Y9</MenuItem>
                         <MenuItem value={30}>10 Elmwood Avenue, Ranelagh, Dublin D06 F9C3</MenuItem>
-                    </Select> {/* placeholder values for now */}
+                    </Select>
                 </FormControl> {/* TODO: Link with backend*/}
+                {/* Almost ready, we'll hittem with the get("/admin/:id/complexes")*/}
             </Box>
 
             {/* The overview tab*/}

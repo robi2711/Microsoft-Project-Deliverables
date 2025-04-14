@@ -66,7 +66,7 @@ const authController: IUserController = {
                     name: AdminInfo.givenName,
                     email: AdminInfo.email,
                     id: response.UserSub as string,
-                    complexId: "",
+                    complexId: "c0",
                     createdAt: new Date().toISOString(),
                 };
                 await adminsContainer.items.create(admin);
