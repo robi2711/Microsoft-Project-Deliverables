@@ -1,5 +1,5 @@
 import express, { Request, Response, Handler } from "express";
-import { User } from "@/types/dbTypes";
+import { IUser } from "@/types/dbTypes";
 import client from "@/config/twilioConfig";
 
 interface extendTwilio {
