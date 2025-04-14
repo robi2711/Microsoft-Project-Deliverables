@@ -1,6 +1,8 @@
 "use client"
 // This page displays data from packages within the selected complex
 
+// TODO: May be worth changing 'delivered' to 'collected' for packages
+
 // importing necessary modules
 import { DataGrid, GridColDef } from '@mui/x-data-grid'; // for building the table
 import {
@@ -18,7 +20,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import axios from "axios";
+import api from "@/components/services/apiService";
 import React, {useEffect, useState} from "react";
 
 interface Package {
@@ -44,9 +46,7 @@ export default function OverviewBody() {
     const [openDialog, setOpenDialog] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
-        unitNumber: "",
-        phone: "",
-        email: "",
+        description: ""
     });
 
     const complexId = "c0"; // complexId will be selected within the sidebar and passed in, hardcoded for now
@@ -59,9 +59,7 @@ export default function OverviewBody() {
         setOpenDialog(false);
         setFormData({
             name: "",
-            unitNumber: "",
-            phone: "",
-            email: "",
+            description: ""
         });
     };
 
@@ -73,15 +71,15 @@ export default function OverviewBody() {
     const handleSubmit = async () => {
 
         try {
-            // create an IUser object TODO: take complexId from the sidebar
-            const newResident = {
+            const newPackage = {
                 ...formData,
-                complexId: "c0", // TODO: take complexId from the sidebar
-                packages: []
+                delivered: false
             }
-            console.log(newResident)
-            await axios.post("http://localhost:3001/db/user", newResident);
-            alert("Resident added successfully!");
+            console.log(newPackage)
+            // user ID can be accessed when selected user by name in dialog
+            // const response = await api.put<Package[]>('/user/:id/package');
+            await api.post("/db/user", newPackage);
+            alert("Package added successfully!");
             handleCloseDialog();
         } catch (error) {
             console.error("Error adding resident:", error);
@@ -93,7 +91,7 @@ export default function OverviewBody() {
         // Function to fetch packages from the backend
         const fetchPackages = async () => {
             try {
-                const response = await axios.get<Package[]>(`http://localhost:3001/db/complex/${complexId}/packages`);
+                const response = await api.get<Package[]>('/db/complex/${complexId}/packages');
 
                 console.log("Response from backend:", response); // Debugging line
                 const packages: Package[] = response.data;
@@ -229,10 +227,11 @@ export default function OverviewBody() {
                                 type - the type of input (text, email, etc.).
                                 value - the current value of the input field, controlled by state.
                                 */}
+                                {/* TODO: change this from a textfield to a drop-down menu of all residents in complex, so ID can be passed onto api. post */}
                                 <TextField
                                     margin="dense"
                                     name="name"
-                                    label="name"
+                                    label="Resident's name"
                                     type="name"
                                     fullWidth
                                     variant="outlined"
@@ -243,39 +242,16 @@ export default function OverviewBody() {
 
                                 <TextField
                                     margin="dense"
-                                    name="unitNumber"
-                                    label="unit number"
+                                    name="description"
+                                    label="description"
                                     type="text"
                                     fullWidth
                                     variant="outlined"
-                                    value={formData.unitNumber}
+                                    value={formData.description}
                                     onChange={handleInputChange}
                                     required
                                 />
 
-                                <TextField
-                                    margin="dense"
-                                    name="phone"
-                                    label="phone number"
-                                    type="tel"
-                                    fullWidth
-                                    variant="outlined"
-                                    value={formData.phone}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-
-                                <TextField
-                                    margin="dense"
-                                    name="email"
-                                    label="email"
-                                    type="email"
-                                    fullWidth
-                                    variant="outlined"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    required
-                                />
 
                             </Box>
                         </DialogContent>

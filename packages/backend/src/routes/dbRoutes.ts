@@ -18,6 +18,9 @@ router.get("/complex/:id/packages", dbController.getPackagesByComplexId);
 router.post("/user", dbController.createUser);
 router.get("/user/:id", dbController.getUser);
 router.put("/user/:id", dbController.updateUser);
+// Update user with a new package - used on overview page to add a packages
+// router.put("/user/:id/package", dbController.updateUserPackage);
+// STAS PLZ
 router.delete("/user/:id", dbController.deleteUser);
 
 router.post("/admin", dbController.createAdmin);

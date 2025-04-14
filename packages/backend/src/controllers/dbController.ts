@@ -115,6 +115,11 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
 	res.status(200).json({ message: "User updated!", user: replacedUser });
 });
 
+// Update user with a new package - used on overview page to add a packages
+// export const updateUserPackage = asyncHandler(async (req: Request, res: Response) => {
+// STAS PLZ
+
+
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	await usersContainer.item(id, id).delete();

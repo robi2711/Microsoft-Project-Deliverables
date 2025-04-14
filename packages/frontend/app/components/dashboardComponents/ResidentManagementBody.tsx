@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
-import axios from "axios";
+import api from "@/components/services/apiService";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete"; // for retrieving resident data from the backend
@@ -94,7 +94,7 @@ export default function ResidentManagementBody() {
                 packages: []
             }
             console.log(newResident)
-            await axios.post("http://localhost:3001/db/user", newResident);
+            await api.post("/db/user", newResident);
             alert("Resident added successfully!");
             handleCloseDialog();
         } catch (error) {
@@ -107,7 +107,7 @@ export default function ResidentManagementBody() {
         // Function to fetch residents from the backend
         const fetchResidents = async () => {
             try {
-                const response = await axios.get<IUser[]>(`http://localhost:3001/db/complex/${complexId}/residents`);
+                const response = await api.get<IUser[]>('/db/complex/${complexId}/residents');
                 console.log("Response from backend:", response); // Debugging line
                 const residents: IUser[] = response.data;
                 setRows(residents);

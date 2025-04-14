@@ -1,6 +1,6 @@
 export interface Package {
     id: string;
-    name: string; // Why do packages have names?
+    name: string; // Why do packages have names? - their recipient's name?
     description: string;
     delivered: boolean;
     // Should we add a field for the date/time the package was delivered?
