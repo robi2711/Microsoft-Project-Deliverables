@@ -34,7 +34,7 @@ import {signUpConcierge} from "@/components/services/authService";
 interface IConcierge {
 	id: string
 	email: string
-}
+} // instead use IAdmin from db types?
 
 // The columns define the structure of the data table
 const columns: GridColDef[] = [

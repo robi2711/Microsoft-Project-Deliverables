@@ -3,13 +3,23 @@
 
 // importing necessary modules
 import { DataGrid, GridColDef } from '@mui/x-data-grid'; // for building the table
-import {Box, Typography, Paper, Button} from "@mui/material";
+import {
+    Box,
+    Typography,
+    Paper,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField
+} from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
-import React, {useEffect, useState} from "react"; // for retrieving resident data from the backend
+import React, {useEffect, useState} from "react";
 
 interface Package {
     id: string;
@@ -31,13 +41,60 @@ export default function OverviewBody() {
     const [rows, setRows] = useState<Package[]>([]); // starts as an empty array of IUser objects
     const [packagesHoldingCount, setPackagesHoldingCount] = useState<number>(0); // for summary statistics at the top of the page
     const [packagesCollectedCount, setPackagesCollectedCount] = useState<number>(0);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        unitNumber: "",
+        phone: "",
+        email: "",
+    });
+
     const complexId = "c0"; // complexId will be selected within the sidebar and passed in, hardcoded for now
+
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setFormData({
+            name: "",
+            unitNumber: "",
+            phone: "",
+            email: "",
+        });
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+        setFormData({...formData, [name]: value});
+    };
+
+    const handleSubmit = async () => {
+
+        try {
+            // create an IUser object TODO: take complexId from the sidebar
+            const newResident = {
+                ...formData,
+                complexId: "c0", // TODO: take complexId from the sidebar
+                packages: []
+            }
+            console.log(newResident)
+            await axios.post("http://localhost:3001/db/user", newResident);
+            alert("Resident added successfully!");
+            handleCloseDialog();
+        } catch (error) {
+            console.error("Error adding resident:", error);
+            alert("Failed to add resident. Please try again.");
+        }
+    };
 
     useEffect(() => {
         // Function to fetch packages from the backend
         const fetchPackages = async () => {
             try {
                 const response = await axios.get<Package[]>(`http://localhost:3001/db/complex/${complexId}/packages`);
+
                 console.log("Response from backend:", response); // Debugging line
                 const packages: Package[] = response.data;
                 setRows(packages);
@@ -122,13 +179,15 @@ export default function OverviewBody() {
 
             </Box>
 
-            {/* adding box for the data table */}
+            {/* adding box for the data table and CRUD buttons */}
             {/* TODO: ADD A COLUMN OF CIRCLES TO THE LEFT INDICATING DELIVERY STATUS*/}
             <Box sx={{ display: "flex", height: "70%" }}>
                 <Paper elevation={3} sx={{ width: "96%", p: 2}}>
+
+                    {/* buttons */}
                     <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
-                        <Button variant="contained" startIcon={<AddIcon />} >
-                            Manually add resident
+                        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenDialog} >
+                            Manually add package
                         </Button>
                         <Button
                             variant="outlined"
@@ -148,13 +207,86 @@ export default function OverviewBody() {
                         </Button>
                     </Box>
 
-                    <DataGrid // using the values defined above.
+                    {/* Data table */}
+                    <DataGrid
                         rows={rows}
                         columns={columns}
                         pageSizeOptions={[5, 10]}
                         checkboxSelection
                         sx={{ border: 0 }}
                     />
+
+                    {/* Dialog for manually adding residents */}
+                    <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+                        <DialogTitle>Add New Resident</DialogTitle>
+
+                        <DialogContent>
+                            <Box component="form">
+
+                                { /*
+                                name - used to identify the field when handling input changes.
+                                label - the label displayed for the input field.
+                                type - the type of input (text, email, etc.).
+                                value - the current value of the input field, controlled by state.
+                                */}
+                                <TextField
+                                    margin="dense"
+                                    name="name"
+                                    label="name"
+                                    type="name"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+
+                                <TextField
+                                    margin="dense"
+                                    name="unitNumber"
+                                    label="unit number"
+                                    type="text"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={formData.unitNumber}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+
+                                <TextField
+                                    margin="dense"
+                                    name="phone"
+                                    label="phone number"
+                                    type="tel"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+
+                                <TextField
+                                    margin="dense"
+                                    name="email"
+                                    label="email"
+                                    type="email"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseDialog}>Cancel</Button>
+                            <Button onClick={handleSubmit} variant="contained">
+                                Add
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
 
                 </Paper>
             </Box>

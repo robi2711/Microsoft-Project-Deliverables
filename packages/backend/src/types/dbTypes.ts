@@ -7,14 +7,14 @@ export interface Package {
 }
 
 export interface IUser {
-    id: string;
+    id: string; // given in controller
     complexId: string;  // Reference to Complex
     name: string;
     unitNumber: string; // Unit number - should we rename this? - it was address
     phone: string; // changed to phone from telephone to match cosmos
     email: string;
     packages: Package[];
-    createdAt: string;
+    createdAt: string; // given in controller
 }
 
 export interface IAdmin {

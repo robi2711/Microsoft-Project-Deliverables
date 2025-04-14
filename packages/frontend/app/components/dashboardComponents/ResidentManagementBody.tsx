@@ -1,9 +1,21 @@
 "use client"
 
+// TODO: consistency needed in naming - sometimes using "Resident" and other times using "User"
+
 // importing necessary modules
 import React, { useState, useEffect } from 'react'; // handling current info displayed
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import {Box, Typography, Paper, IconButton, Button} from "@mui/material";
+import {
+    Box,
+    Typography,
+    Paper,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField
+} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import axios from "axios";
@@ -43,7 +55,53 @@ export default function ResidentManagementBody() {
     const [residentCount, setResidentCount] = useState<number>(0); // For summary statistics at the top of the page
     {/* TODO: improve this logic - show be active packages count, not just packages */ }
     const [residentsWithPackagesCount, setResidentsWithPackagesCount] = useState<number>(0); // For summary statistics at the top of the page
+    const [openDialog, setOpenDialog] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        unitNumber: "",
+        phone: "",
+        email: "",
+    });
+
     const complexId = "c0"; // complexId will be selected within the sidebar and passed in, hardcoded for now
+
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setFormData({
+            name: "",
+            unitNumber: "",
+            phone: "",
+            email: "",
+        });
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+        setFormData({...formData, [name]: value});
+    };
+
+    const handleSubmit = async () => {
+
+        try {
+            // create an IUser object TODO: take complexId from the sidebar
+            const newResident = {
+                ...formData,
+                complexId: "c0", // TODO: take complexId from the sidebar
+                packages: []
+            }
+            console.log(newResident)
+            await axios.post("http://localhost:3001/db/user", newResident);
+            alert("Resident added successfully!");
+            handleCloseDialog();
+        } catch (error) {
+            console.error("Error adding resident:", error);
+            alert("Failed to add resident. Please try again.");
+        }
+    };
 
     useEffect(() => {
         // Function to fetch residents from the backend
@@ -126,8 +184,8 @@ export default function ResidentManagementBody() {
             <Box sx={{ display: "flex", height: "70%" }}>
                 <Paper elevation={3} sx={{ width: "96%", p: 2}}>
                     <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
-                        <Button variant="contained" startIcon={<AddIcon />} >
-                            Manually add package
+                        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenDialog} >
+                            Manually add resident
                         </Button>
                         <Button
                             variant="outlined"
@@ -153,6 +211,78 @@ export default function ResidentManagementBody() {
                         checkboxSelection
                         sx={{ border: 0 }}
                     />
+
+                    {/* Dialog for manually adding residents */}
+                    <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+                        <DialogTitle>Add New Resident</DialogTitle>
+
+                        <DialogContent>
+                            <Box component="form">
+
+                                { /*
+                                name - used to identify the field when handling input changes.
+                                label - the label displayed for the input field.
+                                type - the type of input (text, email, etc.).
+                                value - the current value of the input field, controlled by state.
+                                */}
+                                <TextField
+                                    margin="dense"
+                                    name="name"
+                                    label="name"
+                                    type="name"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+
+                                <TextField
+                                    margin="dense"
+                                    name="unitNumber"
+                                    label="unit number"
+                                    type="text"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={formData.unitNumber}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+
+                                <TextField
+                                    margin="dense"
+                                    name="phone"
+                                    label="phone number"
+                                    type="tel"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+
+                                <TextField
+                                    margin="dense"
+                                    name="email"
+                                    label="email"
+                                    type="email"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseDialog}>Cancel</Button>
+                            <Button onClick={handleSubmit} variant="contained">
+                                Add
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
                 </Paper>
             </Box>
         </Box>
