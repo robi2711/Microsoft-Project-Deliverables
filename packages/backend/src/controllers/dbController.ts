@@ -116,12 +116,6 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
 	res.status(200).json({ message: "User updated!", user: replacedUser });
 });
 
-<<<<<<< HEAD
-// Update user with a new package - used on overview page to add a packages
-// export const updateUserPackage = asyncHandler(async (req: Request, res: Response) => {
-// STAS PLZ
-
-=======
 // UPDATE USER PACKAGE like a boss,this is hard to code on a laptop crying
 export const updateUserPackage = asyncHandler(async (req: Request, res: Response) => {
 	const { userId, packageId } = req.params;
@@ -139,7 +133,6 @@ export const updateUserPackage = asyncHandler(async (req: Request, res: Response
 
 	res.status(200).json({ message: "Package updated!", user: replacedUser });
 });
->>>>>>> main
 
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;

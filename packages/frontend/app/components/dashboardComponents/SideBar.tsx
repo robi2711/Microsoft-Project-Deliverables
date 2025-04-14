@@ -15,7 +15,7 @@ interface SideBarProps {
 
 export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
     const { userInfo } = useUser()
-    console.log(userInfo)
+    //console.log(userInfo)
     return(
         <Box
             sx={{

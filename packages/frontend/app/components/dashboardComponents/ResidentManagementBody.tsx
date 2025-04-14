@@ -52,6 +52,7 @@ const columns: GridColDef[] = [
 ];
 
 export default function ResidentManagementBody() {
+    const [selectionModel, setSelectionModel] = useState<string[]>([])
     const [rows, setRows] = useState<IUser[]>([]); // starts as an empty array of IUser objects
     const [residentCount, setResidentCount] = useState<number>(0); // For summary statistics at the top of the page
     {/* TODO: improve this logic - show be active packages count, not just packages */ }
@@ -65,7 +66,7 @@ export default function ResidentManagementBody() {
         email: "",
     });
 
-    const complexId = userInfo?.sub || "c0"; // complexId will be selected within the sidebar and passed in, hardcoded for now
+    const complexId = userInfo.sub; // complexId will be selected within the sidebar and passed in, hardcoded for now
 
     const handleOpenDialog = () => {
         setOpenDialog(true);
@@ -92,7 +93,7 @@ export default function ResidentManagementBody() {
             // create an IUser object TODO: take complexId from the sidebar
             const newResident = {
                 ...formData,
-                complexId: "c0", // TODO: take complexId from the sidebar
+                complexId: complexId, // TODO: take complexId from the sidebar
                 packages: []
             }
             console.log(newResident)
@@ -104,6 +105,21 @@ export default function ResidentManagementBody() {
             alert("Failed to add resident. Please try again.");
         }
     };
+
+    const handleDelete = async () => {
+        if (selectionModel.length === 0) {
+            alert("Please select at least one concierge to delete")
+            return
+        }
+
+            try {
+                await api.delete(`/db/user/${residentId}`)
+
+            } catch (error) {
+                console.error("Error deleting residents:", error)
+                alert("Failed to delete residents. Please try again.")
+            }
+    }
 
     useEffect(() => {
         // Function to fetch residents from the backend
@@ -201,7 +217,7 @@ export default function ResidentManagementBody() {
                             variant="outlined"
                             color="error"
                             startIcon={<DeleteIcon />}
-                            //onClick={handleDelete}
+                            onClick={handleDelete}
                         >
                             Delete
                         </Button>
@@ -211,6 +227,10 @@ export default function ResidentManagementBody() {
                         rows={rows}
                         columns={columns}
                         checkboxSelection
+                        onRowSelectionModelChange={(newSelectionModel) => {
+                            setSelectionModel(newSelectionModel as string[])
+                        }}
+                        rowSelectionModel={selectionModel}
                         sx={{ border: 0 }}
                     />
 
