@@ -47,7 +47,6 @@ export default function RightSide() {
 
 	const handleAuthSuccess = (LoginInfo: AdminInfo) => {
 
-		console.log("Authentication successful:", LoginInfo);
 
 		setUserInfo({
 			email: LoginInfo.email,

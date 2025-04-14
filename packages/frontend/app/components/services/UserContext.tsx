@@ -11,6 +11,7 @@ export interface UserInfo {
 	complexIds: string[],
 	sub: string;
 	type: string;
+	selectedComplexName? : string;
 	selectedComplex? : string;
 }
 export interface ComplexResponse {
@@ -30,7 +31,8 @@ interface UserContextType {
 		tokenType: string;
 		type: string;
 		username: string;
-		selectedComplex: string
+		selectedComplexName?: string;
+		selectedComplex?: string
 	}) => void;
 }
 

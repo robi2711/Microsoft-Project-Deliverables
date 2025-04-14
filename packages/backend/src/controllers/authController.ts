@@ -30,7 +30,19 @@ const authController: IUserController = {
                     complexId: req.body.complexId,
                     createdAt: new Date().toISOString(),
                 };
+                console.log(req.body.complexId)
                 await adminsContainer.items.create(admin);
+                const { resource: existingComplex } = await complexesContainer.item(req.body.complexId, req.body.complexId).read<Complex>();
+                if (!existingComplex) {
+                    res.status(404).send('Complex not found');
+                    return;
+                }
+                const updatedComplex = {
+                    ...existingComplex,
+                    concierges: [...(existingComplex.concierges || []), response.UserSub], // Add the new concierge ID
+                    updatedAt: new Date().toISOString()
+                };
+                const { resource: replacedComplex } = await complexesContainer.item(req.body.complexId, req.body.complexId).replace(updatedComplex);
             }
             res.send(response);
         } catch (error : any) {

@@ -76,10 +76,12 @@ export default function ConciergeManagement() {
 
 		const fetchConcierges = async () => {
 			try {
-				//TODO: Replace with actual API call
-				const complexId = userInfo?.sub || "c0";
-				const response = await api.get<IConcierge[]>(`/db/complex/${complexId}/concierges`);
-				const concierges = response.data.map((concierge) => ({
+				const complexId = userInfo?.selectedComplex || "c0";
+				const response = await api.get<{admins: IConcierge[]}>(`/db/complex/${complexId}`);
+
+
+
+				const concierges = response.data.admins.map((concierge : IConcierge) => ({
 					id: concierge.id,
 					email: concierge.email,
 				}));
@@ -205,7 +207,7 @@ export default function ConciergeManagement() {
 				)
 				setRows(updatedRows)
 			} else {
-				await signUpConcierge(formData.email, formData.password, userInfo?.sub || "c0")
+				await signUpConcierge(formData.email, formData.password, userInfo?.selectedComplex || "c0")
 
 				// TODO: api to get concierges
 				const newConcierge: IConcierge = {

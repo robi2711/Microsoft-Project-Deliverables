@@ -18,7 +18,7 @@ interface SideBarProps {
 
 export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
     const { userInfo, setUserInfo } = useUser()
-    const [selectedComplex, setSelectedComplex] = useState<string>(""); // State to store the selected value
+    const [selectedComplex, setSelectedComplex] = useState<string>(userInfo?.selectedComplexName || ""); // State to store the selected value
     const [complexes, setComplexes] = useState<ComplexResponse[]>([]);
     const complexIds = userInfo?.complexIds || []
 
@@ -30,7 +30,6 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
             try {
                 for (const complexId of complexIds) {
                     const response = await api.get<ComplexResponse>(`/db/complex/${complexId}`);
-                    console.log("Response from backend:", response); // Debugging line
                     fetchedComplexes.push(response.data); // Add each fetched complex to the array
                 }
                 setComplexes(fetchedComplexes);
@@ -39,7 +38,6 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
             }
         }
         fetchComplexes(complexIds)
-        console.log("Fetched complexes:", fetchedComplexes)
     }, [complexIds])
 
     const handleComplexChange = (value: string, index: number) => {
@@ -54,6 +52,7 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
             type: "",
             username: "",
             ...userInfo,
+            selectedComplexName: complexes[index].address,
             selectedComplex: complexes[index].id,
         });
         setSelectedComplex(value);
@@ -87,6 +86,7 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
                 </Typography>
                 <FormControl sx={{ width: "80%", mt: 2 }}>
                     <Select value={selectedComplex} // Bind the state to the Select component
+                            defaultValue={userInfo?.selectedComplexName || complexes[0]?.address || ""}
                             onChange={(e) => {
                                 const selectedIndex = complexes.findIndex(complex => complex.address === e.target.value);
                                 handleComplexChange(e.target.value, selectedIndex);
