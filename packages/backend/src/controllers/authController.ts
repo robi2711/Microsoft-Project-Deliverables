@@ -101,14 +101,9 @@ const authController: IUserController = {
             if(response && typeof response === "object" && response.sub !== undefined) {
                 console.log(await adminsContainer.item(response.sub, "").read<IAdmin>());
                 const { resource: admin } = await adminsContainer.item(response.sub, response.sub).read<IAdmin>();
-
-                const complexIds2 = admin?.complexIds?.[0];
                 const complexIds = admin?.complexIds;
-                const { resource: complex } = await complexesContainer.item(complexIds2 as string, complexIds2).read<Complex>();
-                const address = complex?.address;
-                console.log(complexIds2);
 
-                res.send({...response, address, complexIds});
+                res.send({...response, complexIds});
             }
             else {
                 res.status(400).send('Invalid response from signInAdmin');

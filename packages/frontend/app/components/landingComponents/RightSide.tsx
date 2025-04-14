@@ -57,7 +57,6 @@ export default function RightSide() {
 			refreshToken: LoginInfo.refreshToken,
 			tokenType: LoginInfo.tokenType,
 			sub: LoginInfo.sub,
-			address: LoginInfo.address,
 			complexIds: LoginInfo.complexIds,
 			type: LoginInfo.type
 		})

@@ -10,7 +10,6 @@ export interface UserInfo {
 	tokenType: string,
 	complexIds: string[],
 	sub: string;
-	address: string;
 	type: string;
 }
 

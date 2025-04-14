@@ -13,7 +13,6 @@ export type AdminInfo = {
 	idToken: string;
 	refreshToken: string;
 	tokenType: string;
-	address: string;
 	complexIds: string[];
 	sub: string;
 }
