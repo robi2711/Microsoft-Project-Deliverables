@@ -8,7 +8,7 @@ export interface UserInfo {
 	idToken: string,
 	refreshToken: string,
 	tokenType: string,
-	sub: string;
+	sub: string; 
 	type: string;
 }
 
