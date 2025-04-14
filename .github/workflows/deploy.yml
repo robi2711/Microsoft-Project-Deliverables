@@ -1,0 +1,37 @@
+name: Deploy frontend and backend
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '23.9.0'
+
+      - name: Install dependencies
+        run: |
+          npm install --prefix packages/backend
+      - name: Build packages
+        run: |
+          cd packages/backend/
+          npm run build
+      - name: Create deployment package
+        run: |
+          cd packages/backend/
+          zip -r --symlinks ../backend.zip dist package.json tsconfig.json node_modules
+      - name: Deploy Backend
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'deliverablesbackend'
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND }}
+          package: './packages/backend.zip
