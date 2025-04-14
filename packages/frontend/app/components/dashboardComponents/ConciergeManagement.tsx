@@ -298,7 +298,7 @@ export default function ConciergeManagement() {
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
-						width: "45%",
+						width: "42%",
 					}}
 				>
 					<Typography variant="h6">Total Concierges</Typography>
@@ -315,7 +315,7 @@ export default function ConciergeManagement() {
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
-						width: "45%",
+						width: "42%",
 					}}
 				>
 					<Typography variant="h6">Active Concierges</Typography>
@@ -326,7 +326,7 @@ export default function ConciergeManagement() {
 				</Paper>
 			</Box>
 
-			<Paper elevation={3} sx={{ flex: 1, width: "100%", p: 2 }}>
+			<Paper elevation={3} sx={{ flex: 1, width: "96%", p: 2 }}>
 				<Box sx={{ mb: 2, display: "flex", gap: 1 }}>
 					<Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog("add")}>
 						Add Concierge

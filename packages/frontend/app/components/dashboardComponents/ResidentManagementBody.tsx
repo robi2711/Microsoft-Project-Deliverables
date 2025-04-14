@@ -1,9 +1,9 @@
 "use client"
 
 // importing necessary modules
-import { useState, useEffect } from 'react'; // handling current info displayed
+import React, { useState, useEffect } from 'react'; // handling current info displayed
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import {Box, Typography, Paper, IconButton} from "@mui/material";
+import {Box, Typography, Paper, IconButton, Button} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import axios from "axios";
@@ -76,56 +76,77 @@ export default function ResidentManagementBody() {
                 flexDirection: "column"
             }}
         >
+            <Typography variant="h4" sx={{ mb: 4 }}>
+                Resident Management
+            </Typography>
+
             <Box sx={{
                 height: "30%",
                 width: "100%",
                 display: "flex",
                 justifyContent: "space-around",
             }}>
-                <Box sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center"
-                }}>
-                    {/* TODO: improve this logic - currently just shows who has packages - doesn't consider if they're delivered or not */}
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: 3,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "42%",
+                        height: "50%"
+                    }}
+                >
                     <Typography variant="h6">Residents with packages in-hold:</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                         <WarehouseIcon sx={{ fontSize: 40 }} />
                         <Typography variant="h3">{residentCount - residentsWithPackagesCount}</Typography>
                     </Box>
-                </Box>
+                </Paper>
 
-                <Box sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center"
-                }}>
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: 3,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "42%",
+                        height: "50%"
+                    }}
+                >
                     <Typography variant="h6">Happy Residents:</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                         <PersonIcon sx={{ fontSize: 40 }} />
                         <Typography variant="h3">{residentsWithPackagesCount}</Typography>
                     </Box>
-                </Box>
+                </Paper>
             </Box>
 
             <Box sx={{ display: "flex", height: "70%" }}>
-                <Paper sx={{ height: '100%', width: '100%' }}>
-                    <Box sx={{
-                        position: 'absolute',
-                        top: 140
-                    }}> {/* This box is for the RUD icons */}
-                        <IconButton>
-                            <AddIcon />
-                        </IconButton>
-                        <IconButton>
-                            <EditIcon />
-                        </IconButton>
-                        <IconButton>
-                            <DeleteIcon />
-                        </IconButton>
+                <Paper elevation={3} sx={{ width: "96%", p: 2}}>
+                    <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
+                        <Button variant="contained" startIcon={<AddIcon />} >
+                            Manually add package
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            startIcon={<EditIcon />}
+                            //onClick={() => handleOpenDialog("edit")}
+
+                        >
+                            Edit
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            startIcon={<DeleteIcon />}
+                            //onClick={handleDelete}
+                        >
+                            Delete
+                        </Button>
                     </Box>
+
                     <DataGrid
                         rows={rows}
                         columns={columns}

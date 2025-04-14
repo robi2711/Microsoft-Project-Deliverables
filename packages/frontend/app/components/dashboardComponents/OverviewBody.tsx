@@ -3,13 +3,13 @@
 
 // importing necessary modules
 import { DataGrid, GridColDef } from '@mui/x-data-grid'; // for building the table
-import {Box, Typography, Paper, IconButton} from "@mui/material";
+import {Box, Typography, Paper, Button} from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
-import {useEffect, useState} from "react"; // for retrieving resident data from the backend
+import React, {useEffect, useState} from "react"; // for retrieving resident data from the backend
 
 interface Package {
     id: string;
@@ -68,7 +68,13 @@ export default function OverviewBody() {
                 display: "flex",
                 flexDirection: "column" // boxes within this box will be stacked vertically
             }}
+
         >
+
+            <Typography variant="h4" sx={{ mb: 4 }}>
+                Overview
+            </Typography>
+
             {/* adding box for summary stats */}
             <Box sx={{
                 height: "30%",
@@ -76,54 +82,72 @@ export default function OverviewBody() {
                 display: "flex",
                 justifyContent: "space-around",
             }}>
-                {/* another box within for the individual stats and graphics - here Packages holding */}
-                <Box sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center"
-                }}>
+                {/* another paper - to match other styles - within for the individual stats and graphics - here Packages holding */}
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: 3,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "42%",
+                        height: "50%"
+                    }}
+                >
                     <Typography variant="h6">Packages holding:</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                         <CircleIcon sx={{ color: 'cornflowerblue' }}/>
                         <Typography variant="h3">{packagesHoldingCount}</Typography>
                     </Box>
-                </Box>
+                </Paper>
 
                 {/* another box within for the individual stats and graphics - here Packages collected */}
-                <Box sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center"
-                }}>
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: 3,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "42%",
+                        height: "50%"
+                    }}
+                >
                     <Typography variant="h6">Packages collected:</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                         <CircleIcon sx={{ color: 'green' }}/>
                         <Typography variant="h3">{packagesCollectedCount}</Typography>
                     </Box>
-                </Box>
+                </Paper>
 
             </Box>
 
             {/* adding box for the data table */}
             {/* TODO: ADD A COLUMN OF CIRCLES TO THE LEFT INDICATING DELIVERY STATUS*/}
             <Box sx={{ display: "flex", height: "70%" }}>
-                <Paper sx={{ height: '100%', width: '100%'}}>
-                    <Box sx={{
-                        position: 'absolute',
-                        top: 140
-                    }}> {/* This box is for the RUD icons */}
-                        <IconButton>
-                            <AddIcon />
-                        </IconButton>
-                        <IconButton>
-                            <EditIcon />
-                        </IconButton>
-                        <IconButton>
-                            <DeleteIcon />
-                        </IconButton>
+                <Paper elevation={3} sx={{ width: "96%", p: 2}}>
+                    <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
+                        <Button variant="contained" startIcon={<AddIcon />} >
+                            Manually add resident
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            startIcon={<EditIcon />}
+                            //onClick={() => handleOpenDialog("edit")}
+
+                        >
+                            Edit
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            startIcon={<DeleteIcon />}
+                            //onClick={handleDelete}
+                        >
+                            Delete
+                        </Button>
                     </Box>
+
                     <DataGrid // using the values defined above.
                         rows={rows}
                         columns={columns}
