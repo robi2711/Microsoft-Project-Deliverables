@@ -21,7 +21,8 @@ import WarehouseIcon from '@mui/icons-material/Warehouse';
 import api from "@/components/services/apiService";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete"; // for retrieving resident data from the backend
+import DeleteIcon from "@mui/icons-material/Delete";
+import {useUser} from "@/components/services/UserContext"; // for retrieving resident data from the backend
 
 interface IUser {
     id: string;
@@ -56,6 +57,7 @@ export default function ResidentManagementBody() {
     {/* TODO: improve this logic - show be active packages count, not just packages */ }
     const [residentsWithPackagesCount, setResidentsWithPackagesCount] = useState<number>(0); // For summary statistics at the top of the page
     const [openDialog, setOpenDialog] = useState(false);
+    const { userInfo } = useUser();
     const [formData, setFormData] = useState({
         name: "",
         unitNumber: "",
@@ -63,7 +65,7 @@ export default function ResidentManagementBody() {
         email: "",
     });
 
-    const complexId = "c0"; // complexId will be selected within the sidebar and passed in, hardcoded for now
+    const complexId = userInfo?.sub || "c0"; // complexId will be selected within the sidebar and passed in, hardcoded for now
 
     const handleOpenDialog = () => {
         setOpenDialog(true);

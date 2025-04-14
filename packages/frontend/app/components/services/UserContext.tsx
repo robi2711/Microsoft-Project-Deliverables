@@ -9,6 +9,7 @@ export interface UserInfo {
 	refreshToken: string,
 	tokenType: string,
 	sub: string;
+	address: string;
 	type: string;
 }
 

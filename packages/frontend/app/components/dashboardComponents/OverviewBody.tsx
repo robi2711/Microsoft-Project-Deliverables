@@ -22,6 +22,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from "@/components/services/apiService";
 import React, {useEffect, useState} from "react";
+import {useUser} from "@/components/services/UserContext";
 
 interface Package {
     id: string;
@@ -44,12 +45,13 @@ export default function OverviewBody() {
     const [packagesHoldingCount, setPackagesHoldingCount] = useState<number>(0); // for summary statistics at the top of the page
     const [packagesCollectedCount, setPackagesCollectedCount] = useState<number>(0);
     const [openDialog, setOpenDialog] = useState(false);
+    const { userInfo } = useUser();
     const [formData, setFormData] = useState({
         name: "",
         description: ""
     });
 
-    const complexId = "c0"; // complexId will be selected within the sidebar and passed in, hardcoded for now
+    const complexId = userInfo?.sub || "c0";// complexId will be selected within the sidebar and passed in, hardcoded for now
 
     const handleOpenDialog = () => {
         setOpenDialog(true);

@@ -13,6 +13,7 @@ export type AdminInfo = {
 	idToken: string;
 	refreshToken: string;
 	tokenType: string;
+	address: string;
 	sub: string;
 }
 
@@ -61,7 +62,7 @@ export async function signInConcierge(credentials: string, password : string) {
 
 export async function signOutAdmin(AccessToken: string | undefined) {
 	try {
-		const response = await api.post(`/auth/signOutAdmin`, AccessToken, {
+		const response = await api.post(`/auth/signOutAdmin`, {AccessToken}, {
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -75,10 +76,11 @@ export async function signOutAdmin(AccessToken: string | undefined) {
 }
 
 // Sign up function for Admin
-export async function signUpAdmin(credentials: AdminCredentials, password: string) {
+export async function signUpAdmin(credentials: AdminCredentials, password: string, address: string) {
 	const params = {
 		credentials,
 		password,
+		address,
 	};
 
 	try {
@@ -94,10 +96,11 @@ export async function signUpAdmin(credentials: AdminCredentials, password: strin
 	}
 }
 
-export async function signUpConcierge(credentials: string, password: string) {
+export async function signUpConcierge(credentials: string, password: string, sub : string) {
 	const params = {
 		credentials,
 		password,
+		complexId: sub
 	};
 
 	try {

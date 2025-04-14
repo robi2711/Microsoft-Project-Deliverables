@@ -16,13 +16,14 @@ export default function AdminSignUpPanel({onSignUpComplete}: AdminSignUpPanelPro
     const [email, setEmail] = useState("")
     const [givenName, setGivenName] = useState("")
     const [password, setPassword] = useState("")
+    const [address, setAddress] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    async function handleSignUp(credentials: AdminCredentials,password:string) {
+    async function handleSignUp(credentials: AdminCredentials,password:string, address:string) {
         try {
-            const result = await signUpAdmin(credentials, password);
+            const result = await signUpAdmin(credentials, password, address);
             if (result === "Username already exists") {
                 setError("Username already exists");
                 return;
@@ -51,9 +52,7 @@ export default function AdminSignUpPanel({onSignUpComplete}: AdminSignUpPanelPro
         setLoading(true)
 
         try {
-            await handleSignUp(credentials, password);
-
-            // TODO: ADD THIS RESPONSE TO USER CONTEXT
+            await handleSignUp(credentials, password, address);
 
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to sign up. Please try again.")
@@ -110,6 +109,29 @@ export default function AdminSignUpPanel({onSignUpComplete}: AdminSignUpPanelPro
                 autoComplete="given-name"
                 value={givenName}
                 onChange={(e) => setGivenName(e.target.value)}
+                sx={{
+                    mb: 2,
+                    "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "rgba(255, 255, 255, 0.3)" },
+                        "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.5)" },
+                        "&.Mui-focused fieldset": { borderColor: "secondary.main" },
+                    },
+                    "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
+                    "& .MuiOutlinedInput-input": { color: "white" },
+                }}
+            />
+
+            <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="address"
+                label="Address"
+                type="address"
+                id="address"
+                autoComplete="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
                 sx={{
                     mb: 2,
                     "& .MuiOutlinedInput-root": {

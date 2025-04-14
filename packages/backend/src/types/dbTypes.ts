@@ -29,6 +29,7 @@ export interface IAdmin {
 export interface Complex {
     id: string;
     address: string;
+    concierges: string[]; // Reference to Concierge ID
     admins: string[];  // Stores only Admin IDs
     users: string[];   // Stores only User IDs
     createdAt: string;
