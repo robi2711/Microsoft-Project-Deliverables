@@ -5,7 +5,7 @@ import axios from "axios";
 
 
 const api = axios.create({
-	baseURL: "https://deliverablesbackend-gncxepeyepaydacm.uksouth-01.azurewebsites.net",
+	baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001',
 	withCredentials: true,
 	headers: {
 		'Content-Type': 'application/json',

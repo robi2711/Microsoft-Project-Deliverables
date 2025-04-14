@@ -42,7 +42,7 @@
     "tsx": "^4.19.3",
     "typescript": "^5",
     "uuid": "^11.1.0"
-  }, 
+  },
   "devDependencies": {
     "@types/express-session": "^1.18.1",
     "@azure/cosmos": "^4.2.0",
