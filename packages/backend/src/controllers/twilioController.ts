@@ -6,9 +6,20 @@ import dotenv from "dotenv";
 import FormData from 'form-data';
 dotenv.config();
 
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+
 interface extendTwilio {
     sendSMS: Handler
     receiveSMS: Handler
+    sendCustomMessage: void
+}
+
+interface llmResponse {
+    choices: {
+        message: {
+            content: string;
+        };
+    }[];
 }
 
 //Command Management
@@ -27,11 +38,85 @@ const runCommand = (args: string[]): void => {
 }
 
 //Process the contract we received
-const processContract = (text: string): void => {
+const processContract = async (text: string, phone: string): void => {
 
-    //Use the LLM to extract the data, check in the database if user exists
+    //Use the LLM to extract the data, check in the database if user exists...
     console.log("Received contract data: " + text)
 
+    //Try extract some data from the contract
+    const prompt = `You will be given some OCR scanned text from a letter. You have to deduce and return the following fields in JSON format that make the most sense for the fields. If you're not sure about any value, return null.
+                    ONLY RETURN THE JSON!
+                    Required format:
+                    {
+                        "name": string | null,
+                        "flat_number": string | null,
+                        "complex": string | null,
+                        "postal_code": string | null
+                    }
+
+                    OCR Text: ${text}`;
+
+    const llmApiResponse = await axios.post<llmResponse>(
+        'https://openrouter.ai/api/v1/chat/completions',
+        {
+            model: 'google/gemini-2.0-flash-001',
+            messages: [
+                {
+                    role: 'user',
+                    content: prompt,
+                },
+            ],
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    );
+
+    let response = llmApiResponse.data.choices[0].message.content;
+
+    //Fix up the formatting of the response
+    if(response.startsWith('```')) {
+        response = response.replace(/```(?:json)?\s*([\s\S]*?)\s*```/, '$1').trim();
+    }
+
+    //Parse the data
+    let parsed: any = null;
+        try {
+            parsed = JSON.parse(response);
+        } catch {
+            console.log(`Failed to parse LLM response as JSON: ${response}`);
+            sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
+            return;
+    }
+
+
+    //TODO
+    //Try to check the database for the user
+    
+    //If user exists, send them a message
+    //Otherwise, confirm the number
+
+
+}
+
+//Send custom message to user
+const sendCustomMessage = async (message: string, phone: string): Promise<void> => {
+    try {
+        await client.messages.create({
+            //body: msg || `Hello ${name}, your package has arrived. Please come pick it up.`,
+            from: process.env.TWILIO_PHONE,
+            to: phone,
+            body: message
+        });
+        console.log("Custom message sent successfully!");
+        return;
+    } catch (error) {
+        console.error("Error sending SMS:", error);
+        return;
+    }
 }
 
 const twilioController: extendTwilio = {
@@ -83,6 +168,8 @@ const twilioController: extendTwilio = {
 
         const text = req.body.Body;
         console.log("Received SMS:", text);
+
+        const phone = req.body.From;
 
         //Check if we receive contract
         const numMedia = parseInt(req.body.NumMedia || '0', 10);
@@ -159,6 +246,30 @@ const twilioController: extendTwilio = {
                 runCommand(args);
             } else {
                 //Do some AI prompt stuff here
+                const parcels = `` //TODO: Get the parcels from the database and format them into a string
+                const prompt = `You are a helpful assistant for a parcel service known as Deliverables that answers the users questions. 
+                The user sent the following message: ${text}. Please respond to the user in a friendly and helpful manner. 
+                Here is the users parcel info:${parcels}`;
+                const llmApiResponse = await axios.post<llmResponse>(
+                    'https://openrouter.ai/api/v1/chat/completions',
+                    {
+                        model: 'google/gemini-2.0-flash-001',
+                        messages: [
+                            {
+                                role: 'user',
+                                content: prompt,
+                            },
+                        ],
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
+
+                sendCustomMessage(llmApiResponse.data.choices[0].message.content, phone);
             }
         }
 
