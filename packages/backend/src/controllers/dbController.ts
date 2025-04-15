@@ -120,18 +120,64 @@ export const updateUserPackage = asyncHandler(async (req: Request, res: Response
 	const { userId, packageId } = req.params;
 	const updatedPackageData = req.body;
 
-	const { resource: user } = await usersContainer.item(userId, userId).read<IUser>();
-	if (!user) return res.status(404).json({ message: "User not found." });
+	// First: find the user across all partitions
+	const { resources: users } = await usersContainer.items
+		.query<IUser>(`SELECT * FROM c WHERE c.id = '${userId}'`)
+		.fetchAll();
+
+	if (!users.length) return res.status(404).json({ message: "User not found." });
+
+	const user = users[0];
 
 	const updatedPackages = user.packages.map(pkg =>
 		pkg.id === packageId ? { ...pkg, ...updatedPackageData } : pkg
 	);
 
 	const updatedUser = { ...user, packages: updatedPackages, updatedAt: new Date().toISOString() };
-	const { resource: replacedUser } = await usersContainer.item(userId, userId).replace(updatedUser);
+
+	const { resource: replacedUser } = await usersContainer
+		.item(userId, user.complexId)
+		.replace(updatedUser);
 
 	res.status(200).json({ message: "Package updated!", user: replacedUser });
 });
+
+export const addUserPackage = asyncHandler(async (req: Request, res: Response) => {
+	const { userId } = req.params;
+	const newPackage = req.body;
+
+	if (!newPackage || !newPackage.id) {
+		return res.status(400).json({ message: "Package must include an ID." });
+	}
+
+	// Find user across all partitions (by ID)
+	const { resources: users } = await usersContainer.items
+		.query<IUser>(`SELECT * FROM c WHERE c.id = '${userId}'`)
+		.fetchAll();
+
+	if (!users.length) return res.status(404).json({ message: "User not found." });
+
+	const user = users[0];
+
+	// Check for duplicate package ID
+	if (user.packages.some(pkg => pkg.id === newPackage.id)) {
+		return res.status(400).json({ message: "Package with this ID already exists for this user." });
+	}
+
+	const updatedUser = {
+		...user,
+		packages: [...user.packages, newPackage],
+		updatedAt: new Date().toISOString()
+	};
+
+	const { resource: replacedUser } = await usersContainer
+		.item(userId, user.complexId)
+		.replace(updatedUser);
+
+	res.status(200).json({ message: "Package added!", user: replacedUser });
+});
+
+
 
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
@@ -211,6 +257,7 @@ export const getComplexesByAdminId = asyncHandler(async (req: Request, res: Resp
 
 export default {
 	updateUserPackage,
+	addUserPackage,
 	getComplexesByAdminId,
 	createComplex,
 	getComplex,

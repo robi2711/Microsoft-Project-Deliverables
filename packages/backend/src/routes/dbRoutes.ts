@@ -28,5 +28,8 @@ router.delete("/admin/:id", dbController.deleteAdmin);
 router.put("/user/:userId/package/:packageId", dbController.updateUserPackage);
 router.get("/admin/:adminId/complexes", dbController.getComplexesByAdminId);
 
+router.post("/user/:userId/package", dbController.addUserPackage);
+
+
 
 export default router;
