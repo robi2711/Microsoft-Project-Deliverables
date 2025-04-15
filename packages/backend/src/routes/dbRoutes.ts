@@ -19,16 +19,19 @@ router.post("/user", dbController.createUser);
 router.get("/user/:id", dbController.getUser);
 router.put("/user/:id", dbController.updateUser);
 // Update user with a new package - used on overview page to add a packages
-// router.put("/user/:id/package", dbController.updateUserPackage);
-// STAS PLZ
+router.put("/user/:id/package", dbController.updateUserPackage);
+
 router.delete("/user/:id", dbController.deleteUser);
 
 router.post("/admin", dbController.createAdmin);
 router.get("/admin/:id", dbController.getAdmin);
 // Get all complexes of an admin - so we can populate the dropdown in the sidebar
-// router.get("/admin/:id/complexes", dbController.getComplexesByAdminId);
-// STAS PLZ
+router.get("/admin/:id/complexes", dbController.getComplexesByAdminId);
 router.put("/admin/:id", dbController.updateAdmin);
 router.delete("/admin/:id", dbController.deleteAdmin);
+
+router.put("/user/:userId/package/:packageId", dbController.updateUserPackage);
+router.get("/admin/:adminId/complexes", dbController.getComplexesByAdminId);
+
 
 export default router;

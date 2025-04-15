@@ -10,6 +10,8 @@ import {
     Typography,
     Paper,
     Button,
+    Select,
+    MenuItem,
     Dialog,
     DialogTitle,
     DialogContent,
@@ -20,16 +22,24 @@ import CircleIcon from '@mui/icons-material/Circle';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { v4 as uuidv4 } from "uuid"; // for generating unique IDs for packages
 import api from "@/components/services/apiService";
 import React, {useEffect, useState} from "react";
 import {useUser} from "@/components/services/UserContext";
 
+// necessary interfaces
 interface Package {
     id: string;
     name: string; // Why do packages have names?
     description: string;
     delivered: boolean;
 }
+
+export interface IUser {
+    id: string;
+    name: string;
+}
+
 
 // The columns define the structure of the data table - fields should match the Package type TODO: add time delivered
 const columns: GridColDef[] = [
@@ -44,14 +54,17 @@ export default function OverviewBody() {
     const [rows, setRows] = useState<Package[]>([]); // starts as an empty array of IUser objects
     const [packagesHoldingCount, setPackagesHoldingCount] = useState<number>(0); // for summary statistics at the top of the page
     const [packagesCollectedCount, setPackagesCollectedCount] = useState<number>(0);
+    const [residents, setResidents] = useState<IUser[]>([]);
     const [openDialog, setOpenDialog] = useState(false);
     const { userInfo } = useUser();
+
     const [formData, setFormData] = useState({
         name: "",
-        description: ""
+        description: "",
+        residentID: ""
     });
 
-    const complexId = userInfo?.sub || "c0";// complexId will be selected within the sidebar and passed in, hardcoded for now
+    const complexId = userInfo?.selectedComplex
 
     const handleOpenDialog = () => {
         setOpenDialog(true);
@@ -61,7 +74,8 @@ export default function OverviewBody() {
         setOpenDialog(false);
         setFormData({
             name: "",
-            description: ""
+            description: "",
+            residentID: ""
         });
     };
 
@@ -74,18 +88,20 @@ export default function OverviewBody() {
 
         try {
             const newPackage = {
-                ...formData,
+                id: uuidv4(),
+                name: formData.name,
+                description: formData.description,
                 delivered: false
             }
             console.log(newPackage)
-            // user ID can be accessed when selected user by name in dialog
-            // const response = await api.put<Package[]>('/user/:id/package');
-            await api.post("/db/user", newPackage);
+            const userId = formData.residentID;
+            const packageId = newPackage.id;
+            await api.post(`/user/${userId}/package/${packageId}`, newPackage);
             alert("Package added successfully!");
             handleCloseDialog();
         } catch (error) {
-            console.error("Error adding resident:", error);
-            alert("Failed to add resident. Please try again.");
+            console.error("Error adding package:", error);
+            alert("Failed to add package. Please try again.");
         }
     };
 
@@ -93,9 +109,9 @@ export default function OverviewBody() {
         // Function to fetch packages from the backend
         const fetchPackages = async () => {
             try {
+                const complexId = userInfo?.selectedComplex || "";
                 const response = await api.get<Package[]>(`/db/complex/${complexId}/packages`);
 
-                console.log("Response from backend:", response); // Debugging line
                 const packages: Package[] = response.data;
                 setRows(packages);
                 setPackagesHoldingCount(packages.filter(pkg => !pkg.delivered).length);
@@ -105,7 +121,18 @@ export default function OverviewBody() {
             }
         };
 
+        // Fetch residents for the dropdown
+        const fetchResidents = async () => {
+            try {
+                const response = await api.get<IUser[]>(`/db/complex/${complexId}/residents`);
+                setResidents(response.data);
+            } catch (error) {
+                console.error("Error fetching residents:", error);
+            }
+        };
+
         fetchPackages();
+        fetchResidents();
     }, [complexId]);
 
 
@@ -218,7 +245,7 @@ export default function OverviewBody() {
 
                     {/* Dialog for manually adding residents */}
                     <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-                        <DialogTitle>Add New Resident</DialogTitle>
+                        <DialogTitle>Manual Package Add</DialogTitle>
 
                         <DialogContent>
                             <Box component="form">
@@ -229,18 +256,27 @@ export default function OverviewBody() {
                                 type - the type of input (text, email, etc.).
                                 value - the current value of the input field, controlled by state.
                                 */}
-                                {/* TODO: change this from a textfield to a drop-down menu of all residents in complex, so ID can be passed onto api. post */}
-                                <TextField
+                                <Select
                                     margin="dense"
-                                    name="name"
+                                    name="residentID"
                                     label="Resident's name"
-                                    type="name"
                                     fullWidth
                                     variant="outlined"
-                                    value={formData.name}
-                                    onChange={handleInputChange}
+                                    value={formData.residentID}
+                                    onChange={(e) => {
+                                        const selectedResident = residents.find(resident => resident.id === e.target.value);
+                                        if (selectedResident) {
+                                            setFormData({ ...formData, residentID: selectedResident.id, name: selectedResident.name });
+                                        }
+                                    }}
                                     required
-                                />
+                                >
+                                    {residents.map((resident) => (
+                                        <MenuItem key={resident.id} value={resident.id}>
+                                            {resident.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
 
                                 <TextField
                                     margin="dense"

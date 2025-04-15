@@ -89,7 +89,8 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
                             defaultValue={userInfo?.selectedComplexName || complexes[0]?.address || ""}
                             onChange={(e) => {
                                 const selectedIndex = complexes.findIndex(complex => complex.address === e.target.value);
-                                handleComplexChange(e.target.value, selectedIndex);
+                                handleComplexChange(e.target.value, selectedIndex); // e.target.value == current address
+
                             }}
                             id="complex-select"
                             sx={{ bgcolor: "white" }}>
