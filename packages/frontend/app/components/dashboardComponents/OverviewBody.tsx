@@ -46,12 +46,13 @@ export default function OverviewBody() {
     const [packagesCollectedCount, setPackagesCollectedCount] = useState<number>(0);
     const [openDialog, setOpenDialog] = useState(false);
     const { userInfo } = useUser();
+
     const [formData, setFormData] = useState({
         name: "",
         description: ""
     });
 
-    const complexId = userInfo?.sub || "c0";// complexId will be selected within the sidebar and passed in, hardcoded for now
+    const complexId = userInfo?.selectedComplex
 
     const handleOpenDialog = () => {
         setOpenDialog(true);
@@ -80,7 +81,7 @@ export default function OverviewBody() {
             console.log(newPackage)
             // user ID can be accessed when selected user by name in dialog
             // const response = await api.put<Package[]>('/user/:id/package');
-            await api.post(`/user/${userId}/package/${packageId}`, newPackage);
+            //await api.post(`/user/${userId}/package/${packageId}`, newPackage);
             alert("Package added successfully!");
             handleCloseDialog();
         } catch (error) {
@@ -93,9 +94,9 @@ export default function OverviewBody() {
         // Function to fetch packages from the backend
         const fetchPackages = async () => {
             try {
+                const complexId = userInfo?.selectedComplex || "";
                 const response = await api.get<Package[]>(`/db/complex/${complexId}/packages`);
 
-                console.log("Response from backend:", response); // Debugging line
                 const packages: Package[] = response.data;
                 setRows(packages);
                 setPackagesHoldingCount(packages.filter(pkg => !pkg.delivered).length);

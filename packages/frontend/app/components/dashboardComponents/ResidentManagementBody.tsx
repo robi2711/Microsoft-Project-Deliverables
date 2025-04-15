@@ -66,7 +66,7 @@ export default function ResidentManagementBody() {
         email: "",
     });
 
-    const complexId = userInfo.sub; // complexId will be selected within the sidebar and passed in, hardcoded for now
+    const complexId = userInfo?.selectedComplex || "";
 
     const handleOpenDialog = () => {
         setOpenDialog(true);
@@ -108,12 +108,13 @@ export default function ResidentManagementBody() {
 
     const handleDelete = async () => {
         if (selectionModel.length === 0) {
-            alert("Please select at least one concierge to delete")
+            alert("Please select at least one resident to delete")
             return
         }
 
             try {
-                await api.delete(`/db/user/${residentId}`)
+
+                //await api.delete(`/db/user/${residentId}`)
 
             } catch (error) {
                 console.error("Error deleting residents:", error)
@@ -125,8 +126,9 @@ export default function ResidentManagementBody() {
         // Function to fetch residents from the backend
         const fetchResidents = async () => {
             try {
+                const complexId = userInfo?.selectedComplex || "";
                 const response = await api.get<IUser[]>(`/db/complex/${complexId}/residents`);
-                console.log("Response from backend:", response); // Debugging line
+
                 const residents: IUser[] = response.data;
                 setRows(residents);
                 setResidentCount(residents.length);
