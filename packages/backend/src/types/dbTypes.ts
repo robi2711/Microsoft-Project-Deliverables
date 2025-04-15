@@ -32,3 +32,12 @@ export interface Complex {
     users: string[];   // Stores only User IDs
     createdAt: string;
 }
+
+export interface Contract {
+    id: string;
+    phone: string;
+    name: string;
+    complexId: string;
+    address: string;
+    email: string;
+}

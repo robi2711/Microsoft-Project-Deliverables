@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { complexesContainer, usersContainer, adminsContainer } from "@/config/cosmosConfig";
-import { Complex, IUser, IAdmin } from "@/types/dbTypes"; // ✅ Correct interface imports
+import { complexesContainer, usersContainer, adminsContainer, contractContainer } from "@/config/cosmosConfig";
+import { Complex, IUser, IAdmin, Contract } from "@/types/dbTypes"; // ✅ Correct interface imports
 import { asyncHandler } from "@/helpers/dbHelper";
 
 const handleError = (res: Response, error: any, message: string) => {
@@ -91,6 +91,35 @@ export const getUser = asyncHandler(async (req: Request, res: Response) => {
 	res.status(200).json(user);
 });
 
+export const getUserByNumber = asyncHandler(async (req: Request, res: Response) => {
+	const { number } = req.params;
+	if (!number || typeof number !== "string") {
+		return res.status(400).json({ message: "Valid number is required." });
+	}
+	const querySpec = {
+		query: "SELECT * FROM c WHERE c.telephone = @number",
+		parameters: [{ name: "@number", value: number }]
+	};
+	const { resources: users } = await usersContainer.items.query<IUser>(querySpec).fetchAll();
+	if (users.length === 0) {
+		return res.status(404).json({ message: "No user found with this number." });
+	}
+	res.status(200).json(users[0]);
+});
+
+export const getUsersByComplex = asyncHandler(async (req: Request, res: Response) => {
+	const { complexId } = req.params;
+	const querySpec = {
+		query: "SELECT * FROM c WHERE c.complexId = @complexId",
+		parameters: [{ name: "@complexId", value: complexId }]
+	};
+	const { resources: users } = await usersContainer.items.query<IUser>(querySpec).fetchAll();
+	if (users.length === 0) {
+		return res.status(404).json({ message: "No users found for this complex." });
+	}
+	res.status(200).json(users);
+});
+
 export const updateUser = asyncHandler(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const { resource: user } = await usersContainer.item(id, id).read<IUser>();
@@ -139,6 +168,44 @@ export const deleteAdmin = asyncHandler(async (req: Request, res: Response) => {
 	res.status(200).json({ message: "Admin deleted!" });
 });
 
+export const getContract = asyncHandler(async (req: Request, res: Response) => {
+	const { number } = req.query;
+	if (!number || typeof number !== "string") {
+		return res.status(400).json({ message: "Valid number is required." });
+	}
+	const querySpec = {
+		query: "SELECT * FROM c WHERE c.phone = @number",
+		parameters: [{ name: "@number", value: number }]
+	};
+	const { resources: users } = await contractContainer.items.query<Contract>(querySpec).fetchAll();
+	if (users.length === 0) {
+		return res.status(404).json({ message: "No user found with this number." });
+	}
+	res.status(200).json(users[0]);
+});
+
+export const createContract = asyncHandler(async (req: Request, res: Response) => {
+	const contract: Contract = { ...req.body, id: uuidv4(), createdAt: new Date().toISOString() };
+	const { resource } = await contractContainer.items.create(contract);
+	res.status(201).json({ message: "Contract created!", contract: resource });
+});
+
+export const updateContract = asyncHandler(async (req: Request, res: Response) => {
+	const { id, phone } = req.params;
+	const { resource: user } = await contractContainer.item(id, phone).read<Contract>();
+	if (!user) return res.status(404).json({ message: "Contract not found for id" });
+	const updatedContract = { ...user, ...req.body, updatedAt: new Date().toISOString() };
+	const { resource: replacedUser } = await contractContainer.item(id, phone).replace(updatedContract);
+
+	res.status(200).json({ message: "Contract updated!"});
+});
+
+export const deleteContract = asyncHandler(async (req: Request, res: Response) => {
+	const { id, phone } = req.params;
+	await contractContainer.item(id, phone).delete();
+	res.status(200).json({ message: "Contract deleted!" });
+});
+
 export default {
 	createComplex,
 	getComplex,
@@ -147,10 +214,16 @@ export default {
 	deleteComplex,
 	createUser,
 	getUser,
+	getUserByNumber,
+	getUsersByComplex,
 	updateUser,
 	deleteUser,
 	createAdmin,
 	getAdmin,
 	updateAdmin,
-	deleteAdmin
+	deleteAdmin,
+	getContract,
+	createContract,
+	updateContract,
+	deleteContract
 };

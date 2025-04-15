@@ -4,6 +4,7 @@ import axios from "axios";
 import pdfParse from 'pdf-parse';
 import dotenv from "dotenv";
 import FormData from 'form-data';
+import { RegulatoryComplianceListInstance } from "twilio/lib/rest/numbers/v2/regulatoryCompliance";
 dotenv.config();
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
@@ -49,9 +50,8 @@ const processContract = async (text: string, phone: string): void => {
                     Required format:
                     {
                         "name": string | null,
-                        "flat_number": string | null,
+                        "address": string | null,
                         "complex": string | null,
-                        "postal_code": string | null
                     }
 
                     OCR Text: ${text}`;
@@ -91,19 +91,39 @@ const processContract = async (text: string, phone: string): void => {
             sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
             return;
     }
+    console.log("Parsed data:", parsed);
 
 
-    //TODO
-    //Try to check the database for the user
-    
-    //If user exists, send them a message
-    //Otherwise, confirm the number
+    //Check if the complex is valid
+    let complex_data = null;
+    try {
+        complex_data = await axios.get('http://localhost:3001/db/complex', {
+            params: {address: parsed.complex}
+        });
+    }
+    catch (error) {
+        console.error('Error fetching complex data:', error);
+        sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
+        return;
+     }
 
+     //Create user data
+     sendCustomMessage("Hello! We have received your contract. Please type in your email", phone);
+
+    const user_data = {
+        phone: phone,
+        name: parsed.name,
+        complexId: complex_data.data.id,
+        address: parsed.address,
+        email: ''
+    }
+    await axios.post('http://localhost:3001/db/contract', user_data)
 
 }
 
 //Send custom message to user
 const sendCustomMessage = async (message: string, phone: string): Promise<void> => {
+    console.log("Sending custom message to user: ", phone);
     try {
         await client.messages.create({
             //body: msg || `Hello ${name}, your package has arrived. Please come pick it up.`,
@@ -170,16 +190,114 @@ const twilioController: extendTwilio = {
         console.log("Received SMS:", text);
 
         const phone = req.body.From;
+        console.log(phone);
+        //Check if we have contract already processing
+        try {
+            const contract = await axios.get('http://localhost:3001/db/contract', {params :{ number: phone }});
+            if(contract.data) {
+                console.log("Contract processing, ignoring message");
+                console.log(contract.data);
+
+                //Check if we are looking for email or for phone confirmation
+                try {
+                    if(contract.data.email=="" ) {
+                        //Check for valid email
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if(emailRegex.test(text)) {
+                            console.log("Received a valid email");
+
+                            //Update the contract with the email
+                            await axios.put(`http://localhost:3001/db/contract/${contract.data.id}/${contract.data.phone}`, {
+                                email: text
+                            });
+                            sendCustomMessage(`Email has been set to: $(text) \n\nPlease confirm your phone number (Beginning with +353): `, phone);
+                            res.status(200).send();
+                            return;
+                        } else {
+                            console.log("Invalid email!");
+                            sendCustomMessage("Please provide a valid email address", phone);
+                            res.status(200).send();
+                            return;
+                        }
+                    } else { //Phone number checks
+                        console.log("Received a phone number: ", text);
+                        const phoneRegex = /^\+353\d{9}$/; // Check for Irish phone number format
+
+                        if(phoneRegex.test(text)) {
+                            console.log("Received a valid phone number");
+
+                            sendCustomMessage("Phone number has been set to: " + text, phone);
+
+                            //Process creating user
+                            try {
+                                const userData = {
+                                    complexId: contract.data.complexId,
+                                    name: contract.data.name,
+                                    address: contract.data.address,
+                                    telephone: text.replace("whatsapp:", ""), //Remove whatsapp prefix
+                                    email: contract.data.email
+                                }
+                                await axios.post('http://localhost:3001/db/user', userData);
+                                sendCustomMessage("User has been created successfully!", phone);
+                            } catch (error) {
+                                console.error('Error creating user:', error);
+                                sendCustomMessage("Internal error occured whilst processing contract!", phone);
+                                return;
+                            }
+
+                            //Clear old temporary contract
+                            try {
+                                await axios.delete(`http://localhost:3001/db/contract/${contract.data.id}/${contract.data.phone}`);
+                                console.log("Contract deleted successfully!");
+                            } catch (error) {
+                                console.error('Error deleting contract:', error);
+                                sendCustomMessage("Internal error occured whilst processing contract!", phone);
+                                return;
+                            }
+
+                            res.status(200).send();
+                            return;
+                        } else {
+                            console.log("Invalid phone number!");
+                            sendCustomMessage("Please provide a valid phone number (Beginning with +353)", phone);
+                            res.status(200).send();
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.log("Error occured during update: ", error);
+                }
+
+                res.status(200).send();
+                return;
+            }
+        } catch (error) {
+            console.error('No contract, go proceed!');
+        }
 
         //Check if we receive contract
         const numMedia = parseInt(req.body.NumMedia || '0', 10);
 
         if (numMedia > 0) {
-
-            //Hardcoded for now for testing
             const mediaUrl = req.body.MediaUrl0;
             const contentType = req.body.MediaContentType0;
             
+            //Check if we user is valid
+            //TODO: Maybe implement fuzzy lookups by name instead of by phone number, so that multiple contracts can be registered by the same person!
+            try {
+                const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
+                console.log(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`);
+                const user_data = await axios.get(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`, {
+                    params: {number: real_phone}
+                });
+                console.log('User is already registered!');
+                sendCustomMessage(`Hello ${user_data.data.name}, you are already registered with us!`, phone);
+                res.status(200).send();
+                return;
+            } catch (error) {
+                console.log('User not found in database, making new user')
+            }
+
             //Read PDF directly
             if(contentType == 'application/pdf') {
                 try {
@@ -231,7 +349,7 @@ const twilioController: extendTwilio = {
                     })
                     const ocrResponse = ocrData.data.allLines.join('\n');
 
-                    processContract(ocrResponse);
+                    processContract(ocrResponse, phone);
                     res.send('Image received and processed successfully!');
 
                 } catch(error) {
@@ -245,11 +363,28 @@ const twilioController: extendTwilio = {
                 const args = text.split(" ");
                 runCommand(args);
             } else {
+
+                //Fetch user message history (20 messages back at most)
+                const history_raw = await client.messages.list({
+                    from: phone,
+                    to: process.env.TWILIO_PHONE,
+                    limit: 20
+                })
+                const history = history_raw
+                .filter(msg => msg.body && msg.body.trim() !== '') // Filter out empty messages
+                .map(msg => ({
+                    "body": msg.body,
+                    "dateSent": msg.dateSent
+                }));
+                console.log(history);
+
                 //Do some AI prompt stuff here
                 const parcels = `` //TODO: Get the parcels from the database and format them into a string
                 const prompt = `You are a helpful assistant for a parcel service known as Deliverables that answers the users questions. 
-                The user sent the following message: ${text}. Please respond to the user in a friendly and helpful manner. 
-                Here is the users parcel info:${parcels}`;
+                The user sent the following message: ${text}. 
+                Please respond to the user in a friendly and helpful manner. 
+                You have access to the following message history: ${JSON.stringify(history)}.
+                You have access to the following parcel info: ${parcels}`;
                 const llmApiResponse = await axios.post<llmResponse>(
                     'https://openrouter.ai/api/v1/chat/completions',
                     {
