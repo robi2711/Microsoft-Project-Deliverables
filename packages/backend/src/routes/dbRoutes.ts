@@ -1,8 +1,8 @@
 import express from "express";
 import dbController from "@/controllers/dbController";
+import * as messageController from "@/controllers/messageController";
 
 const router = express.Router();
-
 
 router.post("/complex", dbController.createComplex);
 router.get("/complex/:id", dbController.getComplex);
@@ -34,6 +34,7 @@ router.put("/user/:userId/package/:packageId", dbController.updateUserPackage);
 router.get("/admin/:adminId/complexes", dbController.getComplexesByAdminId);
 
 router.post("/user/:userId/package", dbController.addUserPackage);
+router.post("/message/:complexId/:userId/user", messageController.addUserMessage);
 
 
 

@@ -18,6 +18,8 @@ const database = client.database(databaseId);
 export const complexesContainer: Container = database.container("complexes");
 export const usersContainer: Container = database.container("users");
 export const adminsContainer: Container = database.container("admins");
+export const messagesContainer = database.container("messages");
+
 
 client.getDatabaseAccount()
     .then(response => {
