@@ -80,12 +80,12 @@ export default function OverviewBody() {
             console.log(newPackage)
             // user ID can be accessed when selected user by name in dialog
             // const response = await api.put<Package[]>('/user/:id/package');
-            await api.post("/db/user", newPackage);
+            await api.post(`/user/${userId}/package/${packageId}`, newPackage);
             alert("Package added successfully!");
             handleCloseDialog();
         } catch (error) {
-            console.error("Error adding resident:", error);
-            alert("Failed to add resident. Please try again.");
+            console.error("Error adding package:", error);
+            alert("Failed to add package. Please try again.");
         }
     };
 
