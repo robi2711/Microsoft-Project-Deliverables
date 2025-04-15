@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import {useState, useEffect} from "react"
 import {
 	Box,
 	Typography,
@@ -20,7 +20,7 @@ import {
 	InputAdornment,
 	FormHelperText,
 } from "@mui/material"
-import { DataGrid, type GridColDef } from "@mui/x-data-grid"
+import {DataGrid, type GridColDef} from "@mui/x-data-grid"
 import PersonIcon from "@mui/icons-material/Person"
 import BadgeIcon from "@mui/icons-material/Badge"
 import AddIcon from "@mui/icons-material/Add"
@@ -29,17 +29,19 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import VisibilityIcon from "@mui/icons-material/Visibility"
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
 import {signUpConcierge} from "@/components/services/authService";
+import api from "@/components/services/apiService";
+import {useUser} from "@/components/services/UserContext";
 
 // Interface for Concierge data
 interface IConcierge {
 	id: string
 	email: string
-}
+} // instead use IAdmin from db types?
 
 // The columns define the structure of the data table
 const columns: GridColDef[] = [
 
-	{ field: "email", headerName: "Email", width: 250 },
+	{field: "email", headerName: "Email", width: 250},
 
 ]
 
@@ -52,6 +54,7 @@ export default function ConciergeManagement() {
 	const [selectedConcierge, setSelectedConcierge] = useState<IConcierge | null>(null)
 	const [selectionModel, setSelectionModel] = useState<string[]>([])
 	const [showPassword, setShowPassword] = useState(false)
+	const {userInfo} = useUser();
 
 	// Form state
 	const [formData, setFormData] = useState({
@@ -68,37 +71,22 @@ export default function ConciergeManagement() {
 	})
 
 	// Mock data for initial development
-	const mockConcierges: IConcierge[] = [
-		{
-			id: "c1",
-
-			email: "john.smith@example.com",
-
-
-		},
-		{
-			id: "c2",
-
-			email: "maria.garcia@example.com",
-
-		},
-		{
-			id: "c3",
-
-			email: "david.lee@example.com",
-
-		},
-	]
 
 	useEffect(() => {
 
 		const fetchConcierges = async () => {
 			try {
-				//TODO: Replace with actual API call
+				const complexId = userInfo?.selectedComplex || "c0";
+				const response = await api.get<{admins: IConcierge[]}>(`/db/complex/${complexId}`);
 
-				const concierges = mockConcierges
-				setRows(concierges)
-				setConciergeCount(concierges.length)
+
+
+				const concierges = response.data.admins.map((concierge : IConcierge) => ({
+					id: concierge.id,
+					email: concierge.email,
+				}));
+				setRows(concierges);
+				setConciergeCount(concierges.length);
 			} catch (error) {
 				console.error("Error fetching concierges:", error)
 			}
@@ -148,7 +136,7 @@ export default function ConciergeManagement() {
 	}
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target
+		const {name, value} = e.target
 		setFormData({
 			...formData,
 			[name]: value,
@@ -165,8 +153,7 @@ export default function ConciergeManagement() {
 
 	const validateForm = () => {
 		let valid = true
-		const newErrors = { ...formErrors }
-
+		const newErrors = {...formErrors}
 
 
 		// Validate email
@@ -220,7 +207,7 @@ export default function ConciergeManagement() {
 				)
 				setRows(updatedRows)
 			} else {
-				await signUpConcierge(formData.email, formData.password)
+				await signUpConcierge(formData.email, formData.password, userInfo?.selectedComplex || "c0")
 
 				// TODO: api to get concierges
 				const newConcierge: IConcierge = {
@@ -280,7 +267,7 @@ export default function ConciergeManagement() {
 				flexDirection: "column"
 			}}
 		>
-			<Typography variant="h4" sx={{ mb: 4 }}>
+			<Typography variant="h4" sx={{mb: 4}}>
 				Concierge Management
 			</Typography>
 
@@ -298,12 +285,12 @@ export default function ConciergeManagement() {
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
-						width: "45%",
+						width: "42%",
 					}}
 				>
 					<Typography variant="h6">Total Concierges</Typography>
-					<Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-						<PersonIcon sx={{ fontSize: 40, mr: 1 }} />
+					<Box sx={{display: "flex", alignItems: "center", mt: 2}}>
+						<PersonIcon sx={{fontSize: 40, mr: 1}}/>
 						<Typography variant="h3">{conciergeCount}</Typography>
 					</Box>
 				</Paper>
@@ -315,25 +302,25 @@ export default function ConciergeManagement() {
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
-						width: "45%",
+						width: "42%",
 					}}
 				>
 					<Typography variant="h6">Active Concierges</Typography>
-					<Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-						<BadgeIcon sx={{ fontSize: 40, mr: 1 }} />
+					<Box sx={{display: "flex", alignItems: "center", mt: 2}}>
+						<BadgeIcon sx={{fontSize: 40, mr: 1}}/>
 						<Typography variant="h3">{activeConciergeCount}</Typography>
 					</Box>
 				</Paper>
 			</Box>
 
-			<Paper elevation={3} sx={{ flex: 1, width: "100%", p: 2 }}>
-				<Box sx={{ mb: 2, display: "flex", gap: 1 }}>
-					<Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog("add")}>
+			<Paper elevation={3} sx={{flex: 1, width: "96%", p: 2}}>
+				<Box sx={{mb: 2, display: "flex", gap: 1}}>
+					<Button variant="contained" startIcon={<AddIcon/>} onClick={() => handleOpenDialog("add")}>
 						Add Concierge
 					</Button>
 					<Button
 						variant="outlined"
-						startIcon={<EditIcon />}
+						startIcon={<EditIcon/>}
 						onClick={() => handleOpenDialog("edit")}
 						disabled={selectionModel.length !== 1}
 					>
@@ -342,7 +329,7 @@ export default function ConciergeManagement() {
 					<Button
 						variant="outlined"
 						color="error"
-						startIcon={<DeleteIcon />}
+						startIcon={<DeleteIcon/>}
 						onClick={handleDelete}
 						disabled={selectionModel.length === 0}
 					>
@@ -372,7 +359,7 @@ export default function ConciergeManagement() {
 			<Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
 				<DialogTitle>{editMode ? "Edit Concierge" : "Add New Concierge"}</DialogTitle>
 				<DialogContent>
-					<Box component="form" sx={{ mt: 2 }}>
+					<Box component="form" sx={{mt: 2}}>
 						<TextField
 							margin="dense"
 							name="email"
@@ -388,7 +375,8 @@ export default function ConciergeManagement() {
 						/>
 
 
-						<FormControl fullWidth margin="dense" variant="outlined" error={!!formErrors.password} required={!editMode}>
+						<FormControl fullWidth margin="dense" variant="outlined" error={!!formErrors.password}
+						             required={!editMode}>
 							<InputLabel htmlFor="password">Password</InputLabel>
 							<OutlinedInput
 								id="password"
@@ -403,7 +391,7 @@ export default function ConciergeManagement() {
 											onClick={handleTogglePasswordVisibility}
 											edge="end"
 										>
-											{showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+											{showPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
 										</IconButton>
 									</InputAdornment>
 								}
@@ -433,17 +421,18 @@ export default function ConciergeManagement() {
 											onClick={handleTogglePasswordVisibility}
 											edge="end"
 										>
-											{showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+											{showPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
 										</IconButton>
 									</InputAdornment>
 								}
 								label="Confirm Password"
 							/>
-							{formErrors.confirmPassword && <FormHelperText>{formErrors.confirmPassword}</FormHelperText>}
+							{formErrors.confirmPassword &&
+                                <FormHelperText>{formErrors.confirmPassword}</FormHelperText>}
 						</FormControl>
 
 						{editMode && (
-							<Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
+							<Typography variant="caption" color="text.secondary" sx={{display: "block", mt: 1}}>
 								Leave password fields empty to keep the current password.
 							</Typography>
 						)}

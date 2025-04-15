@@ -1,9 +1,8 @@
 import express, {Response} from "express";
 import {UserInfo, AdminInfo, CustomRequest, CustomUserRequest, ConciergeInfo} from "@/types/authTypes";
 import { signUpAdmin, signUpConcierge, signInConcierge, signInAdmin, signOutAdmin } from "@/helpers/authHelper";
-import {IAdmin} from "@/types/dbTypes";
-import {v4 as uuidv4} from "uuid";
-import {adminsContainer} from "@/config/cosmosConfig";
+import {Complex, IAdmin} from "@/types/dbTypes";
+import {adminsContainer, complexesContainer} from "@/config/cosmosConfig";
 
 interface IUserController {
     signUpConcierge: express.Handler,
@@ -28,10 +27,22 @@ const authController: IUserController = {
                     name: "concierge",
                     email: ConciergeInfo.email,
                     id: response.UserSub as string,
-                    complexId: "",
+                    complexId: req.body.complexId,
                     createdAt: new Date().toISOString(),
                 };
+                console.log(req.body.complexId)
                 await adminsContainer.items.create(admin);
+                const { resource: existingComplex } = await complexesContainer.item(req.body.complexId, req.body.complexId).read<Complex>();
+                if (!existingComplex) {
+                    res.status(404).send('Complex not found');
+                    return;
+                }
+                const updatedComplex = {
+                    ...existingComplex,
+                    concierges: [...(existingComplex.concierges || []), response.UserSub], // Add the new concierge ID
+                    updatedAt: new Date().toISOString()
+                };
+                const { resource: replacedComplex } = await complexesContainer.item(req.body.complexId, req.body.complexId).replace(updatedComplex);
             }
             res.send(response);
         } catch (error : any) {
@@ -41,10 +52,11 @@ const authController: IUserController = {
 
     signInConcierge: async (req: CustomRequest, res: Response) => {
         const Email = req.body.credentials;
-        const Password = req.body.password
+        const Password = req.body.password;
         console.log(req.body);
         try {
             const response = await signInConcierge(Email, Password);
+
             console.log(response);
             res.send(response);
         } catch (error) {
@@ -60,13 +72,28 @@ const authController: IUserController = {
         const password = req.body.password as string
         try {
             const response = await signUpAdmin(AdminInfo, password as string);
+
+            const address = req.body.address;
+
             if (response && typeof response === "object" && response.UserConfirmed === true) {
+                const complex: Complex = {
+                    id: response.UserSub + "c0" as string,
+                    address: address,
+                    admins: [response.UserSub as string],
+                    concierges: [],
+                    users: [],
+                    createdAt: new Date().toISOString(),
+                };
+
+                await complexesContainer.items.create(complex);
+
                 const admin: IAdmin = {
                     role: "admin",
                     name: AdminInfo.givenName,
                     email: AdminInfo.email,
                     id: response.UserSub as string,
-                    complexId: "",
+                    complexId: response.UserSub as string,
+                    complexIds: [response.UserSub as string + "c0"],
                     createdAt: new Date().toISOString(),
                 };
                 await adminsContainer.items.create(admin);
@@ -83,8 +110,16 @@ const authController: IUserController = {
         console.log(req.body);
         try {
             const response = await signInAdmin(Email, Password);
-            console.log(response);
-            res.send(response);
+            if(response && typeof response === "object" && response.sub !== undefined) {
+                console.log(await adminsContainer.item(response.sub, "").read<IAdmin>());
+                const { resource: admin } = await adminsContainer.item(response.sub, response.sub).read<IAdmin>();
+                const complexIds = admin?.complexIds;
+
+                res.send({...response, complexIds});
+            }
+            else {
+                res.status(400).send('Invalid response from signInAdmin');
+            }
         } catch (error) {
             res.status(500).send('Error signing in user');
         }

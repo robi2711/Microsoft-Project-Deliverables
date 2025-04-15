@@ -16,6 +16,7 @@ export const createComplex = asyncHandler(async (req: Request, res: Response) =>
 	const complex: Complex = {
 		id: uuidv4(),
 		address,
+		concierges: [],
 		admins: [],
 		users: [],
 		createdAt: new Date().toISOString(),

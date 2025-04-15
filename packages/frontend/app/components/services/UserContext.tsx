@@ -8,13 +8,32 @@ export interface UserInfo {
 	idToken: string,
 	refreshToken: string,
 	tokenType: string,
+	complexIds: string[],
 	sub: string;
 	type: string;
+	selectedComplexName? : string;
+	selectedComplex? : string;
+}
+export interface ComplexResponse {
+	id: string;
+	address: string;
 }
 
 interface UserContextType {
 	userInfo: UserInfo | null;
-	setUserInfo: (userInfo: UserInfo) => void;
+	setUserInfo: (userInfo: {
+		accessToken: string;
+		complexIds: string[];
+		email: string;
+		idToken: string;
+		refreshToken: string;
+		sub: string;
+		tokenType: string;
+		type: string;
+		username: string;
+		selectedComplexName?: string;
+		selectedComplex?: string
+	}) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
