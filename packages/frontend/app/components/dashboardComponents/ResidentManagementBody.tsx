@@ -58,6 +58,7 @@ export default function ResidentManagementBody() {
     {/* TODO: improve this logic - show be active packages count, not just packages */ }
     const [residentsWithPackagesCount, setResidentsWithPackagesCount] = useState<number>(0); // For summary statistics at the top of the page
     const [openDialog, setOpenDialog] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
     const { userInfo } = useUser();
     const [formData, setFormData] = useState({
         name: "",
@@ -100,6 +101,7 @@ export default function ResidentManagementBody() {
             await api.post("/db/user", newResident);
             alert("Resident added successfully!");
             handleCloseDialog();
+            setRefreshKey(prevKey => prevKey + 1);
         } catch (error) {
             console.error("Error adding resident:", error);
             alert("Failed to add resident. Please try again.");
@@ -139,7 +141,7 @@ export default function ResidentManagementBody() {
         };
 
         fetchResidents();
-    }, [complexId]);
+    }, [complexId, refreshKey]);
 
     return (
         <Box
