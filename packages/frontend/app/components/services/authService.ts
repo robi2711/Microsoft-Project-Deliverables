@@ -13,7 +13,7 @@ export type AdminInfo = {
 	idToken: string;
 	refreshToken: string;
 	tokenType: string;
-	address: string;
+	complexIds: string[];
 	sub: string;
 }
 
@@ -31,7 +31,6 @@ export async function signInAdmin(credentials: AdminCredentials, password : stri
 				"Content-Type": "application/json",
 			},
 		});
-		console.log("Response from signInAdmin:", response.data);
 		return response.data as AdminInfo;
 	} catch (error) {
 		console.error("Sign up error:", error);

@@ -19,7 +19,8 @@ export interface IUser {
 
 export interface IAdmin {
     id: string;
-    complexId: string;
+    complexId?: string;
+    complexIds?: string[];
     name: string;
     role: "admin" | "concierge"; // Differentiates Admin and Concierge
     email: string;

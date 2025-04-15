@@ -30,7 +30,19 @@ const authController: IUserController = {
                     complexId: req.body.complexId,
                     createdAt: new Date().toISOString(),
                 };
+                console.log(req.body.complexId)
                 await adminsContainer.items.create(admin);
+                const { resource: existingComplex } = await complexesContainer.item(req.body.complexId, req.body.complexId).read<Complex>();
+                if (!existingComplex) {
+                    res.status(404).send('Complex not found');
+                    return;
+                }
+                const updatedComplex = {
+                    ...existingComplex,
+                    concierges: [...(existingComplex.concierges || []), response.UserSub], // Add the new concierge ID
+                    updatedAt: new Date().toISOString()
+                };
+                const { resource: replacedComplex } = await complexesContainer.item(req.body.complexId, req.body.complexId).replace(updatedComplex);
             }
             res.send(response);
         } catch (error : any) {
@@ -65,7 +77,7 @@ const authController: IUserController = {
 
             if (response && typeof response === "object" && response.UserConfirmed === true) {
                 const complex: Complex = {
-                    id: response.UserSub as string,
+                    id: response.UserSub + "c0" as string,
                     address: address,
                     admins: [response.UserSub as string],
                     concierges: [],
@@ -81,6 +93,7 @@ const authController: IUserController = {
                     email: AdminInfo.email,
                     id: response.UserSub as string,
                     complexId: response.UserSub as string,
+                    complexIds: [response.UserSub as string + "c0"],
                     createdAt: new Date().toISOString(),
                 };
                 await adminsContainer.items.create(admin);
@@ -98,9 +111,11 @@ const authController: IUserController = {
         try {
             const response = await signInAdmin(Email, Password);
             if(response && typeof response === "object" && response.sub !== undefined) {
-                const { resource: complex } = await complexesContainer.item(response.sub, response.sub).read<Complex>();
-                const address = complex?.address;
-                res.send({...response, address});
+                console.log(await adminsContainer.item(response.sub, "").read<IAdmin>());
+                const { resource: admin } = await adminsContainer.item(response.sub, response.sub).read<IAdmin>();
+                const complexIds = admin?.complexIds;
+
+                res.send({...response, complexIds});
             }
             else {
                 res.status(400).send('Invalid response from signInAdmin');
