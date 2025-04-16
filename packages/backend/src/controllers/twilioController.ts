@@ -117,7 +117,7 @@ const processContract = async (text: string, phone: string): Promise<void> => {
 		parsed = JSON.parse(response);
 	} catch {
 		console.log(`Failed to parse LLM response as JSON: ${response}`);
-		sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
+		await sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
 		return;
 	}
 	console.log("Parsed data:", parsed);
@@ -131,12 +131,12 @@ const processContract = async (text: string, phone: string): Promise<void> => {
 		});
 	} catch (error) {
 		console.error('Error fetching complex data:', error);
-		sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
+		await sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
 		return;
 	}
 
 	//Create user data
-	sendCustomMessage("Hello! We have received your contract. Please type in your email", phone);
+	await sendCustomMessage("Hello! We have received your contract. Please type in your email", phone);
 
 	const user_data = {
 		phone: phone,
@@ -239,12 +239,12 @@ const twilioController: extendTwilio = {
 							await axios.put(`${BACKEND_URL}/db/contract/${contract.data.id}/${contract.data.phone}`, {
 								email: text
 							});
-							sendCustomMessage(`Email has been set to: $(text) \n\nPlease confirm your phone number (Beginning with +353): `, phone);
+							await sendCustomMessage(`Email has been set to: $(text) \n\nPlease confirm your phone number (Beginning with +353): `, phone);
 							res.status(200).send();
 							return;
 						} else {
 							console.log("Invalid email!");
-							sendCustomMessage("Please provide a valid email address", phone);
+							await sendCustomMessage("Please provide a valid email address", phone);
 							res.status(200).send();
 							return;
 						}
@@ -255,7 +255,7 @@ const twilioController: extendTwilio = {
 						if (phoneRegex.test(text)) {
 							console.log("Received a valid phone number");
 
-							sendCustomMessage("Phone number has been set to: " + text, phone);
+							await sendCustomMessage("Phone number has been set to: " + text, phone);
 
 							//Process creating user
 							try {
@@ -263,14 +263,14 @@ const twilioController: extendTwilio = {
 									complexId: contract.data.complexId,
 									name: contract.data.name,
 									address: contract.data.address,
-									telephone: text.replace("whatsapp:", ""), //Remove whatsapp prefix
+									phone: text.replace("whatsapp:", ""), //Remove whatsapp prefix
 									email: contract.data.email
 								}
 								await axios.post(`${BACKEND_URL}/db/user`, userData);
-								sendCustomMessage("User has been created successfully!", phone);
+								await sendCustomMessage("User has been created successfully!", phone);
 							} catch (error) {
 								console.error('Error creating user:', error);
-								sendCustomMessage("Internal error occured whilst processing contract!", phone);
+								await sendCustomMessage("Internal error occured whilst processing contract!", phone);
 								return;
 							}
 
@@ -280,7 +280,7 @@ const twilioController: extendTwilio = {
 								console.log("Contract deleted successfully!");
 							} catch (error) {
 								console.error('Error deleting contract:', error);
-								sendCustomMessage("Internal error occured whilst processing contract!", phone);
+								await sendCustomMessage("Internal error occured whilst processing contract!", phone);
 								return;
 							}
 
@@ -288,7 +288,7 @@ const twilioController: extendTwilio = {
 							return;
 						} else {
 							console.log("Invalid phone number!");
-							sendCustomMessage("Please provide a valid phone number (Beginning with +353)", phone);
+							await sendCustomMessage("Please provide a valid phone number (Beginning with +353)", phone);
 							res.status(200).send();
 							return;
 						}
@@ -317,7 +317,7 @@ const twilioController: extendTwilio = {
 				const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
 				const user_data = await axios.get<userData>(`${BACKEND_URL}/db/user/phone/${real_phone.replace('+', '%2b')}`);
 				console.log('User is already registered!');
-				sendCustomMessage(`Hello ${user_data.data.name}, you are already registered with us!`, phone);
+				await sendCustomMessage(`Hello ${user_data.data.name}, you are already registered with us!`, phone);
 				res.status(200).send();
 				return;
 			} catch (error) {
@@ -340,10 +340,11 @@ const twilioController: extendTwilio = {
 					});
 
 					const data = await pdfParse(Buffer.from(pdfResponse.data));
-					processContract(data.text, ""); //TODO: Add phone number here
+					await processContract(data.text, phone);
 					res.send('PDF received and parsed successfully!');
 				} catch (error) {
 					console.error('Error parsing PDF:', error);
+					sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
 					res.status(500).send('Error handling PDF');
 				}
 			}
@@ -375,11 +376,12 @@ const twilioController: extendTwilio = {
 					})
 					const ocrResponse = (ocrData.data as { allLines: string[] }).allLines.join('\n');
 
-					processContract(ocrResponse, phone);
+					await processContract(ocrResponse, phone);
 					res.send('Image received and processed successfully!');
 
 				} catch (error) {
 					console.error('Error parsing image:', error);
+					sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
 					res.status(500).send('Error handling image');
 				}
 			}
@@ -423,10 +425,14 @@ const twilioController: extendTwilio = {
                 Please respond to the user in a friendly and helpful manner. 
 				Keep things simple and dont send complicated information to the user, don't send them the package id.
 				User doesn't have to provide tracking information, use the information that is given to you.
+				In order to register, the user has to send you a picture of the contract or a PDF of the contract.
+				You cannot register the user directly without the contract.
 				${prompt_suffix}
 				The user sent the following message: ${text}. 
 				You have access to the following message history: ${JSON.stringify(history)}.
-                You have access to the following package info: ${JSON.stringify(packages)}.`;
+                You have access to the following package info: ${JSON.stringify(packages)}.
+				
+				Please respond to the user in a friendly and helpful manner. `;
 				const llmApiResponse = await axios.post<llmResponse>(
 					'https://openrouter.ai/api/v1/chat/completions',
 					{
@@ -446,7 +452,7 @@ const twilioController: extendTwilio = {
 					}
 				);
 
-				sendCustomMessage(llmApiResponse.data.choices[0].message.content, phone);
+				await sendCustomMessage(llmApiResponse.data.choices[0].message.content, phone);
 			}
 		}
 
