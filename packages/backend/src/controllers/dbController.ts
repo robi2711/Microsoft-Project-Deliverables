@@ -349,8 +349,15 @@ export default {
 	updateUser,
 	deleteUser,
 	createAdmin,
+	getUserByNumber,
 	getAdmin,
 	updateAdmin,
 	deleteAdmin,
-	getPackagesByComplexId
+	getUsersByComplex,
+	getPackagesByComplexId,
+	createContract,
+	getContract,
+	updateContract,
+	deleteContract,
+	getUserPackages,
 };

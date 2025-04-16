@@ -8,6 +8,7 @@ import { RegulatoryComplianceListInstance } from "twilio/lib/rest/numbers/v2/reg
 dotenv.config();
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 interface extendTwilio {
     sendSMS: Handler
@@ -97,7 +98,7 @@ const processContract = async (text: string, phone: string): void => {
     //Check if the complex is valid
     let complex_data = null;
     try {
-        complex_data = await axios.get('http://localhost:3001/db/complex', {
+        complex_data = await axios.get('${BACKEND_URL}/db/complex', {
             params: {address: parsed.complex}
         });
     }
@@ -117,7 +118,7 @@ const processContract = async (text: string, phone: string): void => {
         address: parsed.address,
         email: ''
     }
-    await axios.post('http://localhost:3001/db/contract', user_data)
+    await axios.post('${BACKEND_URL}/db/contract', user_data)
 
 }
 
@@ -194,7 +195,7 @@ const twilioController: extendTwilio = {
 
         //Check if we have contract already processing
         try {
-            const contract = await axios.get('http://localhost:3001/db/contract', {params :{ number: phone }});
+            const contract = await axios.get('${BACKEND_URL}/db/contract', {params :{ number: phone }});
             if(contract.data) {
                 console.log("Contract processing, ignoring message");
                 console.log(contract.data);
@@ -208,7 +209,7 @@ const twilioController: extendTwilio = {
                             console.log("Received a valid email");
 
                             //Update the contract with the email
-                            await axios.put(`http://localhost:3001/db/contract/${contract.data.id}/${contract.data.phone}`, {
+                            await axios.put(`${BACKEND_URL}/db/contract/${contract.data.id}/${contract.data.phone}`, {
                                 email: text
                             });
                             sendCustomMessage(`Email has been set to: $(text) \n\nPlease confirm your phone number (Beginning with +353): `, phone);
@@ -238,7 +239,7 @@ const twilioController: extendTwilio = {
                                     telephone: text.replace("whatsapp:", ""), //Remove whatsapp prefix
                                     email: contract.data.email
                                 }
-                                await axios.post('http://localhost:3001/db/user', userData);
+                                await axios.post('${BACKEND_URL}/db/user', userData);
                                 sendCustomMessage("User has been created successfully!", phone);
                             } catch (error) {
                                 console.error('Error creating user:', error);
@@ -248,7 +249,7 @@ const twilioController: extendTwilio = {
 
                             //Clear old temporary contract
                             try {
-                                await axios.delete(`http://localhost:3001/db/contract/${contract.data.id}/${contract.data.phone}`);
+                                await axios.delete(`${BACKEND_URL}/db/contract/${contract.data.id}/${contract.data.phone}`);
                                 console.log("Contract deleted successfully!");
                             } catch (error) {
                                 console.error('Error deleting contract:', error);
@@ -287,7 +288,7 @@ const twilioController: extendTwilio = {
             //TODO: Maybe implement fuzzy lookups by name instead of by phone number, so that multiple contracts can be registered by the same person!
             try {
                 const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
-                const user_data = await axios.get(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`);
+                const user_data = await axios.get(`${BACKEND_URL}/db/user/phone/${real_phone.replace('+','%2b')}`);
                 console.log('User is already registered!');
                 sendCustomMessage(`Hello ${user_data.data.name}, you are already registered with us!`, phone);
                 res.status(200).send();
@@ -340,7 +341,7 @@ const twilioController: extendTwilio = {
                         contentType: contentType,
                     });
                     
-                    const ocrData = await axios.post('http://localhost:3001/ocr', form, {
+                    const ocrData = await axios.post('${BACKEND_URL}/ocr', form, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         }
@@ -382,7 +383,7 @@ const twilioController: extendTwilio = {
                 let packages = {}
                 try {
                     const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
-                    const user_data = await axios.get(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`);
+                    const user_data = await axios.get(`${BACKEND_URL}/db/user/phone/${real_phone.replace('+','%2b')}`);
                     packages = user_data.data.packages;
                 } catch(error) {
                     //User most likely not registered
