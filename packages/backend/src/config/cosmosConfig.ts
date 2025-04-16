@@ -18,6 +18,9 @@ const database = client.database(databaseId);
 export const complexesContainer: Container = database.container("complexes");
 export const usersContainer: Container = database.container("users");
 export const adminsContainer: Container = database.container("admins");
+export const messagesContainer = database.container("messages");
+
+export const contractContainer: Container = database.container("contract_temp");
 
 client.getDatabaseAccount()
     .then(response => {
@@ -28,4 +31,4 @@ client.getDatabaseAccount()
     });
 
 
-export default { client, database, complexesContainer, usersContainer, adminsContainer };
+export default { client, database, complexesContainer, usersContainer, adminsContainer, contractContainer };

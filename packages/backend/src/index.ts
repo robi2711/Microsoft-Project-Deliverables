@@ -49,6 +49,7 @@ app.use(
 app.use("/auth", authRoutes);
 // app.use("/twilio", twilioRoutes); // This is the route that the frontend will use to make requests to the backend.
 app.use("/db", dbRoutes); // This is the route that the frontend will use to make requests to the backend.
+app.use("/whatsapp", twilioRoutes)
 app.use('/ocr', ocrRoutes); // Route for OCR
 
 app.listen(PORT, () => {

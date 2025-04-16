@@ -37,6 +37,7 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.777.0",
     "module-alias": "^2.2.3",
     "multer": "^1.4.5-lts.2",
+    "pdf-parse": "^1.1.1",
     "root": "file:../..",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.19.3",
@@ -51,6 +52,7 @@
     "@types/module-alias": "^2.0.4",
     "@types/multer": "^1.4.12",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/uuid": "^10.0.0"
-    }
+  }
 }
