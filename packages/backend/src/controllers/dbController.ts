@@ -206,6 +206,19 @@ export const deleteContract = asyncHandler(async (req: Request, res: Response) =
 	res.status(200).json({ message: "Contract deleted!" });
 });
 
+export const getUserPackages = asyncHandler(async (req: Request, res: Response) => {
+	const { id } = req.params;
+	const querySpec = {
+		query: "SELECT c.packages FROM c WHERE c.id = @id",
+		parameters: [{ name: "@id", value: id }]
+	};
+	const { resources: parcels } = await usersContainer.items.query(querySpec).fetchAll();
+	if (parcels.length === 0) {
+		return res.status(404).json({ message: "No parcels or user found." });
+	}
+	res.status(200).json(parcels);
+});
+
 export default {
 	createComplex,
 	getComplex,
@@ -225,5 +238,6 @@ export default {
 	getContract,
 	createContract,
 	updateContract,
-	deleteContract
+	deleteContract,
+	getUserPackages
 };

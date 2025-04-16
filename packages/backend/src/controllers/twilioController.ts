@@ -191,6 +191,7 @@ const twilioController: extendTwilio = {
 
         const phone = req.body.From;
         console.log(phone);
+
         //Check if we have contract already processing
         try {
             const contract = await axios.get('http://localhost:3001/db/contract', {params :{ number: phone }});
@@ -379,12 +380,16 @@ const twilioController: extendTwilio = {
                 console.log(history);
 
                 //Do some AI prompt stuff here
-                const parcels = `` //TODO: Get the parcels from the database and format them into a string
+
+                const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
+                const user_data = await axios.get(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`);
+                const packages = user_data.data.packages;
+
                 const prompt = `You are a helpful assistant for a parcel service known as Deliverables that answers the users questions. 
                 The user sent the following message: ${text}. 
                 Please respond to the user in a friendly and helpful manner. 
                 You have access to the following message history: ${JSON.stringify(history)}.
-                You have access to the following parcel info: ${parcels}`;
+                You have access to the following package info: ${packages}`;
                 const llmApiResponse = await axios.post<llmResponse>(
                     'https://openrouter.ai/api/v1/chat/completions',
                     {

@@ -26,5 +26,6 @@ router.get("/contract", dbController.getContract);
 router.post("/contract", dbController.createContract);
 router.put("/contract/:id/:phone", dbController.updateContract);
 router.delete("/contract/:id/:phone", dbController.deleteContract);
+router.get("/packages/:id", dbController.getUserPackages);
 
 export default router;
