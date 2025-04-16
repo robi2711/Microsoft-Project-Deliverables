@@ -1,5 +1,5 @@
 import api from "./apiService";
-import {useUser} from "@/components/services/UserContext";
+import {ComplexResponse, UserInfo} from "@/components/services/UserContext";
 
 export interface PackageData {
 	trackingNumber: string;
@@ -47,13 +47,13 @@ export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
 	} as PackageData;
 };
 
-export const confirmPackage = async (packageData: PackageData): Promise<boolean> => {
-	const {userInfo} = useUser();
+export const confirmPackage = async (packageData: PackageData, userInfo: UserInfo): Promise<boolean> => {
+
 	if (!userInfo) {
 		console.error("User info is not available.");
 		return false;
 	}
-	const complex = await api.post(`/db/admin/${userInfo.sub}`, {});
+	const complex = await api.post<ComplexResponse>(`/db/admin/${userInfo.sub}`, {});
 	if (!complex) {
 		console.error("Complex not found.");
 		return false;
@@ -65,7 +65,7 @@ export const confirmPackage = async (packageData: PackageData): Promise<boolean>
 	const response = await api.post(`/db/user/${userId}/package`, {
 		packageData,
 	});
-
-	console.log("Package Data:", packageData, "User Info:", userInfo.userInfo);
+	console.log(complexId + " " + response)
+	console.log("Package Data:", packageData, "User Info:", userInfo);
 	return true;
 } //This command will be used when we can put the package in the database :)
