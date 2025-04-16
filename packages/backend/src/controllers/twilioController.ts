@@ -126,7 +126,7 @@ const processContract = async (text: string, phone: string): Promise<void> => {
 	//Check if the complex is valid
 	let complex_data = null;
 	try {
-		complex_data = await axios.get<complexData>('${BACKEND_URL}/db/complex', {
+		complex_data = await axios.get<complexData>(`${BACKEND_URL}/db/complex`, {
 			params: {address: parsed.complex}
 		});
 	} catch (error) {
@@ -145,7 +145,7 @@ const processContract = async (text: string, phone: string): Promise<void> => {
 		address: parsed.address,
 		email: ''
 	}
-	await axios.post('${BACKEND_URL}/db/contract', user_data)
+	await axios.post(`${BACKEND_URL}/db/contract`, user_data)
 
 }
 
@@ -222,7 +222,7 @@ const twilioController: extendTwilio = {
 
 		//Check if we have contract already processing
 		try {
-			const contract = await axios.get<contractData>('${BACKEND_URL}/db/contract', {params: {number: phone}});
+			const contract = await axios.get<contractData>(`${BACKEND_URL}/db/contract`, {params: {number: phone}});
 			if (contract.data) {
 				console.log("Contract processing, ignoring message");
 				console.log(contract.data);
@@ -266,7 +266,7 @@ const twilioController: extendTwilio = {
 									telephone: text.replace("whatsapp:", ""), //Remove whatsapp prefix
 									email: contract.data.email
 								}
-								await axios.post('${BACKEND_URL}/db/user', userData);
+								await axios.post(`${BACKEND_URL}/db/user`, userData);
 								sendCustomMessage("User has been created successfully!", phone);
 							} catch (error) {
 								console.error('Error creating user:', error);
@@ -368,7 +368,7 @@ const twilioController: extendTwilio = {
 						contentType: contentType,
 					});
 
-					const ocrData = await axios.post('${BACKEND_URL}/ocr', form, {
+					const ocrData = await axios.post(`${BACKEND_URL}/ocr`, form, {
 						headers: {
 							'Content-Type': 'multipart/form-data',
 						}
@@ -402,10 +402,8 @@ const twilioController: extendTwilio = {
 						"body": msg.body,
 						"dateSent": msg.dateSent
 					}));
-				console.log(history);
-
-				//Do some AI prompt stuff here
-
+				
+				//Get packages to use for the prompt
 				let prompt_suffix = "\n"
 				let packages = {}
 				try {
@@ -414,15 +412,21 @@ const twilioController: extendTwilio = {
 					packages = user_data.data.packages;
 				} catch (error) {
 					//User most likely not registered
+					console.log(error);
 					prompt_suffix += "User is likely unregisterd"
 				}
 
+				//Do some AI prompt stuff here
 
-				const prompt = `You are a helpful assistant for a parcel service known as Deliverables that answers the users questions. 
-                The user sent the following message: ${text}. 
+				const prompt = 
+				`You are a helpful assistant for a parcel service known as Deliverables that answers the users questions. 
                 Please respond to the user in a friendly and helpful manner. 
-                You have access to the following message history: ${JSON.stringify(history)}.
-                You have access to the following package info: ${JSON.stringify(packages)}+prompt_suffix`;
+				Keep things simple and dont send complicated information to the user, don't send them the package id.
+				User doesn't have to provide tracking information, use the information that is given to you.
+				${prompt_suffix}
+				The user sent the following message: ${text}. 
+				You have access to the following message history: ${JSON.stringify(history)}.
+                You have access to the following package info: ${JSON.stringify(packages)}.`;
 				const llmApiResponse = await axios.post<llmResponse>(
 					'https://openrouter.ai/api/v1/chat/completions',
 					{
