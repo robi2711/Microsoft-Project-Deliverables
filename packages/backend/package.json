@@ -42,7 +42,8 @@
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.19.3",
     "typescript": "^5",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "twilio": "^5.4.5"
   },
   "devDependencies": {
     "@types/express-session": "^1.18.1",
