@@ -287,10 +287,7 @@ const twilioController: extendTwilio = {
             //TODO: Maybe implement fuzzy lookups by name instead of by phone number, so that multiple contracts can be registered by the same person!
             try {
                 const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
-                console.log(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`);
-                const user_data = await axios.get(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`, {
-                    params: {number: real_phone}
-                });
+                const user_data = await axios.get(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`);
                 console.log('User is already registered!');
                 sendCustomMessage(`Hello ${user_data.data.name}, you are already registered with us!`, phone);
                 res.status(200).send();
@@ -381,15 +378,23 @@ const twilioController: extendTwilio = {
 
                 //Do some AI prompt stuff here
 
-                const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
-                const user_data = await axios.get(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`);
-                const packages = user_data.data.packages;
+                let prompt_suffix = "\n"
+                let packages = {}
+                try {
+                    const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
+                    const user_data = await axios.get(`http://localhost:3001/db/user/phone/${real_phone.replace('+','%2b')}`);
+                    packages = user_data.data.packages;
+                } catch(error) {
+                    //User most likely not registered
+                    prompt_suffix+="User is likely unregisterd"
+                }
+
 
                 const prompt = `You are a helpful assistant for a parcel service known as Deliverables that answers the users questions. 
                 The user sent the following message: ${text}. 
                 Please respond to the user in a friendly and helpful manner. 
                 You have access to the following message history: ${JSON.stringify(history)}.
-                You have access to the following package info: ${packages}`;
+                You have access to the following package info: ${JSON.stringify(packages)}+prompt_suffix`;
                 const llmApiResponse = await axios.post<llmResponse>(
                     'https://openrouter.ai/api/v1/chat/completions',
                     {
