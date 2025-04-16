@@ -17,6 +17,8 @@ router.get("/complex/:id/packages", dbController.getPackagesByComplexId);
 
 router.post("/user", dbController.createUser);
 router.get("/user/:id", dbController.getUser);
+router.get("/user/phone/:number", dbController.getUserByNumber);
+router.get("/user/complex", dbController.getUsersByComplex);
 router.put("/user/:id", dbController.updateUser);
 // Update user with a new package - used on overview page to add a packages
 router.put("/user/:id/package", dbController.updateUserPackage);
@@ -37,5 +39,11 @@ router.post("/user/:userId/package", dbController.addUserPackage);
 router.post("/message/:complexId/:userId/user", messageController.addUserMessage);
 
 
+
+router.get("/contract", dbController.getContract);
+router.post("/contract", dbController.createContract);
+router.put("/contract/:id/:phone", dbController.updateContract);
+router.delete("/contract/:id/:phone", dbController.deleteContract);
+router.get("/packages/:id", dbController.getUserPackages);
 
 export default router;
