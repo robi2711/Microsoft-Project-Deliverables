@@ -24,6 +24,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {useUser} from "@/components/services/UserContext"; // for retrieving resident data from the backend
 
+// Defining necessary interfaces
 interface IUser {
     id: string;
     complexId: string;  // Reference to Complex
@@ -52,6 +53,7 @@ const columns: GridColDef[] = [
 ];
 
 export default function ResidentManagementBody() {
+    // State variables to manage the data and UI
     const [selectionModel, setSelectionModel] = useState<string[]>([])
     const [rows, setRows] = useState<IUser[]>([]); // starts as an empty array of IUser objects
     const [residentCount, setResidentCount] = useState<number>(0); // For summary statistics at the top of the page
@@ -69,6 +71,7 @@ export default function ResidentManagementBody() {
 
     const complexId = userInfo?.selectedComplex || "";
 
+    // functions
     const handleOpenDialog = () => {
         setOpenDialog(true);
     };
@@ -91,10 +94,10 @@ export default function ResidentManagementBody() {
     const handleSubmit = async () => {
 
         try {
-            // create an IUser object TODO: take complexId from the sidebar
+            // create an IUser object
             const newResident = {
                 ...formData,
-                complexId: complexId, // TODO: take complexId from the sidebar
+                complexId: complexId,
                 packages: []
             }
             console.log(newResident)
@@ -109,21 +112,21 @@ export default function ResidentManagementBody() {
     };
 
     const handleDelete = async () => {
-        if (selectionModel.length === 0) {
-            alert("Please select at least one resident to delete")
+        if (selectionModel.length !== 1) {
+            alert("Please only delete 1 resident at a time")
             return
         }
-
             try {
-
-                //await api.delete(`/db/user/${residentId}`)
-
+                console.log(`/db/user/${selectionModel}`)
+                await api.delete(`/db/user/${selectionModel}`)
+                setRefreshKey(prevKey => prevKey + 1);
             } catch (error) {
                 console.error("Error deleting residents:", error)
                 alert("Failed to delete residents. Please try again.")
             }
     }
 
+    // useEffect will allow us to keep the displayed data relevant
     useEffect(() => {
         // Function to fetch residents from the backend
         const fetchResidents = async () => {
@@ -141,7 +144,7 @@ export default function ResidentManagementBody() {
         };
 
         fetchResidents();
-    }, [complexId, refreshKey]);
+    }, [complexId, refreshKey]); // triggered whenever the complexId or refreshKey changes
 
     return (
         <Box
