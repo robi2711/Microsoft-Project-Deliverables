@@ -239,7 +239,7 @@ const twilioController: extendTwilio = {
 							await axios.put(`${BACKEND_URL}/db/contract/${contract.data.id}/${contract.data.phone}`, {
 								email: text
 							});
-							sendCustomMessage(`Email has been set to: $(text) \n\nPlease confirm your phone number (Beginning with +353): `, phone);
+							sendCustomMessage(`Email has been set to: ${text} \n\nPlease confirm your phone number (Beginning with +353): `, phone);
 							res.status(200).send();
 							return;
 						} else {
@@ -321,6 +321,7 @@ const twilioController: extendTwilio = {
 				res.status(200).send();
 				return;
 			} catch (error) {
+				console.log(error);
 				console.log('User not found in database, making new user')
 			}
 
