@@ -137,7 +137,7 @@ export const getUserByNumber = asyncHandler(async (req: Request, res: Response) 
 		return res.status(400).json({message: "Valid number is required."});
 	}
 	const querySpec = {
-		query: "SELECT * FROM c WHERE c.telephone = @number",
+		query: "SELECT * FROM c WHERE c.phone = @number",
 		parameters: [{name: "@number", value: number}]
 	};
 	const {resources: users} = await usersContainer.items.query<IUser>(querySpec).fetchAll();

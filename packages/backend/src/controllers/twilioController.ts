@@ -263,7 +263,7 @@ const twilioController: extendTwilio = {
 									complexId: contract.data.complexId,
 									name: contract.data.name,
 									address: contract.data.address,
-									telephone: text.replace("whatsapp:", ""), //Remove whatsapp prefix
+									phone: text.replace("whatsapp:", ""), //Remove whatsapp prefix
 									email: contract.data.email
 								}
 								await axios.post(`${BACKEND_URL}/db/user`, userData);
@@ -340,10 +340,11 @@ const twilioController: extendTwilio = {
 					});
 
 					const data = await pdfParse(Buffer.from(pdfResponse.data));
-					processContract(data.text, ""); //TODO: Add phone number here
+					processContract(data.text, phone);
 					res.send('PDF received and parsed successfully!');
 				} catch (error) {
 					console.error('Error parsing PDF:', error);
+					sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
 					res.status(500).send('Error handling PDF');
 				}
 			}
@@ -380,6 +381,7 @@ const twilioController: extendTwilio = {
 
 				} catch (error) {
 					console.error('Error parsing image:', error);
+					sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
 					res.status(500).send('Error handling image');
 				}
 			}
@@ -420,13 +422,16 @@ const twilioController: extendTwilio = {
 
 				const prompt = 
 				`You are a helpful assistant for a parcel service known as Deliverables that answers the users questions. 
-                Please respond to the user in a friendly and helpful manner. 
 				Keep things simple and dont send complicated information to the user, don't send them the package id.
 				User doesn't have to provide tracking information, use the information that is given to you.
+				In order to register, the user has to send you a picture of the contract or a PDF of the contract.
+				You cannot register the user directly without the contract.
 				${prompt_suffix}
 				The user sent the following message: ${text}. 
 				You have access to the following message history: ${JSON.stringify(history)}.
-                You have access to the following package info: ${JSON.stringify(packages)}.`;
+                You have access to the following package info: ${JSON.stringify(packages)}.
+				
+				Please respond to the user in a friendly and helpful manner. `;
 				const llmApiResponse = await axios.post<llmResponse>(
 					'https://openrouter.ai/api/v1/chat/completions',
 					{
