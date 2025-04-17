@@ -46,4 +46,10 @@ router.put("/contract/:id/:phone", dbController.updateContract);
 router.delete("/contract/:id/:phone", dbController.deleteContract);
 router.get("/packages/:id", dbController.getUserPackages);
 
+//Used to found user at scanner stage. Use "-" for spaces my g's.
+router.get("/userIdName/:name", dbController.getUserIdByName);
+router.get("/userIdAddress/:address", dbController.getUserIdByAddress);
+
+
+
 export default router;

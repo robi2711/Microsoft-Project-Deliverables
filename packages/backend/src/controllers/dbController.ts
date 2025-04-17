@@ -370,8 +370,71 @@ export const getComplexesByAdminId = asyncHandler(async (req: Request, res: Resp
 	res.status(200).json(complexes);
 });
 
+export const getUserIdByName = asyncHandler(async (req: Request, res: Response) => {
+	const { name } = req.params;
+
+	if (!name || typeof name !== "string") {
+		return res.status(400).json({ message: "Name is required." });
+	}
+
+	const normalizedName = name.replace(/-/g, " ").toLowerCase();
+
+	const querySpec = {
+		query: "SELECT * FROM c WHERE LOWER(c.name) = @name",
+		parameters: [{ name: "@name", value: normalizedName }]
+	};
+
+	const { resources: users } = await usersContainer.items.query<IUser>(querySpec).fetchAll();
+
+	if (!users.length) {
+		return res.status(404).json({ message: "No user found with that name." });
+	}
+
+	const user = users[0];
+
+	res.status(200).json({
+		id: user.id,
+		complexId: user.complexId,
+		name: user.name
+	});
+});
+
+
+export const getUserIdByAddress = asyncHandler(async (req: Request, res: Response) => {
+	const { address } = req.params;
+
+	if (!address || typeof address !== "string") {
+		return res.status(400).json({ message: "Address is required." });
+	}
+
+	const normalizedAddress = address.replace(/-/g, " ").toLowerCase();
+
+	const querySpec = {
+		query: "SELECT * FROM c WHERE LOWER(c.unitNumber) = @address",
+		parameters: [{ name: "@address", value: normalizedAddress }]
+	};
+
+	const { resources: users } = await usersContainer.items.query<IUser>(querySpec).fetchAll();
+
+	if (!users.length) {
+		return res.status(404).json({ message: "No user found with that address." });
+	}
+
+	const user = users[0];
+
+	res.status(200).json({
+		id: user.id,
+		complexId: user.complexId,
+		unitNumber: user.unitNumber,
+		name: user.name
+	});
+});
+
+
 
 export default {
+	getUserIdByName,
+	getUserIdByAddress,
 	updateUserPackage,
 	addUserPackage,
 	getComplexesByAdminId,
