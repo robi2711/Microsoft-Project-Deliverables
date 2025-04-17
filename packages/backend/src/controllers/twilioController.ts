@@ -413,6 +413,7 @@ const twilioController: extendTwilio = {
 					const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
 					const user_data = await axios.get<userData>(`${BACKEND_URL}/db/user/phone/${real_phone.replace('+', '%2b')}`);
 					packages = user_data.data.packages;
+					prompt_suffix += "User is registered"
 				} catch (error) {
 					//User most likely not registered
 					console.log(error);
