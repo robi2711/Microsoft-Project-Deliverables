@@ -1,5 +1,6 @@
 import api from "./apiService";
-import {useUser} from "@/components/services/UserContext";
+import {UserInfo} from "@/components/services/UserContext";
+
 
 export interface PackageData {
 	trackingNumber: string;
@@ -14,7 +15,6 @@ interface OcrResponseData {
 }
 
 export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
-	console.log("Image Source:", imageSrc);
 	try {
 		const blob = await fetch(imageSrc).then(res => res.blob());
 		const formData = new FormData();
@@ -34,7 +34,6 @@ export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
 			} as PackageData;
 		}
 
-		console.log("API Response:", response.data);
 	} catch (error) {
 		console.error("Error Message:", error);
 	}
@@ -47,25 +46,37 @@ export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
 	} as PackageData;
 };
 
-export const confirmPackage = async (packageData: PackageData): Promise<boolean> => {
-	const {userInfo} = useUser();
+export const confirmPackage = async (packageData: PackageData, userInfo : UserInfo): Promise<boolean> => {
+
 	if (!userInfo) {
 		console.error("User info is not available.");
 		return false;
 	}
-	const complex = await api.post(`/db/admin/${userInfo.sub}`, {});
+
+	interface ComplexResponse {
+		data: {
+			id: string;
+		}[];
+	}
+	interface UserResponse {
+		id: string;
+	}
+	const complex = await api.get<ComplexResponse>(`/db/concierge/${userInfo.sub}/complexes`, {});
 	if (!complex) {
 		console.error("Complex not found.");
 		return false;
 	}
-	const complexId = complex.data.id;
-
-	const userId = "r0"//TODO: FIND A WAY TO FIND USERID
-
-	const response = await api.post(`/db/user/${userId}/package`, {
+	const complexId = Array.isArray(complex.data) && complex.data.length > 0 ? complex.data[0].id : null;
+	const userId = await api.get<UserResponse>(`/db/userIdName`, {
+		params: {
+			name: packageData.recipientName,
+			address: packageData.flatNumber,
+			complexId: complexId,
+		}
+	});
+	await api.post(`/db/user/${userId.data.id}/package`, {
 		packageData,
 	});
 
-	console.log("Package Data:", packageData, "User Info:", userInfo.userInfo);
 	return true;
 } //This command will be used when we can put the package in the database :)

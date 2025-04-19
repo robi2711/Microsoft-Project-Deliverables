@@ -33,6 +33,25 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
                     fetchedComplexes.push(response.data); // Add each fetched complex to the array
                 }
                 setComplexes(fetchedComplexes);
+                if (fetchedComplexes.length > 0) {
+                    const firstComplex = fetchedComplexes[0];
+                    setUserInfo({
+                        accessToken: "",
+                        complexIds: [],
+                        email: "",
+                        idToken: "",
+                        refreshToken: "",
+                        sub: "",
+                        tokenType: "",
+                        type: "",
+                        username: "",
+                        ...userInfo,
+                        selectedComplexName: firstComplex.address,
+                        selectedComplex: firstComplex.id,
+                    });
+                    setSelectedComplex(firstComplex.address);
+                    console.log("Selected complex set to:", firstComplex.address);
+                }
             } catch (error) {
                 console.error("Error fetching complexes:", error)
             }
