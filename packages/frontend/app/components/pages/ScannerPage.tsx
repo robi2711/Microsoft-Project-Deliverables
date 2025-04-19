@@ -7,6 +7,7 @@ import { CameraView } from "@/components/scannerComponents/CameraView"
 import { ScanInstructions } from "@/components/scannerComponents/ScanInstructions"
 import { PackageInfoForm } from "@/components/scannerComponents/PackageInfoForm"
 import { scanPackage, confirmPackage, type PackageData } from "@/components/services/scannerService"
+import {useUser} from "@/components/services/UserContext";
 
 export default function ScannerPage() {
 	// Scanning states
@@ -14,6 +15,7 @@ export default function ScannerPage() {
 	const [scanComplete, setScanComplete] = useState(false)
 	const [scanError, setScanError] = useState<string | null>(null)
 	const [capturedImage, setCapturedImage] = useState<string | null>(null)
+	const {userInfo} = useUser();
 
 	// Package data states
 	const [packageData, setPackageData] = useState<PackageData | null>(null)
@@ -54,7 +56,9 @@ export default function ScannerPage() {
 		setConfirmationError(null)
 
 		try {
-			await confirmPackage(packageData)
+			if(userInfo) {
+				await confirmPackage(packageData, userInfo)
+			}
 			setConfirmationSuccess(true)
 
 			// Reset after 3 seconds
