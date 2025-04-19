@@ -209,7 +209,6 @@ export default function ConciergeManagement() {
 			} else {
 				await signUpConcierge(formData.email, formData.password, userInfo?.selectedComplex || "c0")
 
-				// TODO: api to get concierges
 				const newConcierge: IConcierge = {
 					id: `c${rows.length + 1}`,
 					email: formData.email,

@@ -79,4 +79,4 @@ export const confirmPackage = async (packageData: PackageData, userInfo : UserIn
 	});
 
 	return true;
-} //This command will be used when we can put the package in the database :)
+} 

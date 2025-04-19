@@ -347,12 +347,14 @@ export const getPackagesByComplexId = asyncHandler(async (req: Request, res: Res
 
 
 	const allPackages = users.flatMap(user =>
-		user.packages.map(pkg => ({
-			...pkg,
-			userId: user.id,
-			userName: user.name,
-			unitNumber: user.unitNumber
-		}))
+		Array.isArray(user.packages)
+			? user.packages.map(pkg => ({
+				...pkg,
+				userId: user.id,
+				userName: user.name,
+				unitNumber: user.unitNumber,
+			}))
+			: []
 	);
 
 	res.status(200).json(allPackages);
