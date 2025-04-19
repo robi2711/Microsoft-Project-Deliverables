@@ -25,6 +25,8 @@ router.put("/user/:id/package", dbController.updateUserPackage);
 
 router.delete("/user/:id", dbController.deleteUser);
 
+router.get("/concierge/:id/complexes", dbController.getComplexesByConciergeID);
+
 router.post("/admin", dbController.createAdmin);
 router.get("/admin/:id", dbController.getAdmin);
 // Get all complexes of an admin - so we can populate the dropdown in the sidebar
@@ -45,5 +47,11 @@ router.post("/contract", dbController.createContract);
 router.put("/contract/:id/:phone", dbController.updateContract);
 router.delete("/contract/:id/:phone", dbController.deleteContract);
 router.get("/packages/:id", dbController.getUserPackages);
+
+//Used to found user at scanner stage. Use "-" for spaces my g's.
+router.get("/userIdName/", dbController.getUserIdByName);
+router.get("/userIdAddress/:address", dbController.getUserIdByAddress);
+
+
 
 export default router;

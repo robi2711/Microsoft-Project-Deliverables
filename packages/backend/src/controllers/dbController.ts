@@ -137,8 +137,8 @@ export const getUserByNumber = asyncHandler(async (req: Request, res: Response) 
 		return res.status(400).json({message: "Valid number is required."});
 	}
 	const querySpec = {
-		query: "SELECT * FROM c WHERE c.phone = @number",
-		parameters: [{name: "@number", value: number}]
+		query: "SELECT * FROM c WHERE c.phone = @phone",
+		parameters: [{name: "@phone", value: number}]
 	};
 	const {resources: users} = await usersContainer.items.query<IUser>(querySpec).fetchAll();
 	if (users.length === 0) {
@@ -194,10 +194,14 @@ export const updateUserPackage = asyncHandler(async (req: Request, res: Response
 
 export const addUserPackage = asyncHandler(async (req: Request, res: Response) => {
 	const {userId} = req.params;
-	const newPackage = req.body;
-
-	if (!newPackage || !newPackage.id) {
-		return res.status(400).json({message: "Package must include an ID."});
+	const newPackage = req.body.packageData;
+	newPackage.timeStamp = new Date().toISOString();
+	newPackage.collected = false;
+	if (!newPackage) {
+		return res.status(400).json({message: "Package must be included."});
+	}
+	if (!newPackage.id) {
+		newPackage.id = uuidv4();
 	}
 
 	// Find user across all partitions (by ID)
@@ -210,7 +214,6 @@ export const addUserPackage = asyncHandler(async (req: Request, res: Response) =
 	if (!users.length) return res.status(404).json({message: "User not found."});
 
 	const user = users[0];
-
 	// Check for duplicate package ID
 	if (user.packages.some(pkg => pkg.id === newPackage.id)) {
 		return res.status(400).json({message: "Package with this ID already exists for this user."});
@@ -344,12 +347,14 @@ export const getPackagesByComplexId = asyncHandler(async (req: Request, res: Res
 
 
 	const allPackages = users.flatMap(user =>
-		user.packages.map(pkg => ({
-			...pkg,
-			userId: user.id,
-			userName: user.name,
-			unitNumber: user.unitNumber
-		}))
+		Array.isArray(user.packages)
+			? user.packages.map(pkg => ({
+				...pkg,
+				userId: user.id,
+				userName: user.name,
+				unitNumber: user.unitNumber,
+			}))
+			: []
 	);
 
 	res.status(200).json(allPackages);
@@ -370,8 +375,99 @@ export const getComplexesByAdminId = asyncHandler(async (req: Request, res: Resp
 	res.status(200).json(complexes);
 });
 
+export const getComplexesByConciergeID = asyncHandler(async (req: Request, res: Response) => {
+	const {id} = req.params;
+
+	const {resources: complexes} = await complexesContainer.items
+		.query<Complex>(`SELECT *
+                         FROM c
+                         WHERE ARRAY_CONTAINS(c.concierges, '${id}')`)
+		.fetchAll();
+
+	if (!complexes.length) return res.status(404).json({message: "No complexes found for this admin."});
+
+	res.status(200).json(complexes);
+});
+
+export const getUserIdByName = asyncHandler(async (req: Request, res: Response) => {
+	const { name, complexId, address } = req.query;
+
+
+	if (!name || typeof name !== "string") {
+		return res.status(400).json({ message: "Name is required." });
+	}
+
+	if (!complexId || typeof complexId !== "string") {
+		return res.status(400).json({ message: "Valid complexId is required." });
+	}
+
+	const normalizedName = name.toLowerCase();
+
+	const querySpec = {
+		query: "SELECT * FROM c WHERE LOWER(c.name) = @name AND c.complexId = @complexId",
+		parameters: [
+			{ name: "@name", value: normalizedName },
+			{ name: "@complexId", value: complexId },
+		],
+	};
+
+	const { resources: users } = await usersContainer.items.query<IUser>(querySpec).fetchAll();
+
+	if (!users.length) {
+		return res.status(404).json({ message: "No user found with that name." });
+	}
+
+	// If multiple users are found and address is provided, filter by address
+	if (users.length > 1 && address && typeof address === "string") {
+		const normalizedAddress = address.replace(/-/g, " ").toLowerCase();
+		const filteredUsers = users.filter(user => user.unitNumber.toLowerCase() === normalizedAddress);
+
+		if (!filteredUsers.length) {
+			return res.status(404).json({ message: "No user found with the provided name and address." });
+		}
+
+		return res.status(200).json(filteredUsers[0]); // Return the first match
+	}
+
+	res.status(200).json(users[0]);
+});
+
+
+export const getUserIdByAddress = asyncHandler(async (req: Request, res: Response) => {
+	const { address } = req.params;
+
+	if (!address || typeof address !== "string") {
+		return res.status(400).json({ message: "Address is required." });
+	}
+
+	const normalizedAddress = address.replace(/-/g, " ").toLowerCase();
+
+	const querySpec = {
+		query: "SELECT * FROM c WHERE LOWER(c.unitNumber) = @address",
+		parameters: [{ name: "@address", value: normalizedAddress }]
+	};
+
+	const { resources: users } = await usersContainer.items.query<IUser>(querySpec).fetchAll();
+
+	if (!users.length) {
+		return res.status(404).json({ message: "No user found with that address." });
+	}
+
+	const user = users[0];
+
+	res.status(200).json({
+		id: user.id,
+		complexId: user.complexId,
+		unitNumber: user.unitNumber,
+		name: user.name
+	});
+});
+
+
 
 export default {
+	getUserIdByName,
+	getUserIdByAddress,
 	updateUserPackage,
 	addUserPackage,
 	getComplexesByAdminId,
@@ -396,5 +492,6 @@ export default {
 	getContract,
 	updateContract,
 	deleteContract,
+	getComplexesByConciergeID,
 	getUserPackages,
 };

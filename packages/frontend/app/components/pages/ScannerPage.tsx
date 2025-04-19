@@ -15,7 +15,8 @@ export default function ScannerPage() {
 	const [scanComplete, setScanComplete] = useState(false)
 	const [scanError, setScanError] = useState<string | null>(null)
 	const [capturedImage, setCapturedImage] = useState<string | null>(null)
-	const {userInfo} = useUser()
+	const {userInfo} = useUser();
+
 	// Package data states
 	const [packageData, setPackageData] = useState<PackageData | null>(null)
 
@@ -55,8 +56,8 @@ export default function ScannerPage() {
 		setConfirmationError(null)
 
 		try {
-			if (userInfo){
-			await confirmPackage(packageData, userInfo)
+			if(userInfo) {
+				await confirmPackage(packageData, userInfo)
 			}
 			setConfirmationSuccess(true)
 

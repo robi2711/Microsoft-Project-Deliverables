@@ -131,10 +131,10 @@ export default function ResidentManagementBody() {
                 const complexId = userInfo?.selectedComplex || "";
                 const response = await api.get<IUser[]>(`/db/complex/${complexId}/residents`);
 
-                const residents: IUser[] = response.data;
+                const residents: IUser[] = response.data || []; // Ensure residents is an array
                 setRows(residents);
                 setResidentCount(residents.length);
-                setResidentsWithPackagesCount(residents.filter(resident => resident.packages.length > 0).length);
+                setResidentsWithPackagesCount(residents.filter(resident => resident.packages?.length > 0).length);
             } catch (error) {
                 console.error("Error fetching residents:", error);
             }
