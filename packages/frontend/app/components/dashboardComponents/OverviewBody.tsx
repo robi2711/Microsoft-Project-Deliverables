@@ -44,9 +44,11 @@ export interface IUser {
 // The columns define the structure of the data table - fields should match the Package type TODO: add time delivered
 const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'name', headerName: 'Resident name', width: 150 },
-    { field: 'description', headerName: 'Description', width: 500 },
-    { field: 'delivered', headerName: 'Collection Status', width: 150 },
+    { field: 'recipientName', headerName: 'Resident name', width: 150 },
+    { field: 'flatNumber', headerName: 'Flat number', width: 150 },
+    { field: 'carrier', headerName: 'Carrier', width: 150 },
+    { field: 'timeStamp', headerName: 'Delivery time', width: 150 },
+    { field: 'collected', headerName: 'Collection status', width: 150 },
 ];
 
 
