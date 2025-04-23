@@ -274,6 +274,25 @@ export const deleteAdmin = asyncHandler(async (req: Request, res: Response) => {
 	res.status(200).json({message: "Admin deleted!"});
 });
 
+export const getContractById = asyncHandler(async (req: Request, res: Response) => {
+	const {id} = req.params;
+	const {resource: contract} = await contractContainer.item(id, id).read<Contract>();
+	if (!contract) return res.status(404).json({message: "Contract not found."});
+
+	res.status(200).json(contract);
+}
+);
+
+export const updateContract = asyncHandler(async (req: Request, res: Response) => {
+	const {id} = req.params;
+	const {resource: contract} = await contractContainer.item(id, id).read<Contract>();
+	if (!contract) return res.status(404).json({message: "Contract not found."});
+
+	const updatedContract = {...contract, ...req.body, updatedAt: new Date().toISOString()};
+	const {resource: replacedContract} = await contractContainer.item(id, id).replace(updatedContract);
+
+	res.status(200).json({message: "Contract updated!", contract: replacedContract});
+});
 
 export const getContract = asyncHandler(async (req: Request, res: Response) => {
 	const {number} = req.query;
@@ -291,28 +310,16 @@ export const getContract = asyncHandler(async (req: Request, res: Response) => {
 	res.status(200).json(users[0]);
 });
 
-
 export const createContract = asyncHandler(async (req: Request, res: Response) => {
-	const contract: Contract = {...req.body, id: uuidv4(), createdAt: new Date().toISOString()};
+	const id = uuidv4();
+	const contract: Contract = {...req.body, id:id, scanned:false, complete:false, createdAt: new Date().toISOString()};
 	const {resource} = await contractContainer.items.create(contract);
 	res.status(201).json({message: "Contract created!", contract: resource});
 });
 
-
-export const updateContract = asyncHandler(async (req: Request, res: Response) => {
-	const {id, phone} = req.params;
-	const {resource: user} = await contractContainer.item(id, phone).read<Contract>();
-	if (!user) return res.status(404).json({message: "Contract not found for id"});
-	const updatedContract = {...user, ...req.body, updatedAt: new Date().toISOString()};
-	const {resource: replacedUser} = await contractContainer.item(id, phone).replace(updatedContract);
-
-	res.status(200).json({message: "Contract updated!"});
-});
-
-
 export const deleteContract = asyncHandler(async (req: Request, res: Response) => {
-	const {id, phone} = req.params;
-	await contractContainer.item(id, phone).delete();
+	const {id} = req.params;
+	await contractContainer.item(id).delete();
 	res.status(200).json({message: "Contract deleted!"});
 });
 
@@ -490,6 +497,7 @@ export default {
 	getPackagesByComplexId,
 	createContract,
 	getContract,
+	getContractById,
 	updateContract,
 	deleteContract,
 	getComplexesByConciergeID,
