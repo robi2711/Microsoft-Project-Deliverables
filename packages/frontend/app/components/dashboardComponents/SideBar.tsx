@@ -9,7 +9,7 @@ import {useEffect, useState} from "react";
 import api from "@/components/services/apiService";
 // import Image from 'next/image';
 
-import { MiniMap } from "@/components/dashboardComponents/MapSideBar";
+import MiniMap from "@/components/dashboardComponents/MapSideBar";
 
 {/* We need arguments relating to active tabs so we can highlight the active */}
 interface SideBarProps {

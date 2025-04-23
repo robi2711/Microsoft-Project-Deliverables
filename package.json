@@ -27,7 +27,7 @@
   "dependencies": {
     "@aws-cdk/aws-cognito": "^1.203.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.777.0",
-    "@react-google-maps/api": "^2.20.6",
+    "@vis.gl/react-google-maps": "^1.5.2",
     "express-session": "^1.18.1",
     "pdf-parse": "^1.1.1",
     "react-webcam": "^7.2.0",
