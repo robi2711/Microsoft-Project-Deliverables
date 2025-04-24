@@ -43,4 +43,6 @@ export interface Contract {
     complexId: string;
     address: string;
     email: string;
+	scanned: boolean;
+	complete: boolean;
 }

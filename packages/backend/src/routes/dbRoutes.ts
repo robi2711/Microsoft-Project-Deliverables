@@ -40,12 +40,11 @@ router.get("/admin/:adminId/complexes", dbController.getComplexesByAdminId);
 router.post("/user/:userId/package", dbController.addUserPackage);
 router.post("/message/:complexId/:userId/user", messageController.addUserMessage);
 
-
-
+router.put("/contract/:id", dbController.updateContract);
+router.get("/contract/:id", dbController.getContractById);
 router.get("/contract", dbController.getContract);
 router.post("/contract", dbController.createContract);
-router.put("/contract/:id/:phone", dbController.updateContract);
-router.delete("/contract/:id/:phone", dbController.deleteContract);
+router.delete("/contract/:id", dbController.deleteContract);
 router.get("/packages/:id", dbController.getUserPackages);
 
 //Used to found user at scanner stage. Use "-" for spaces my g's.
