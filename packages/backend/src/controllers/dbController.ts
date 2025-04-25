@@ -432,7 +432,7 @@ export const getUserIdByName = asyncHandler(async (req: Request, res: Response) 
 		if (!filteredUsers.length) {
 			return res.status(404).json({ message: "No user found with the provided name and address." });
 		}
-
+		//TODO: Ernest, add the comand to send a message!
 		return res.status(200).json(filteredUsers[0]); // Return the first match
 	}
 
