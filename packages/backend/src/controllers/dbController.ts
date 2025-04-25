@@ -228,7 +228,7 @@ export const addUserPackage = asyncHandler(async (req: Request, res: Response) =
 	const {resource: replacedUser} = await usersContainer
 		.item(userId, user.complexId)
 		.replace(updatedUser);
-
+	//TODO: ADD SEND MESSAGE TO USER
 	res.status(200).json({message: "Package added!", user: replacedUser});
 });
 
@@ -432,7 +432,7 @@ export const getUserIdByName = asyncHandler(async (req: Request, res: Response) 
 		if (!filteredUsers.length) {
 			return res.status(404).json({ message: "No user found with the provided name and address." });
 		}
-		//TODO: Ernest, add the comand to send a message!
+
 		return res.status(200).json(filteredUsers[0]); // Return the first match
 	}
 
