@@ -20,6 +20,8 @@ interface contractData {
 	complexId: string;
 	email: string;
 	phone: string;
+	scanned: boolean;
+	complete: boolean;
 }
 
 interface userData {
@@ -74,13 +76,11 @@ const processContract = async (text: string, phone: string): Promise<void> => {
 	console.log("Received contract data: " + text)
 
 	//Try extract some data from the contract
-	const prompt = `You will be given some OCR scanned text from a letter. You have to deduce and return the following fields in JSON format that make the most sense for the fields. If you're not sure about any value, return null.
+	const prompt = `You will be given some OCR scanned text from a letter. You have to get the UUIDV4 ID of the contract from the text.
                     ONLY RETURN THE JSON!
                     Required format:
                     {
-                        "name": string | null,
-                        "address": string | null,
-                        "complex": string | null,
+                        "id" : string | null
                     }
 
                     OCR Text: ${text}`;
@@ -122,30 +122,22 @@ const processContract = async (text: string, phone: string): Promise<void> => {
 	}
 	console.log("Parsed data:", parsed);
 
-
-	//Check if the complex is valid
-	let complex_data = null;
+	//Search for the contract and marked as scanned if found
 	try {
-		complex_data = await axios.get<complexData>(`${BACKEND_URL}/db/complex`, {
-			params: {address: parsed.complex}
-		});
+		const contract = await axios.get<contractData>(`${BACKEND_URL}/db/contract/${parsed.id}`);
+		if (contract.data) {
+			console.log("Contract found, marking as scanned!");
+			await axios.put(`${BACKEND_URL}/db/contract/${parsed.id}`, {
+				scanned: true,
+				phone: phone
+			});
+			await sendCustomMessage(`Hello ${contract.data.name}! We have received your contract. Please type in your email`, phone);
+			return;
+		}
 	} catch (error) {
-		console.error('Error fetching complex data:', error);
-		await sendCustomMessage("Failed to process contract! Please contact your complex administrator or concierge", phone);
+		await sendCustomMessage("Contract seems to be invalid, please contact your admin or concierge", phone);
 		return;
 	}
-
-	//Create user data
-	await sendCustomMessage("Hello! We have received your contract. Please type in your email", phone);
-
-	const user_data = {
-		phone: phone,
-		name: parsed.name,
-		complexId: complex_data.data.id,
-		address: parsed.address,
-		email: ''
-	}
-	await axios.post(`${BACKEND_URL}/db/contract`, user_data)
 
 }
 
@@ -223,7 +215,7 @@ const twilioController: extendTwilio = {
 		//Check if we have contract already processing
 		try {
 			const contract = await axios.get<contractData>(`${BACKEND_URL}/db/contract`, {params: {number: phone}});
-			if (contract.data) {
+			if (contract.data && contract.data.scanned && !contract.data.complete) {
 				console.log("Contract processing, ignoring message");
 				console.log(contract.data);
 
@@ -236,7 +228,8 @@ const twilioController: extendTwilio = {
 							console.log("Received a valid email");
 
 							//Update the contract with the email
-							await axios.put(`${BACKEND_URL}/db/contract/${contract.data.id}/${contract.data.phone}`, {
+							console.log(contract.data.id);
+							await axios.put(`${BACKEND_URL}/db/contract/${contract.data.id}`, {
 								email: text
 							});
 							await sendCustomMessage(`Email has been set to: ${text} \n\nPlease confirm your phone number (Beginning with +353): `, phone);
@@ -276,10 +269,13 @@ const twilioController: extendTwilio = {
 
 							//Clear old temporary contract
 							try {
-								await axios.delete(`${BACKEND_URL}/db/contract/${contract.data.id}/${contract.data.phone}`);
+								await axios.put(`${BACKEND_URL}/db/contract/${contract.data.id}`, {
+									complete: true,
+									scanned: false
+								});
 								console.log("Contract deleted successfully!");
 							} catch (error) {
-								console.error('Error deleting contract:', error);
+								console.error('Error completing contract:', error);
 								await sendCustomMessage("Internal error occured whilst processing contract!", phone);
 								return;
 							}
@@ -311,18 +307,15 @@ const twilioController: extendTwilio = {
 			const mediaUrl = req.body.MediaUrl0;
 			const contentType = req.body.MediaContentType0;
 
-			//Check if we user is valid
-			//TODO: Maybe implement fuzzy lookups by name instead of by phone number, so that multiple contracts can be registered by the same person!
 			try {
-				const real_phone = phone.replace('whatsapp:', ''); //Remove whatsapp prefix
-				const user_data = await axios.get<userData>(`${BACKEND_URL}/db/user/phone/${real_phone.replace('+', '%2b')}`);
-				console.log('User is already registered!');
-				await sendCustomMessage(`Hello ${user_data.data.name}, you are already registered with us!`, phone);
-				res.status(200).send();
-				return;
+				const contract = await axios.get<contractData>(`${BACKEND_URL}/db/contract`, {params: {number: phone}});
+				if(contract.data.complete) {
+					await sendCustomMessage("Contract is already registered!", phone);
+					res.status(200).send();
+					return;
+				}
 			} catch (error) {
-				console.log(error);
-				console.log('User not found in database, making new user')
+				//Contract not found, we can proceed
 			}
 
 			//Read PDF directly
@@ -429,8 +422,10 @@ const twilioController: extendTwilio = {
 				User doesn't have to provide tracking information, use the information that is given to you.
 				In order to register, the user has to send you a picture of the contract or a PDF of the contract.
 				You cannot register the user directly without the contract.
+				You are not allowed to send the user any links or ask them to click on any links.
 				${prompt_suffix}
-				The user sent the following message: ${text}. 
+				The user sent the following message: ${text}.
+				Respond in the same language as the user's message.
 				You have access to the following message history: ${JSON.stringify(history)}.
                 You have access to the following package info: ${JSON.stringify(packages)}.
 				
