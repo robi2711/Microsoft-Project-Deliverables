@@ -162,6 +162,17 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
                         width: "100%" }}
                     onClick={() => setActiveTab("conciergeManagement")}
                 />
+            </Box>
+
+            {/* resident management tab*/}
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 0, width: "100%" }}>
+                <Tab
+                    label="Contract management"
+                    sx={{ color: "white",
+                        bgcolor: activeTab === "contractManagement" ? "secondary.dark" : "secondary.light", // if active, make it dark, else light
+                        width: "100%" }}
+                    onClick={() => setActiveTab("contractManagement")}
+                />
                 <Tab label="Other tabs..." sx={{ color: "white", bgcolor: "secondary.light", width: "100%" }} />
             </Box>
 

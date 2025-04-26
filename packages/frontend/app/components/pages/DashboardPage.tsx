@@ -6,6 +6,7 @@ import Overview from "@/components/dashboardComponents/OverviewBody";
 import ResidentManagement from "@/components/dashboardComponents/ResidentManagementBody";
 import ConciergeManagement from "@/components/dashboardComponents/ConciergeManagement";
 import { useUser } from "@/components/services/UserContext";
+import ContractManagement from "../dashboardComponents/ContractManagement";
 
 export default function DashboardPage() {
 	const [activeTab, setActiveTab] = useState("overview"); // Default to overview
@@ -41,6 +42,7 @@ export default function DashboardPage() {
 			{activeTab === "overview" && <Overview />} {/* If the active tab is overview, display the overview component */}
 			{activeTab === "residentManagement" && <ResidentManagement />} {/* same logic */}
 			{activeTab === "conciergeManagement" && <ConciergeManagement />} {/* same logic */}
+			{activeTab === "contractManagement" && <ContractManagement />} {/* same logic */}
 		</Box>
 	);
 }

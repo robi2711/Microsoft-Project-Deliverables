@@ -13,6 +13,7 @@ router.get("/complex", dbController.getComplexByAddress);
 router.get("/complex/:id/residents", dbController.getResidentsByComplexId);
 // Get all packages of a complex - to populate rows in all packages viewer.
 router.get("/complex/:id/packages", dbController.getPackagesByComplexId);
+router.get("/complex/:id/contracts", dbController.getContractsByComplexId);
 
 
 router.post("/user", dbController.createUser);
