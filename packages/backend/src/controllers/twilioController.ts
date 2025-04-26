@@ -187,7 +187,7 @@ const twilioController: extendTwilio = {
 				//body: msg || `Hello ${name}, your package has arrived. Please come pick it up.`,
 				from: process.env.TWILIO_PHONE,
 				to: telephone,
-				contentSid: "HX9228870bcfa80b319cd98247e26fecd3",
+				contentSid: process.env.TWILIO_CONTENT_PACKAGE,
 				contentVariables: JSON.stringify({
 					1: name,
 					2: packages
