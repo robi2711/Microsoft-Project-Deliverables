@@ -131,6 +131,10 @@ const processContract = async (text: string, phone: string): Promise<void> => {
 				scanned: true,
 				phone: phone
 			});
+			if(contract.data.complete) {
+				await sendCustomMessage("Contract has already been processed!", phone);
+				return;
+			}
 			await sendCustomMessage(`Hello ${contract.data.name}! We have received your contract. Please type in your email`, phone);
 			return;
 		}
@@ -164,7 +168,7 @@ const twilioController: extendTwilio = {
 	//POST route for sending an SMS to a given phone number
 	sendSMS: async (req: Request, res: Response) => {
 
-		const {name, address, telephone, packages, msg} = req.body;
+		const {name, address, telephone, packages} = req.body;
 
 		console.log("Sending SMS to:", telephone);
 		console.log("Name:", name);
@@ -183,9 +187,10 @@ const twilioController: extendTwilio = {
 				//body: msg || `Hello ${name}, your package has arrived. Please come pick it up.`,
 				from: process.env.TWILIO_PHONE,
 				to: telephone,
-				contentSid: "HX9404ac9cf792bb00cf9ccff03dba9472",
+				contentSid: "HX9228870bcfa80b319cd98247e26fecd3",
 				contentVariables: JSON.stringify({
 					1: name,
+					2: packages
 				}),
 
 			});
@@ -307,17 +312,6 @@ const twilioController: extendTwilio = {
 			const mediaUrl = req.body.MediaUrl0;
 			const contentType = req.body.MediaContentType0;
 
-			try {
-				const contract = await axios.get<contractData>(`${BACKEND_URL}/db/contract`, {params: {number: phone}});
-				if(contract.data.complete) {
-					await sendCustomMessage("Contract is already registered!", phone);
-					res.status(200).send();
-					return;
-				}
-			} catch (error) {
-				//Contract not found, we can proceed
-			}
-
 			//Read PDF directly
 			if (contentType == 'application/pdf') {
 				try {
@@ -416,8 +410,9 @@ const twilioController: extendTwilio = {
 				//Do some AI prompt stuff here
 
 				const prompt = 
-				`You are a helpful assistant for a parcel service known as Deliverables that answers the users questions. 
-                Please respond to the user in a friendly and helpful manner. 
+				`You are a helpful assistant for a parcel service known as Deliverables that answers the users questions.
+				You provide a notification for a user who lives in a complex flat and a package has arrived for them.
+				We do not offer any kind of shipment, we only deliver a service for notifying the user about their package.
 				Keep things simple and dont send complicated information to the user, don't send them the package id.
 				User doesn't have to provide tracking information, use the information that is given to you.
 				In order to register, the user has to send you a picture of the contract or a PDF of the contract.
