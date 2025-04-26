@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
 import {
     Box,
@@ -11,7 +11,9 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField
+    TextField,
+    Checkbox,
+    FormControlLabel
 } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
@@ -20,7 +22,8 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {useUser} from "@/components/services/UserContext"; // for retrieving resident data from the backend
-import { Article, Check, Schedule } from "@mui/icons-material";
+import { Article, Check, Print, Refresh, Save, Schedule, Upload } from "@mui/icons-material";
+import jsPDF from "jspdf";
 
 interface IContract {
     id: string;
@@ -37,6 +40,8 @@ interface IContract {
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 150 },
     { field: 'address', headerName: 'Address', width: 200 },
+    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'phone', headerName: 'Phone', width: 200 },
     { field: 'scanned', headerName: 'Scanned', width: 100, type: 'boolean' },
     { field: 'complete', headerName: 'Complete', width: 100, type: 'boolean' },
     { field: 'id', headerName: 'Identifer', width: 350, type: 'string'}
@@ -59,6 +64,8 @@ export default function ContractManagement() {
         phone: "",
         address: "",
         email: "",
+        scanned: false,
+        complete: false,
     });
 
     const complexId = userInfo?.selectedComplex || "";
@@ -77,6 +84,8 @@ export default function ContractManagement() {
                     phone: contractToEdit.phone,
                     address: contractToEdit.address,
                     email: contractToEdit.email,
+                    scanned: contractToEdit.scanned,
+                    complete: contractToEdit.complete,
                 });
                 setEditMode(true);
             }
@@ -85,7 +94,9 @@ export default function ContractManagement() {
                 name: "",
                 phone: "",
                 address: "",
-                email: ""
+                email: "",
+                scanned: false,
+                complete: false,
             });
             setEditMode(false);
             setSelectedContract(null);
@@ -99,13 +110,19 @@ export default function ContractManagement() {
             name: "",
             phone: "",
             address: "",
-            email: ""
+            email: "",
+            scanned: false,
+            complete: false,
         });
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
+        if(e.target.type === "checkbox") {
+            setFormData({...formData, [name]: e.target.checked});
+        } else {
+            setFormData({...formData, [name]: value});
+        }
     };
 
     const handleSubmit = async () => {
@@ -179,12 +196,137 @@ export default function ContractManagement() {
         fetchContracts();
     }, [complexId, refreshKey])
 
+
+    //LOADING CSV FILE
+    const fileInputRef = useRef(null); // Ref for the hidden file input
+    const loadContractsCSV = (event : any) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+
+        // Read the file as text
+        reader.onload = (e) => {
+            const text = e.target?.result as string;
+            const lines = text.trim().split("\n");
+            const headers = lines[0].split(",");
+
+            //Get all rows from the CSV file
+            const rows = lines.slice(1).map((line) => {
+                const values = line.split(",");
+                const row: any = {};
+                headers.forEach((header, index) => {
+                    row[header.trim()] = values[index].trim();
+                });
+                return row;
+            });
+
+            //Load contracts
+            const contracts = [];
+            for (const row of rows) {
+                const contractData = {
+                    phone: row.phone,
+                    name: row.name,
+                    complexId: complexId,
+                    address: row.address,
+                    email: row.email,
+                    scanned: false,
+                    complete: false,
+                    createdAt: new Date().toISOString(),
+                };
+                contracts.push(contractData);
+            }
+
+            //Push all contracts to backend
+            Promise.all(contracts.map(async (contract) => {
+                try {
+                    await api.post<IContract>(`/db/contract`, contract);
+                }
+                catch (error) {
+                    console.error("Error adding contract from CSV:", error);
+                }
+            })).then(() => {
+                setRefreshKey((prev) => prev + 1); // Refresh the data after loading contracts
+            });
+            
+        };
+        reader.readAsText(file);
+    }
+
+    const savePDF = () => {
+        const doc = generatePDF();
+        if(doc) {
+            doc.save("contracts.pdf");
+        }
+        
+    }
+    
+    const handlePrint = () => {
+        const doc = generatePDF();
+        if(doc) {
+            doc.autoPrint();
+            window.open(doc.output('bloburl'), '_blank');
+        }
+    }
+
+    //PDF GENERATION
+    const generatePDF = () => {
+        const doc = new jsPDF();
+        const contracts = rows.filter((row) => selectionModel.includes(row.id));
+        if(contracts.length === 0) {
+            alert("Please select at least one contract to save as PDF")
+            return;
+        }
+        doc.setFont("helvetica", "normal");
+
+        contracts.forEach((contract,i) => {
+            doc.setFontSize(22);
+            doc.text(`Dear ${contract.name},`, 10, 40);
+            doc.setFontSize(16);
+            doc.text(
+`Within your complex we are using a service that allows you to receive 
+notifications whenever a package is delivered to the complex.
+
+By signing this contract and scanning it, you agree to use the service 
+and hence will be notified whenever a package is delivered to the complex.
+            
+Should you have any questions, please contact the concierge or the admin 
+of the complex.
+            
+
+In order to begin, send the contract to our service bot on Whatsapp: 
++44 7700 171376
+
+
+You may also chat with the bot to ask any questions you may have in
+regards to packages or general queries
+
+We will process information such as your name, phone number, email,
+address and flat number in order to provide you with the service.`
+            , 10, 60, {align:"left"});
+            doc.setFontSize(20);
+            doc.text("Signature: ______________________", 10, 280);
+            doc.setFontSize(8);
+            doc.text("Contract ID: " + contract.id, 10, 290);
+            if(i < contracts.length-1) doc.addPage();
+        });
+        return doc;
+    }
+
     return (
         <Box sx={{position: "absolute", top: "8vh", left: "21vw", width: "78vw", height: "91vh", bgcolor: "white", display: "flex", flexDirection: "column"}}>
             <Typography variant="h4" sx={{ mb: 4 }}>
                 Contract Management
             </Typography>
-            
+
+            {/* Hidden input for CSV file upload */}
+            <input
+                type="file"
+                accept=".csv"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={loadContractsCSV}
+            />
+
             {/* Contract info boxes */}
             <Box sx={{height: "30%", width: "100%", display: "flex", justifyContent: "space-around",}}>
                 <Paper elevation={3} sx={{p: 3, display: "flex", flexDirection: "column", alignItems: "center", width: "42%", height: "50%"}}>
@@ -210,6 +352,11 @@ export default function ContractManagement() {
                 </Paper>
             </Box>
 
+            {/* Refresh button */}
+            <Button variant="outlined" onClick={() => setRefreshKey((prev) => prev + 1)} sx={{ mb: 2, ml: 2, width: "8%" }}>
+                <Refresh sx={{ mr: 1 }} />
+                Refresh
+            </Button>
             {/* Page area */}
             <Box sx={{ display: "flex", height: "70%" }}>
 
@@ -219,11 +366,24 @@ export default function ContractManagement() {
                         <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog("add")}>
                             Manually add contract
                         </Button>
+                        <Button variant="contained" startIcon={<Upload />} onClick={() => {
+                            (fileInputRef.current as any).click();
+                        }}>
+                            Load CSV
+                        </Button>
+                    </Box>
+                    <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
                         <Button variant="outlined" startIcon={<EditIcon />} onClick={() => handleOpenDialog("edit")}>
                             Edit
                         </Button>
                         <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={handleDelete}>
                             Delete
+                        </Button>
+                        <Button variant="outlined" color="info" startIcon={<Print />} onClick={()=>{handlePrint()}}>
+                            Print
+                        </Button>
+                        <Button variant="outlined" color="info" startIcon={<Save />} onClick={()=>{savePDF()}}>
+                            Save as PDF
                         </Button>
                     </Box>
 
@@ -253,29 +413,12 @@ export default function ContractManagement() {
                             type - the type of input (text, email, etc.).
                             value - the current value of the input field, controlled by state.
                             */}
-                            <TextField
-                                margin="dense"
-                                name="name"
-                                label="name"
-                                type="name"
-                                fullWidth
-                                variant="outlined"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                required
-                            />
-
-                            <TextField
-                                margin="dense"
-                                name="address"
-                                label="address"
-                                type="text"
-                                fullWidth
-                                variant="outlined"
-                                value={formData.address}
-                                onChange={handleInputChange}
-                                required
-                            />
+                            <TextField margin="dense" name="name" label="name" type="text" fullWidth variant="outlined" value={formData.name} onChange={handleInputChange} required />
+                            <TextField margin="dense" name="address" label="address" type="text" fullWidth variant="outlined" value={formData.address} onChange={handleInputChange} required />
+                            <TextField margin="dense" name="phone" label="phone" type="text" fullWidth variant="outlined" value={formData.phone} onChange={handleInputChange} />
+                            <TextField margin="dense" name="email" label="email" type="text" fullWidth variant="outlined" value={formData.email} onChange={handleInputChange} />
+                            <FormControlLabel control={<Checkbox checked={formData.scanned} onChange={handleInputChange} name="scanned" color="primary" />} label="Scanned"/>
+                            <FormControlLabel control={<Checkbox  checked={formData.complete} onChange={handleInputChange} name="complete" color="primary"/>} label="Complete" />
 
                         </Box>
                     </DialogContent>
