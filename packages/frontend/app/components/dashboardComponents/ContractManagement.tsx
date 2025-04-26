@@ -11,7 +11,9 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField
+    TextField,
+    Checkbox,
+    FormControlLabel
 } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
@@ -38,6 +40,8 @@ interface IContract {
 const columns: GridColDef[] = [
     { field: 'name', headerName: 'Name', width: 150 },
     { field: 'address', headerName: 'Address', width: 200 },
+    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'phone', headerName: 'Phone', width: 200 },
     { field: 'scanned', headerName: 'Scanned', width: 100, type: 'boolean' },
     { field: 'complete', headerName: 'Complete', width: 100, type: 'boolean' },
     { field: 'id', headerName: 'Identifer', width: 350, type: 'string'}
@@ -59,7 +63,9 @@ export default function ContractManagement() {
         name: "",
         phone: "",
         address: "",
-        email: ""
+        email: "",
+        scanned: false,
+        complete: false,
     });
 
     const complexId = userInfo?.selectedComplex || "";
@@ -78,6 +84,8 @@ export default function ContractManagement() {
                     phone: contractToEdit.phone,
                     address: contractToEdit.address,
                     email: contractToEdit.email,
+                    scanned: contractToEdit.scanned,
+                    complete: contractToEdit.complete,
                 });
                 setEditMode(true);
             }
@@ -86,7 +94,9 @@ export default function ContractManagement() {
                 name: "",
                 phone: "",
                 address: "",
-                email: ""
+                email: "",
+                scanned: false,
+                complete: false,
             });
             setEditMode(false);
             setSelectedContract(null);
@@ -100,13 +110,19 @@ export default function ContractManagement() {
             name: "",
             phone: "",
             address: "",
-            email: ""
+            email: "",
+            scanned: false,
+            complete: false,
         });
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
+        if(e.target.type === "checkbox") {
+            setFormData({...formData, [name]: e.target.checked});
+        } else {
+            setFormData({...formData, [name]: value});
+        }
     };
 
     const handleSubmit = async () => {
@@ -397,29 +413,12 @@ address and flat number in order to provide you with the service.`
                             type - the type of input (text, email, etc.).
                             value - the current value of the input field, controlled by state.
                             */}
-                            <TextField
-                                margin="dense"
-                                name="name"
-                                label="name"
-                                type="name"
-                                fullWidth
-                                variant="outlined"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                required
-                            />
-
-                            <TextField
-                                margin="dense"
-                                name="address"
-                                label="address"
-                                type="text"
-                                fullWidth
-                                variant="outlined"
-                                value={formData.address}
-                                onChange={handleInputChange}
-                                required
-                            />
+                            <TextField margin="dense" name="name" label="name" type="text" fullWidth variant="outlined" value={formData.name} onChange={handleInputChange} required />
+                            <TextField margin="dense" name="address" label="address" type="text" fullWidth variant="outlined" value={formData.address} onChange={handleInputChange} required />
+                            <TextField margin="dense" name="phone" label="phone" type="text" fullWidth variant="outlined" value={formData.phone} onChange={handleInputChange} />
+                            <TextField margin="dense" name="email" label="email" type="text" fullWidth variant="outlined" value={formData.email} onChange={handleInputChange} />
+                            <FormControlLabel control={<Checkbox checked={formData.scanned} onChange={handleInputChange} name="scanned" color="primary" />} label="Scanned"/>
+                            <FormControlLabel control={<Checkbox  checked={formData.complete} onChange={handleInputChange} name="complete" color="primary"/>} label="Complete" />
 
                         </Box>
                     </DialogContent>
