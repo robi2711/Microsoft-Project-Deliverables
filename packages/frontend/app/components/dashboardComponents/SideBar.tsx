@@ -7,7 +7,10 @@ import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import {useUser, ComplexResponse} from "@/components/services/UserContext";
 import {useEffect, useState} from "react";
 import api from "@/components/services/apiService";
+import LocalPostOfficeIcon from '@mui/icons-material/LocalPostOffice';
 // import Image from 'next/image';
+
+import MiniMap from "@/components/dashboardComponents/MapSideBar";
 
 {/* We need arguments relating to active tabs so we can highlight the active */}
 interface SideBarProps {
@@ -88,11 +91,8 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
             }}
         >
             {/* adding a logo and title to the sidebar within it's own box */}
-            <Box sx={{ display: "flex", alignItems: "center"}}>
-                {/* <Image src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/favicon.ico"
-                     style={{ width: 24, height: 24, marginRight: 8 }} alt={""}/>
-                     currently commenting out image
-                     TODO: fix it, giving errors and idk how it's supposed to work*/}
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <LocalPostOfficeIcon sx={{ fontSize: 32, color: "white" }} />
                 <Typography variant="h5" sx={{ color: "white", textAlign: "center" }}>
                     Deliverables
                 </Typography>
@@ -136,14 +136,13 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
             {/* google maps window */}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, width: "100%" }}>
                 <Box sx={{ width: "80%", height: "100px", bgcolor: "white"}}>
-                    {/* TODO: Google Maps API goes here - gotta look into that */}
-                    {/* <Image src="https://raw.githubusercontent.com/robi2711/Microsoft-Project-Deliverables/refs/heads/version-3-frontend/SampleImage.png"
-                         style={{ width: "100%", height: "100%"}} alt={""}/> */}
+                    {userInfo?.selectedComplexName && (
+                        <MiniMap address={userInfo.selectedComplexName} />
+                    )}
                 </Box>
             </Box>
-
             {/* resident management tab*/}
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, width: "100%" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 0, width: "100%" }}>
                 <Tab
                     label="Resident management"
                     sx={{ color: "white",

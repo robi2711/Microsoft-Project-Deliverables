@@ -16,7 +16,7 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField
+    TextField, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, FormHelperText
 } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,6 +26,9 @@ import { v4 as uuidv4 } from "uuid"; // for generating unique IDs for packages
 import api from "@/components/services/apiService";
 import React, {useEffect, useState} from "react";
 import {useUser} from "@/components/services/UserContext";
+import {signUpConcierge} from "@/components/services/authService";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 // necessary interfaces
 interface Package {
@@ -43,12 +46,9 @@ export interface IUser {
 
 // The columns define the structure of the data table - fields should match the Package type TODO: add time delivered
 const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'recipientName', headerName: 'Resident name', width: 150 },
-    { field: 'flatNumber', headerName: 'Flat number', width: 150 },
-    { field: 'carrier', headerName: 'Carrier', width: 150 },
-    { field: 'timeStamp', headerName: 'Delivery time', width: 150 },
-    { field: 'collected', headerName: 'Collection status', width: 150 },
+    { field: 'name', headerName: 'Resident name', width: 150 },
+    { field: 'description', headerName: 'Description', width: 500 },
+    { field: 'delivered', headerName: 'Collection Status', width: 150 }
 ];
 
 
@@ -57,55 +57,21 @@ export default function OverviewBody() {
     const [packagesHoldingCount, setPackagesHoldingCount] = useState<number>(0); // for summary statistics at the top of the page
     const [packagesCollectedCount, setPackagesCollectedCount] = useState<number>(0);
     const [residents, setResidents] = useState<IUser[]>([]);
+    const [selectedPackage, setSelectedPackage] = useState<Package | null>(null)
+    const [selectionModel, setSelectionModel] = useState<string[]>([])
     const [openDialog, setOpenDialog] = useState(false);
+    const [editMode, setEditMode] = useState(false)
     const { userInfo } = useUser();
 
+    // Form State
     const [formData, setFormData] = useState({
+        packageID: "",
         name: "",
         description: "",
         residentID: ""
     });
 
     const complexId = userInfo?.selectedComplex
-
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
-    };
-
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-        setFormData({
-            name: "",
-            description: "",
-            residentID: ""
-        });
-    };
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
-    };
-
-    const handleSubmit = async () => {
-
-        try {
-            const newPackage = {
-                id: uuidv4(),
-                name: formData.name,
-                description: formData.description,
-                delivered: false
-            }
-            console.log(newPackage)
-            const userId = formData.residentID;
-            const packageId = newPackage.id;
-            await api.post(`/user/${userId}/package/${packageId}`, newPackage);
-            alert("Package added successfully!");
-            handleCloseDialog();
-        } catch (error) {
-            console.error("Error adding package:", error);
-            alert("Failed to add package. Please try again.");
-        }
-    };
 
     useEffect(() => {
         // Function to fetch packages from the backend
@@ -138,6 +104,113 @@ export default function OverviewBody() {
     }, [complexId]);
 
 
+    const handleOpenDialog = (mode: "add" | "edit") => {
+        if (mode === "edit") {
+            if (selectionModel.length !== 1) {
+                alert("Please select exactly one package to edit");
+                return;
+            }
+
+            const packageToEdit = rows.find((row) => row.id === selectionModel[0]);
+            if (packageToEdit) {
+                setSelectedPackage(packageToEdit);
+                setFormData({
+                    packageID: packageToEdit.id,
+                    name: packageToEdit.name,
+                    description: packageToEdit.description,
+                    residentID: ""
+                });
+                setEditMode(true);
+            }
+        } else {
+            // Reset form for add mode
+            setFormData({
+                packageID: "",
+                name: "",
+                description: "",
+                residentID: ""
+            });
+            setSelectedPackage(null);
+            setEditMode(false);
+        }
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setFormData({
+            packageID: "",
+            name: "",
+            description: "",
+            residentID: ""
+        });
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+        setFormData({...formData, [name]: value});
+    };
+
+    const handleSubmit = async () => {
+        try {
+            if (editMode && selectedPackage) {
+                const updatedPackage = {
+                    ...selectedPackage,
+                    name: formData.name,
+                    description: formData.description
+                };
+
+                const updatedRows = rows.map((row) =>
+                    row.id === selectedPackage.id ? updatedPackage : row
+                );
+                setRows(updatedRows);
+
+                // Update package via API
+                await api.put(`/package/${selectedPackage.id}`, updatedPackage);
+            } else {
+                const newPackage = {
+                    id: uuidv4(),
+                    name: formData.name,
+                    description: formData.description,
+                    delivered: false
+                };
+
+                setRows([...rows, newPackage]);
+
+                // Add package via API
+                // await api.post(`/package`, newPackage);
+            }
+
+            handleCloseDialog();
+        } catch (error) {
+            console.error("Error saving package:", error);
+            alert("Failed to save package. Please try again.");
+        }
+    };
+
+    const handleDelete = async () => {
+        if (selectionModel.length === 0) {
+            alert("Please select at least one package to delete");
+            return;
+        }
+
+        if (confirm(`Are you sure you want to delete ${selectionModel.length} package(s)?`)) {
+            try {
+                const remainingRows = rows.filter((row) => !selectionModel.includes(row.id));
+                setRows(remainingRows);
+
+                // Delete packages via API
+                for (const id of selectionModel) {
+                    await api.delete(`/package/${id}`);
+                }
+
+                setSelectionModel([]);
+            } catch (error) {
+                console.error("Error deleting packages:", error);
+                alert("Failed to delete packages. Please try again.");
+            }
+        }
+    };
 
     return(
 
@@ -215,13 +288,14 @@ export default function OverviewBody() {
 
                     {/* buttons */}
                     <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
-                        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenDialog} >
+                        <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog("add")} >
                             Manually add package
                         </Button>
                         <Button
                             variant="outlined"
-                            startIcon={<EditIcon />}
-                            //onClick={() => handleOpenDialog("edit")}
+                            startIcon={<EditIcon/>}
+                            onClick={() => handleOpenDialog("edit")}
+                            disabled={selectionModel.length !== 1}
 
                         >
                             Edit
@@ -229,8 +303,9 @@ export default function OverviewBody() {
                         <Button
                             variant="outlined"
                             color="error"
-                            startIcon={<DeleteIcon />}
-                            //onClick={handleDelete}
+                            startIcon={<DeleteIcon/>}
+                            onClick={handleDelete}
+                            disabled={selectionModel.length === 0}
                         >
                             Delete
                         </Button>
@@ -242,48 +317,38 @@ export default function OverviewBody() {
                         columns={columns}
                         pageSizeOptions={[5, 10]}
                         checkboxSelection
+                        onRowSelectionModelChange={(newSelectionModel) => {
+                            setSelectionModel(newSelectionModel as string[])
+                        }}
                         sx={{ border: 0 }}
                     />
 
                     {/* Dialog for manually adding residents */}
                     <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-                        <DialogTitle>Manual Package Add</DialogTitle>
-
+                        <DialogTitle>{editMode ? "Edit Package" : "Add New Package"}</DialogTitle>
                         <DialogContent>
-                            <Box component="form">
-
-                                { /*
-                                name - used to identify the field when handling input changes.
-                                label - the label displayed for the input field.
-                                type - the type of input (text, email, etc.).
-                                value - the current value of the input field, controlled by state.
-                                */}
-                                <Select
-                                    margin="dense"
-                                    name="residentID"
-                                    label="Resident's name"
-                                    fullWidth
-                                    variant="outlined"
-                                    value={formData.residentID}
-                                    onChange={(e) => {
-                                        const selectedResident = residents.find(resident => resident.id === e.target.value);
-                                        if (selectedResident) {
-                                            setFormData({ ...formData, residentID: selectedResident.id, name: selectedResident.name });
-                                        }
-                                    }}
-                                    required
-                                >
-                                    {residents.map((resident) => (
-                                        <MenuItem key={resident.id} value={resident.id}>
-                                            {resident.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
+                            <Box component="form" sx={{mt: 2}}>
+                                <FormControl fullWidth margin="dense" required>
+                                    <InputLabel id="resident-select-label">Resident</InputLabel>
+                                    <Select
+                                        labelId="resident-select-label"
+                                        name="residentID"
+                                        value={formData.residentID || (editMode && selectedPackage?.residentID) || ""}
+                                        onChange={(e) => handleInputChange(e as React.ChangeEvent<HTMLInputElement>)}
+                                        variant="outlined"
+                                    >
+                                        {residents.map((resident) => (
+                                            <MenuItem key={resident.id} value={resident.id}>
+                                                {resident.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
                                 <TextField
                                     margin="dense"
                                     name="description"
-                                    label="description"
+                                    label="package description"
                                     type="text"
                                     fullWidth
                                     variant="outlined"
@@ -291,7 +356,6 @@ export default function OverviewBody() {
                                     onChange={handleInputChange}
                                     required
                                 />
-
 
                             </Box>
                         </DialogContent>
