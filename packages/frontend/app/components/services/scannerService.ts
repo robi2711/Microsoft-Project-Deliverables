@@ -52,7 +52,19 @@ export const confirmPackage = async (packageData: PackageData, userInfo : UserIn
 		console.error("User info is not available.");
 		return false;
 	}
-
+	if(userInfo.type === "admin") {
+		const userId = await api.get<UserResponse>(`/db/userIdName`, {
+			params: {
+				name: packageData.recipientName,
+				address: packageData.flatNumber,
+				complexId: userInfo.selectedComplex,
+			}
+		});
+		await api.post(`/db/user/${userId.data.id}/package`, {
+				packageData,
+		});
+		return true;
+	}
 	interface ComplexResponse {
 		data: {
 			id: string;
