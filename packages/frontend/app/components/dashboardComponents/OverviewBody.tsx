@@ -16,7 +16,9 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, FormHelperText
+    TextField,
+    FormControl,
+    InputLabel
 } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,9 +28,6 @@ import { v4 as uuidv4 } from "uuid"; // for generating unique IDs for packages
 import api from "@/components/services/apiService";
 import React, {useEffect, useState} from "react";
 import {useUser} from "@/components/services/UserContext";
-import {signUpConcierge} from "@/components/services/authService";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
 // necessary interfaces
 interface Package {
@@ -333,8 +332,15 @@ export default function OverviewBody() {
                                     <Select
                                         labelId="resident-select-label"
                                         name="residentID"
-                                        value={formData.residentID || (editMode && selectedPackage?.residentID) || ""}
-                                        onChange={(e) => handleInputChange(e as React.ChangeEvent<HTMLInputElement>)}
+                                        value={formData.residentID || ""}
+                                        onChange={(e) => {
+                                            const selectedResident = residents.find(resident => resident.id === e.target.value);
+                                            setFormData({
+                                                ...formData,
+                                                residentID: e.target.value,
+                                                name: selectedResident ? selectedResident.name : ""
+                                            });
+                                        }}
                                         variant="outlined"
                                     >
                                         {residents.map((resident) => (
