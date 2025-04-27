@@ -142,7 +142,7 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
                 </Box>
             </Box>
             {/* resident management tab*/}
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 0, width: "100%" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, width: "100%" }}>
                 <Tab
                     label="Resident management"
                     sx={{ color: "white",
