@@ -228,7 +228,7 @@ export const addUserPackage = asyncHandler(async (req: Request, res: Response) =
 	const {resource: replacedUser} = await usersContainer
 		.item(userId, user.complexId)
 		.replace(updatedUser);
-
+	//TODO: ADD SEND MESSAGE TO USER
 	res.status(200).json({message: "Package added!", user: replacedUser});
 });
 
@@ -319,7 +319,7 @@ export const createContract = asyncHandler(async (req: Request, res: Response) =
 
 export const deleteContract = asyncHandler(async (req: Request, res: Response) => {
 	const {id} = req.params;
-	await contractContainer.item(id).delete();
+	await contractContainer.item(id,id).delete();
 	res.status(200).json({message: "Contract deleted!"});
 });
 
@@ -365,6 +365,22 @@ export const getPackagesByComplexId = asyncHandler(async (req: Request, res: Res
 	);
 
 	res.status(200).json(allPackages);
+});
+
+export const getContractsByComplexId = asyncHandler(async (req: Request, res: Response) => {
+	const {id} = req.params;
+
+	const {resources: contracts} = await contractContainer.items
+		.query<Contract>(`SELECT *
+                       FROM c
+                       WHERE c.complexId = '${id}'`)
+		.fetchAll();
+
+	if (!contracts.length) {
+		return res.status(404).json({message: "No contracts found for this complex."});
+	}
+
+	res.status(200).json(contracts);
 });
 
 
@@ -495,6 +511,7 @@ export default {
 	deleteAdmin,
 	getUsersByComplex,
 	getPackagesByComplexId,
+	getContractsByComplexId,
 	createContract,
 	getContract,
 	getContractById,

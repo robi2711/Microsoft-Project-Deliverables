@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Button, Link, useMediaQuery, useTheme, Container } from "@mui/material"
+import { Box, useMediaQuery, useTheme } from "@mui/material"
 import LeftSide from "@/components/landingComponents/LeftSide"
 import RightSide from "@/components/landingComponents/RightSide"
 
@@ -21,18 +21,6 @@ export default function LandingPage() {
                 <>
                     <LeftSide />
                     <RightSide />
-                    <Container sx={{ py: 4, display: "flex", justifyContent: "center", gap: 2 }}>
-                        <Link href="/scanner" style={{ textDecoration: "none" }}>
-                            <Button variant="contained" color="primary" fullWidth>
-                                Go to Scanner
-                            </Button>
-                        </Link>
-                        <Link href="/dashboard" style={{ textDecoration: "none" }}>
-                            <Button variant="outlined" color="primary" fullWidth>
-                                Go to Dashboard
-                            </Button>
-                        </Link>
-                    </Container>
                 </>
             ) : (
                 <>
