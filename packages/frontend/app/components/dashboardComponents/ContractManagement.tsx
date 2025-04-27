@@ -132,9 +132,9 @@ export default function ContractManagement() {
                 );
                 setRows(updatedRows);
             } else {
-                await api.post<IContract>(`/db/contract`, {...formData, complexId:complexId}).then((response) => {
-                    const newContract : IContract = {
-                        id:response.data.contract.id,
+                await api.post<{ contract: IContract }>(`/db/contract`, {...formData, complexId:complexId}).then((response) => {
+                    const newContract: IContract = {
+                        id: response.data.contract.id,
                         phone: formData.phone,
                         name: formData.name,
                         complexId: complexId,
@@ -143,7 +143,7 @@ export default function ContractManagement() {
                         scanned: false,
                         complete: false,
                         createdAt: new Date().toISOString(),
-                    }
+                    };
                     setRows([...rows, newContract]);
                     setContractCount(contractCount + 1);
                 });
@@ -196,9 +196,9 @@ export default function ContractManagement() {
 
 
     //LOADING CSV FILE
-    const fileInputRef = useRef(null); // Ref for the hidden file input
-    const loadContractsCSV = (event : any) => {
-        const file = event.target.files[0];
+    const fileInputRef = useRef<HTMLInputElement | null>(null); // Ref for the hidden file input
+    const loadContractsCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
         if (!file) return;
         const reader = new FileReader();
 
@@ -211,7 +211,7 @@ export default function ContractManagement() {
             //Get all rows from the CSV file
             const rows = lines.slice(1).map((line) => {
                 const values = line.split(",");
-                const row: any = {};
+                const row: Record<string, string> = {};
                 headers.forEach((header, index) => {
                     row[header.trim()] = values[index].trim();
                 });
@@ -365,7 +365,7 @@ address and flat number in order to provide you with the service.`
                             Manually add contract
                         </Button>
                         <Button variant="contained" startIcon={<Upload />} onClick={() => {
-                            (fileInputRef.current as any).click();
+                            fileInputRef.current?.click();
                         }}>
                             Load CSV
                         </Button>
