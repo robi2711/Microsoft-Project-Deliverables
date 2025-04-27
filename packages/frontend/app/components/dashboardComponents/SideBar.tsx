@@ -10,6 +10,8 @@ import api from "@/components/services/apiService";
 import LocalPostOfficeIcon from '@mui/icons-material/LocalPostOffice';
 // import Image from 'next/image';
 
+import MiniMap from "@/components/dashboardComponents/MapSideBar";
+
 {/* We need arguments relating to active tabs so we can highlight the active */}
 interface SideBarProps {
     setActiveTab: (tab: string) => void;
@@ -131,6 +133,14 @@ export default function SideBar({ setActiveTab, activeTab }: SideBarProps) {
                 />
             </Box>
 
+            {/* google maps window */}
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, width: "100%" }}>
+                <Box sx={{ width: "80%", height: "100px", bgcolor: "white"}}>
+                    {userInfo?.selectedComplexName && (
+                        <MiniMap address={userInfo.selectedComplexName} />
+                    )}
+                </Box>
+            </Box>
             {/* resident management tab*/}
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 0, width: "100%" }}>
                 <Tab
