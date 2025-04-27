@@ -30,7 +30,6 @@ const authController: IUserController = {
                     complexId: req.body.complexId,
                     createdAt: new Date().toISOString(),
                 };
-                console.log(req.body.complexId)
                 await adminsContainer.items.create(admin);
                 const { resource: existingComplex } = await complexesContainer.item(req.body.complexId, req.body.complexId).read<Complex>();
                 if (!existingComplex) {
@@ -53,11 +52,9 @@ const authController: IUserController = {
     signInConcierge: async (req: CustomRequest, res: Response) => {
         const Email = req.body.credentials;
         const Password = req.body.password;
-        console.log(req.body);
         try {
             const response = await signInConcierge(Email, Password);
 
-            console.log(response);
             res.send(response);
         } catch (error) {
             res.status(500).send('Error signing in user');
@@ -107,11 +104,10 @@ const authController: IUserController = {
     signInAdmin: async (req: CustomRequest, res: Response) => {
         const Email = req.body.credentials.email;
         const Password = req.body.password
-        console.log(req.body);
         try {
             const response = await signInAdmin(Email, Password);
             if(response && typeof response === "object" && response.sub !== undefined) {
-                console.log(await adminsContainer.item(response.sub, "").read<IAdmin>());
+                await adminsContainer.item(response.sub, "").read<IAdmin>();
                 const { resource: admin } = await adminsContainer.item(response.sub, response.sub).read<IAdmin>();
                 const complexIds = admin?.complexIds;
 
