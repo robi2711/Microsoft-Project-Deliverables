@@ -15,8 +15,6 @@ import {
     Checkbox,
     FormControlLabel
 } from "@mui/material";
-import PersonIcon from '@mui/icons-material/Person';
-import WarehouseIcon from '@mui/icons-material/Warehouse';
 import api from "@/components/services/apiService";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
