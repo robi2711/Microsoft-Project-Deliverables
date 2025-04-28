@@ -22,7 +22,8 @@ import api from "@/components/services/apiService";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {useUser} from "@/components/services/UserContext"; // for retrieving resident data from the backend
+import { useUser } from "@/components/services/UserContext";  // for retrieving resident data from the backend
+import { v4 as uuidv4 } from "uuid";
 
 interface IUser {
     id: string;
@@ -52,13 +53,12 @@ const columns: GridColDef[] = [
 ];
 
 export default function ResidentManagementBody() {
-    const [selectionModel, setSelectionModel] = useState<string[]>([])
-    const [rows, setRows] = useState<IUser[]>([]); // starts as an empty array of IUser objects
-    const [residentCount, setResidentCount] = useState<number>(0); // For summary statistics at the top of the page
-    {/* TODO: improve this logic - show be active packages count, not just packages */ }
-    const [residentsWithPackagesCount, setResidentsWithPackagesCount] = useState<number>(0); // For summary statistics at the top of the page
+    const [selectionModel, setSelectionModel] = useState<string[]>([]);
+    const [rows, setRows] = useState<IUser[]>([]);
+    const [residentCount, setResidentCount] = useState<number>(0);
+    const [residentsWithPackagesCount, setResidentsWithPackagesCount] = useState<number>(0);
     const [openDialog, setOpenDialog] = useState(false);
-    const [refreshKey, setRefreshKey] = useState(0);
+    const [editMode, setEditMode] = useState(false);
     const { userInfo } = useUser();
     const [formData, setFormData] = useState({
         name: "",
@@ -69,7 +69,48 @@ export default function ResidentManagementBody() {
 
     const complexId = userInfo?.selectedComplex || "";
 
-    const handleOpenDialog = () => {
+    useEffect(() => {
+        const fetchResidents = async () => {
+            try {
+                const response = await api.get<IUser[]>(`/db/complex/${complexId}/residents`);
+                const residents: IUser[] = response.data || [];
+                setRows(residents);
+                setResidentCount(residents.length);
+                setResidentsWithPackagesCount(residents.filter(resident => resident.packages?.length > 0).length);
+            } catch (error) {
+                console.error("Error fetching residents:", error);
+            }
+        };
+
+        fetchResidents();
+    }, [complexId]);
+
+    const handleOpenDialog = (mode: "add" | "edit") => {
+        if (mode === "edit") {
+            if (selectionModel.length !== 1) {
+                alert("Please select exactly one resident to edit");
+                return;
+            }
+
+            const residentToEdit = rows.find((row) => row.id === selectionModel[0]);
+            if (residentToEdit) {
+                setFormData({
+                    name: residentToEdit.name,
+                    unitNumber: residentToEdit.unitNumber,
+                    phone: residentToEdit.phone,
+                    email: residentToEdit.email,
+                });
+                setEditMode(true);
+            }
+        } else {
+            setFormData({
+                name: "",
+                unitNumber: "",
+                phone: "",
+                email: "",
+            });
+            setEditMode(false);
+        }
         setOpenDialog(true);
     };
 
@@ -84,64 +125,74 @@ export default function ResidentManagementBody() {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleSubmit = async () => {
-
         try {
-            // create an IUser object TODO: take complexId from the sidebar
-            const newResident = {
-                ...formData,
-                complexId: complexId, // TODO: take complexId from the sidebar
-                packages: []
+            if (editMode && selectionModel.length === 1) {
+                const updatedResident: IUser = {
+                    ...formData,
+                    id: selectionModel[0],
+                    complexId: complexId,
+                    packages: rows.find((row) => row.id === selectionModel[0])?.packages || [],
+                    createdAt: rows.find((row) => row.id === selectionModel[0])?.createdAt || new Date().toISOString(), // If it cannot find previous created at date, it'll now serve as a 'last edited' date.
+                };
+
+                const updatedRows = rows.map((row) =>
+                    row.id === selectionModel[0] ? updatedResident : row
+                );
+                setRows(updatedRows);
+
+                // TODO: Check api call
+                // await api.put(`/db/user/${selectionModel[0]}`, updatedResident);
+
+            } else {
+                const newResident: IUser = {
+                    ...formData,
+                    id: uuidv4(),
+                    complexId: complexId,
+                    packages: [], // Default value for packages
+                    createdAt: new Date().toISOString(), // Set createdAt to the current timestamp
+                };
+
+                setRows([...rows, newResident]);
+                // TODO: Check api call
+                // await api.post("/db/user", newResident);
             }
-            console.log(newResident)
-            await api.post("/db/user", newResident);
-            alert("Resident added successfully!");
-            handleCloseDialog();
-            setRefreshKey(prevKey => prevKey + 1);
+
+            setOpenDialog(false);
         } catch (error) {
-            console.error("Error adding resident:", error);
-            alert("Failed to add resident. Please try again.");
+            console.error("Error saving resident:", error);
+            alert("Failed to save resident. Please try again.");
         }
     };
 
     const handleDelete = async () => {
         if (selectionModel.length === 0) {
-            alert("Please select at least one resident to delete")
-            return
+            alert("Please select at least one resident to delete");
+            return;
         }
 
+        if (confirm(`Are you sure you want to delete ${selectionModel.length} resident(s)?`)) {
             try {
+                const remainingRows = rows.filter((row) => !selectionModel.includes(row.id));
+                setRows(remainingRows);
 
-                //await api.delete(`/db/user/${residentId}`)
+                for (const id of selectionModel) {
+                    console.log(id);
+                    // TODO: Check api call
+                    //await api.delete(`/db/user/${id}`);
+                }
 
+                setSelectionModel([]);
             } catch (error) {
-                console.error("Error deleting residents:", error)
-                alert("Failed to delete residents. Please try again.")
+                console.error("Error deleting residents:", error);
+                alert("Failed to delete residents. Please try again.");
             }
-    }
-
-    useEffect(() => {
-        // Function to fetch residents from the backend
-        const fetchResidents = async () => {
-            try {
-                const complexId = userInfo?.selectedComplex || "";
-                const response = await api.get<IUser[]>(`/db/complex/${complexId}/residents`);
-
-                const residents: IUser[] = response.data || []; // Ensure residents is an array
-                setRows(residents);
-                setResidentCount(residents.length);
-                setResidentsWithPackagesCount(residents.filter(resident => resident.packages?.length > 0).length);
-            } catch (error) {
-                console.error("Error fetching residents:", error);
-            }
-        };
-
-        fetchResidents();
-    }, [complexId, refreshKey]);
+        }
+    };
 
     return (
         <Box
@@ -206,14 +257,14 @@ export default function ResidentManagementBody() {
             <Box sx={{ display: "flex", height: "70%" }}>
                 <Paper elevation={3} sx={{ width: "96%", p: 2}}>
                     <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
-                        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenDialog} >
+                        <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog("add")}>
                             Manually add resident
                         </Button>
                         <Button
                             variant="outlined"
                             startIcon={<EditIcon />}
-                            //onClick={() => handleOpenDialog("edit")}
-
+                            onClick={() => handleOpenDialog("edit")}
+                            disabled={selectionModel.length !== 1}
                         >
                             Edit
                         </Button>
@@ -222,6 +273,7 @@ export default function ResidentManagementBody() {
                             color="error"
                             startIcon={<DeleteIcon />}
                             onClick={handleDelete}
+                            disabled={selectionModel.length === 0}
                         >
                             Delete
                         </Button>
@@ -232,41 +284,31 @@ export default function ResidentManagementBody() {
                         columns={columns}
                         checkboxSelection
                         onRowSelectionModelChange={(newSelectionModel) => {
-                            setSelectionModel(newSelectionModel as string[])
+                            setSelectionModel(newSelectionModel as string[]);
                         }}
                         rowSelectionModel={selectionModel}
                         sx={{ border: 0 }}
                     />
 
-                    {/* Dialog for manually adding residents */}
                     <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-                        <DialogTitle>Add New Resident</DialogTitle>
-
+                        <DialogTitle>{editMode ? "Edit Resident" : "Add New Resident"}</DialogTitle>
                         <DialogContent>
                             <Box component="form">
-
-                                { /*
-                                name - used to identify the field when handling input changes.
-                                label - the label displayed for the input field.
-                                type - the type of input (text, email, etc.).
-                                value - the current value of the input field, controlled by state.
-                                */}
                                 <TextField
                                     margin="dense"
                                     name="name"
-                                    label="name"
-                                    type="name"
+                                    label="Name"
+                                    type="text"
                                     fullWidth
                                     variant="outlined"
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     required
                                 />
-
                                 <TextField
                                     margin="dense"
                                     name="unitNumber"
-                                    label="unit number"
+                                    label="Unit Number"
                                     type="text"
                                     fullWidth
                                     variant="outlined"
@@ -274,11 +316,10 @@ export default function ResidentManagementBody() {
                                     onChange={handleInputChange}
                                     required
                                 />
-
                                 <TextField
                                     margin="dense"
                                     name="phone"
-                                    label="phone number"
+                                    label="Phone Number"
                                     type="tel"
                                     fullWidth
                                     variant="outlined"
@@ -286,11 +327,10 @@ export default function ResidentManagementBody() {
                                     onChange={handleInputChange}
                                     required
                                 />
-
                                 <TextField
                                     margin="dense"
                                     name="email"
-                                    label="email"
+                                    label="Email"
                                     type="email"
                                     fullWidth
                                     variant="outlined"
@@ -298,17 +338,15 @@ export default function ResidentManagementBody() {
                                     onChange={handleInputChange}
                                     required
                                 />
-
                             </Box>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleCloseDialog}>Cancel</Button>
                             <Button onClick={handleSubmit} variant="contained">
-                                Add
+                                {editMode ? "Save" : "Add"}
                             </Button>
                         </DialogActions>
                     </Dialog>
-
                 </Paper>
             </Box>
         </Box>

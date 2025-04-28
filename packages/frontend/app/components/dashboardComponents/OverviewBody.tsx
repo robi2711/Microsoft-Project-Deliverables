@@ -16,7 +16,9 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    TextField, FormControl, InputLabel
+    TextField,
+    FormControl,
+    InputLabel
 } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import AddIcon from '@mui/icons-material/Add';
@@ -44,9 +46,12 @@ export interface IUser {
 
 // The columns define the structure of the data table - fields should match the Package type TODO: add time delivered
 const columns: GridColDef[] = [
-    { field: 'name', headerName: 'Resident name', width: 150 },
-    { field: 'description', headerName: 'Description', width: 500 },
-    { field: 'delivered', headerName: 'Collection Status', width: 150 }
+    { field: 'id', headerName: 'ID', width: 100 },
+    { field: 'recipientName', headerName: 'Resident name', width: 150 },
+    { field: 'flatNumber', headerName: 'Flat number', width: 150 },
+    { field: 'carrier', headerName: 'Carrier', width: 150 },
+    { field: 'timeStamp', headerName: 'Delivery time', width: 150 },
+    { field: 'collected', headerName: 'Collection status', width: 150 },
 ];
 
 
@@ -69,13 +74,12 @@ export default function OverviewBody() {
         residentID: ""
     });
 
-    const complexId = userInfo?.selectedComplex
+    const complexId = userInfo?.selectedComplex || "";
 
     useEffect(() => {
         // Function to fetch packages from the backend
         const fetchPackages = async () => {
             try {
-                const complexId = userInfo?.selectedComplex || "";
                 const response = await api.get<Package[]>(`/db/complex/${complexId}/packages`);
 
                 const packages: Package[] = response.data;
@@ -164,7 +168,8 @@ export default function OverviewBody() {
                 setRows(updatedRows);
 
                 // Update package via API
-                await api.put(`/package/${selectedPackage.id}`, updatedPackage);
+                // TODO: Check api call
+                // await api.put(`/package/${selectedPackage.id}`, updatedPackage);
             } else {
                 const newPackage = {
                     id: uuidv4(),
@@ -176,6 +181,7 @@ export default function OverviewBody() {
                 setRows([...rows, newPackage]);
 
                 // Add package via API
+                // TODO: Check api call
                 // await api.post(`/package`, newPackage);
             }
 
@@ -199,7 +205,9 @@ export default function OverviewBody() {
 
                 // Delete packages via API
                 for (const id of selectionModel) {
-                    await api.delete(`/package/${id}`);
+                    console.log(id);
+                    // TODO: Check api call
+                    // await api.delete(`/package/${id}`);
                 }
 
                 setSelectionModel([]);
@@ -331,8 +339,15 @@ export default function OverviewBody() {
                                     <Select
                                         labelId="resident-select-label"
                                         name="residentID"
-                                        value={formData.residentID || (editMode && selectedPackage?.residentID) || ""}
-                                        onChange={(e) => handleInputChange(e as React.ChangeEvent<HTMLInputElement>)}
+                                        value={formData.residentID || ""}
+                                        onChange={(e) => {
+                                            const selectedResident = residents.find(resident => resident.id === e.target.value);
+                                            setFormData({
+                                                ...formData,
+                                                residentID: e.target.value,
+                                                name: selectedResident ? selectedResident.name : ""
+                                            });
+                                        }}
                                         variant="outlined"
                                     >
                                         {residents.map((resident) => (

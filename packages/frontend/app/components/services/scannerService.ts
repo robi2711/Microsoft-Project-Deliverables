@@ -63,6 +63,7 @@ export const confirmPackage = async (packageData: PackageData, userInfo : UserIn
 		await api.post(`/db/user/${userId.data.id}/package`, {
 				packageData,
 		});
+
 		return true;
 	}
 	interface ComplexResponse {
@@ -72,6 +73,7 @@ export const confirmPackage = async (packageData: PackageData, userInfo : UserIn
 	}
 	interface UserResponse {
 		id: string;
+		phone: string;
 	}
 	const complex = await api.get<ComplexResponse>(`/db/concierge/${userInfo.sub}/complexes`, {});
 	if (!complex) {
