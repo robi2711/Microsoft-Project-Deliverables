@@ -443,7 +443,7 @@ export const getUserIdByName = asyncHandler(async (req: Request, res: Response) 
 	// If multiple users are found and address is provided, filter by address
 	if (users.length > 1 && address && typeof address === "string") {
 		const normalizedAddress = address.replace(/-/g, " ").toLowerCase();
-		const filteredUsers = users.filter(user => user.unitNumber.toLowerCase() === normalizedAddress);
+		const filteredUsers = users.filter(user => user.unitNumber && user.unitNumber.toLowerCase() === normalizedAddress);
 
 		if (!filteredUsers.length) {
 			return res.status(404).json({ message: "No user found with the provided name and address." });
