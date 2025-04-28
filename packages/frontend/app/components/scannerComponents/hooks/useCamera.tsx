@@ -115,7 +115,6 @@ export const useCamera = ({
 	}
 
 	// Switch camera between front and back
-	//TODO: This is not working
 	const toggleCamera = () => {
 		setFacingMode((prevMode) => (prevMode === "user" ? "environment" : "user"))
 	}
