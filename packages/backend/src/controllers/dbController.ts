@@ -3,6 +3,10 @@ import {v4 as uuidv4} from "uuid";
 import {adminsContainer, complexesContainer, contractContainer, usersContainer} from "@/config/cosmosConfig";
 import {Complex, Contract, IAdmin, IUser} from "@/types/dbTypes"; // ✅ Correct interface imports
 import {asyncHandler} from "@/helpers/dbHelper";
+import dotenv from "dotenv";
+
+dotenv.config();
+const BACKEND_URL = process.env.BACKEND_URL;
 
 const handleError = (res: Response, error: any, message: string) => {
 	console.error(message, error);
@@ -228,7 +232,20 @@ export const addUserPackage = asyncHandler(async (req: Request, res: Response) =
 	const {resource: replacedUser} = await usersContainer
 		.item(userId, user.complexId)
 		.replace(updatedUser);
-	//TODO: ADD SEND MESSAGE TO USER
+
+	// Send WhatsApp notification to the target user
+	await fetch(`${BACKEND_URL}/whatsapp/send`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			telephone: 'whatsapp:' + user.phone,
+			name: newPackage.recipientName,
+			packages: newPackage.carrier, // Tracking number for now, no way to know what package is yet
+		}),
+	});
+	
 	res.status(200).json({message: "Package added!", user: replacedUser});
 });
 

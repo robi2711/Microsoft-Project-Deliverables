@@ -64,13 +64,6 @@ export const confirmPackage = async (packageData: PackageData, userInfo : UserIn
 				packageData,
 		});
 
-		// Send WhatsApp notification to the target user
-		await api.post(`/whatsapp/send`, {
-			telephone: 'whatsapp:'+userId.data.phone,
-			name: packageData.recipientName,
-			packages: packageData.carrier //Tracking number for now, no way to know what package is yet
-		})
-
 		return true;
 	}
 	interface ComplexResponse {
