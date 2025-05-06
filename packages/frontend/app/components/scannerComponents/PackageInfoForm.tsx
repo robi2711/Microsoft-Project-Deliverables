@@ -151,7 +151,7 @@ export const PackageInfoForm: React.FC<PackageInfoFormProps> = ({
 					<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
 						<Box>
 							<Typography variant="subtitle2" color="text.secondary">
-								Tracking Number
+								Post Code
 							</Typography>
 							<Typography variant="body1">{packageData.trackingNumber || "N/A"}</Typography>
 						</Box>
@@ -172,7 +172,7 @@ export const PackageInfoForm: React.FC<PackageInfoFormProps> = ({
 
 						<Box>
 							<Typography variant="subtitle2" color="text.secondary">
-								Carrier
+								Street
 							</Typography>
 							<Typography variant="body1">{packageData.carrier || "N/A"}</Typography>
 						</Box>

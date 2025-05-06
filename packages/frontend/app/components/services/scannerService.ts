@@ -39,14 +39,14 @@ export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
 		if (extracted?.name) {
 			output.recipientName = extracted.name;
 		}
-		if (extracted?.street) {
-			output.flatNumber = extracted.street;
+		if (extracted?.flat_number) {
+			output.flatNumber = extracted.flat_number;
 		}
 		if (extracted?.postal_code) {
 			output.trackingNumber = extracted.postal_code;
 		}
 		if (extracted?.street) {
-			output.carrier = "Unknown Carrier";
+			output.carrier = extracted.street;
 		}
 
 	} catch (error) {
