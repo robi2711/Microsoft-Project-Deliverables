@@ -1,6 +1,5 @@
 import api from "./apiService";
-import {UserInfo} from "@/components/services/UserContext";
-
+import { UserInfo } from "@/components/services/UserContext";
 
 export interface PackageData {
 	trackingNumber: string;
@@ -10,8 +9,14 @@ export interface PackageData {
 }
 
 interface OcrResponseData {
-	name: string;
-	address: string;
+	extracted: {
+		name: string | null;
+		street: string | null;
+		flat_number: string | null;
+		country: string | null;
+		postal_code: string | null;
+	};
+	allLines: string[];
 }
 
 export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
@@ -25,13 +30,16 @@ export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
 				'Content-Type': 'multipart/form-data',
 			},
 		});
-		if((response.data as OcrResponseData)?.address && (response.data as OcrResponseData)?.name){
+
+		const extracted = (response.data as OcrResponseData)?.extracted;
+
+		if (extracted?.name && extracted?.flat_number) {
 			return {
 				trackingNumber: "WE DONT KNOW YET",
-				recipientName: (response.data as OcrResponseData).name,
-				flatNumber: (response.data as OcrResponseData).address,
+				recipientName: extracted.name,
+				flatNumber: extracted.flat_number,
 				carrier: "UPS",
-			} as PackageData;
+			};
 		}
 
 	} catch (error) {
@@ -43,16 +51,16 @@ export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
 		recipientName: "Not Found",
 		flatNumber: "Not Found",
 		carrier: "Not Found",
-	} as PackageData;
+	};
 };
 
-export const confirmPackage = async (packageData: PackageData, userInfo : UserInfo): Promise<boolean> => {
-
+export const confirmPackage = async (packageData: PackageData, userInfo: UserInfo): Promise<boolean> => {
 	if (!userInfo) {
 		console.error("User info is not available.");
 		return false;
 	}
-	if(userInfo.type === "admin") {
+
+	if (userInfo.type === "admin") {
 		const userId = await api.get<UserResponse>(`/db/userIdName`, {
 			params: {
 				name: packageData.recipientName,
@@ -61,26 +69,29 @@ export const confirmPackage = async (packageData: PackageData, userInfo : UserIn
 			}
 		});
 		await api.post(`/db/user/${userId.data.id}/package`, {
-				packageData,
+			packageData,
 		});
-
 		return true;
 	}
+
 	interface ComplexResponse {
 		data: {
 			id: string;
 		}[];
 	}
+
 	interface UserResponse {
 		id: string;
 		phone: string;
 	}
+
 	const complex = await api.get<ComplexResponse>(`/db/concierge/${userInfo.sub}/complexes`, {});
 	if (!complex) {
 		console.error("Complex not found.");
 		return false;
 	}
 	const complexId = Array.isArray(complex.data) && complex.data.length > 0 ? complex.data[0].id : null;
+
 	const userId = await api.get<UserResponse>(`/db/userIdName`, {
 		params: {
 			name: packageData.recipientName,
@@ -93,4 +104,4 @@ export const confirmPackage = async (packageData: PackageData, userInfo : UserIn
 	});
 
 	return true;
-} 
+}
