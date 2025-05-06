@@ -20,38 +20,40 @@ interface OcrResponseData {
 }
 
 export const scanPackage = async (imageSrc: string): Promise<PackageData> => {
+	const output = {
+		trackingNumber: "Not Found",
+		recipientName: "Not Found",
+		flatNumber: "Not Found",
+		carrier: "Not Found"
+	} as PackageData;
 	try {
 		const blob = await fetch(imageSrc).then(res => res.blob());
 		const formData = new FormData();
 		formData.append('image', blob, 'image.jpg');
-
 		const response = await api.post("/ocr/", formData, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
 		});
-
 		const extracted = (response.data as OcrResponseData)?.extracted;
-
-		if (extracted?.name && extracted?.flat_number) {
-			return {
-				trackingNumber: "WE DONT KNOW YET",
-				recipientName: extracted.name,
-				flatNumber: extracted.flat_number,
-				carrier: "UPS",
-			};
+		if (extracted?.name) {
+			output.recipientName = extracted.name;
+		}
+		if (extracted?.street) {
+			output.flatNumber = extracted.street;
+		}
+		if (extracted?.postal_code) {
+			output.trackingNumber = extracted.postal_code;
+		}
+		if (extracted?.street) {
+			output.carrier = "Unknown Carrier";
 		}
 
 	} catch (error) {
 		console.error("Error Message:", error);
 	}
 
-	return {
-		trackingNumber: "Not Found",
-		recipientName: "Not Found",
-		flatNumber: "Not Found",
-		carrier: "Not Found",
-	};
+	return output;
 };
 
 export const confirmPackage = async (packageData: PackageData, userInfo: UserInfo): Promise<boolean> => {
